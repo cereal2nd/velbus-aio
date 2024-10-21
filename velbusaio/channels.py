@@ -19,7 +19,7 @@ from velbusaio.const import (
     VOLUME_LITERS_HOUR,
 )
 from velbusaio.message import Message
-from velbusaio.messages.edge_set_color import SetEdgeColorMessage, CustomColorPriority
+from velbusaio.messages.edge_set_color import CustomColorPriority, SetEdgeColorMessage
 from velbusaio.messages.module_status import PROGRAM_SELECTION
 
 if TYPE_CHECKING:
@@ -508,7 +508,7 @@ class Temperature(Channel):
     _min = None
     _target = 0
     _cmode = None
-    _coolmode = None
+    _cool_mode = None
     _cstatus = None
     _thermostat = False
     _sleep_timer = 0

@@ -5,29 +5,28 @@ Velbus packet handler
 
 from __future__ import annotations
 
-from velbusaio.const import SCAN_MODULETYPE_TIMEOUT
-from velbusaio.const import SCAN_MODULEINFO_TIMEOUT_INITIAL
-from velbusaio.const import SCAN_MODULEINFO_TIMEOUT_INTERVAL
-
 import asyncio
 import json
 import logging
-import threading
 import os
 import pathlib
+import threading
+from typing import TYPE_CHECKING, Awaitable, Callable
 
+import pkg_resources
 from aiofile import async_open
 
-from typing import TYPE_CHECKING, Awaitable, Callable
-import pkg_resources
-
 from velbusaio.command_registry import commandRegistry
+from velbusaio.const import (
+    SCAN_MODULEINFO_TIMEOUT_INITIAL,
+    SCAN_MODULEINFO_TIMEOUT_INTERVAL,
+    SCAN_MODULETYPE_TIMEOUT,
+)
 from velbusaio.helpers import h2, keys_exists
 from velbusaio.message import Message
 from velbusaio.messages.module_subtype import ModuleSubTypeMessage
-from velbusaio.messages.module_type import ModuleTypeMessage, ModuleType2Message
+from velbusaio.messages.module_type import ModuleType2Message, ModuleTypeMessage
 from velbusaio.raw_message import RawMessage
-
 
 if TYPE_CHECKING:
     from velbusaio.controller import Velbus
@@ -121,14 +120,16 @@ class PacketHandler:
                             SCAN_MODULEINFO_TIMEOUT_INITIAL / 1000.0,
                         )
                         self._scan_delay_msec = SCAN_MODULEINFO_TIMEOUT_INITIAL
-                        while self._scan_delay_msec > 50 and not module.is_loaded():
+                        while (
+                            self._scan_delay_msec > 50 and not await module.is_loaded()
+                        ):
                             # self._log.debug(
                             #    f"\t... waiting {self._scan_delay_msec} is_loaded={module.is_loaded()}"
                             # )
                             self._scan_delay_msec = self._scan_delay_msec - 50
                             await asyncio.sleep(0.05)
                         self._log.info(
-                            f"Scan module {address} completed, module loaded={module.is_loaded()}"
+                            f"Scan module {address} completed, module loaded={await module.is_loaded()}"
                         )
                     except asyncio.TimeoutError:
                         self._log.error(

@@ -1,7 +1,7 @@
 import logging
+from unittest.mock import MagicMock
 
 import pytest
-from unittest.mock import MagicMock
 
 from velbusaio.handler import PacketHandler
 from velbusaio.messages.memory_data import MemoryDataMessage

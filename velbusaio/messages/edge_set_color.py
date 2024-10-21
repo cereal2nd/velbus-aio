@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+
 from velbusaio.command_registry import register
 from velbusaio.message import Message
 

@@ -1,9 +1,10 @@
-import pytest
 from unittest.mock import MagicMock
 
-from velbusaio.module import Module, VmbDali
+import pytest
+
 from velbusaio.handler import PacketHandler
 from velbusaio.helpers import h2
+from velbusaio.module import Module, VmbDali
 
 
 class MockWriter:

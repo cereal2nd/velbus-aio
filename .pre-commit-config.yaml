@@ -43,7 +43,6 @@ repos:
     rev: 5.13.2
     hooks:
       - id: isort
-        stages: [manual]
         args: ["--profile", "black"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0 # Use the ref you want to point at
@@ -67,13 +66,19 @@ repos:
   - repo: https://github.com/cdce8p/python-typing-update
     rev: v0.7.0
     hooks:
-      # Run `python-typing-update` hook manually from time to time
-      # to update python typing syntax.
-      # Will require manual work, before submitting changes!
       - id: python-typing-update
         stages: [manual]
         args:
           - --py38-plus
           - --force
-          - --black
           - --keep-updates
+  - repo: local
+    hooks:
+      - id: pytest
+        stages: [manual]
+        name: pytest
+        entry: pytest tests
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true

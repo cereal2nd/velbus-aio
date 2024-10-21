@@ -4,9 +4,9 @@ is correctly stored into the module.
 """
 
 import pathlib
+from unittest.mock import MagicMock
 
 import pytest
-from unittest.mock import MagicMock
 
 from velbusaio.channels import Channel, LightSensor, SelectedProgram
 from velbusaio.const import (

@@ -4,13 +4,15 @@ This represents a velbus module
 
 from __future__ import annotations
 
+import json
 import logging
+import os
 import pathlib
 import struct
 import sys
-import json
-import os
 from typing import Awaitable, Callable
+
+from aiofile import async_open
 
 from velbusaio.channels import (
     Blind,
@@ -25,9 +27,10 @@ from velbusaio.channels import (
     SelectedProgram,
     Sensor,
     SensorNumber,
-    Temperature,
-    ThermostatChannel,
 )
+from velbusaio.channels import Temperature
+from velbusaio.channels import Temperature as TemperatureChannelType
+from velbusaio.channels import ThermostatChannel
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
     CHANNEL_LIGHT_VALUE,
@@ -37,7 +40,6 @@ from velbusaio.const import (
 )
 from velbusaio.helpers import handle_match, keys_exists
 from velbusaio.message import Message
-from velbusaio.messages.dali_device_settings import DaliDeviceSettingMsg
 from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage
 from velbusaio.messages.channel_name_part1 import (
     ChannelNamePart1Message,
@@ -61,6 +63,7 @@ from velbusaio.messages.channel_name_request import ChannelNameRequestMessage
 from velbusaio.messages.clear_led import ClearLedMessage
 from velbusaio.messages.counter_status import CounterStatusMessage
 from velbusaio.messages.counter_status_request import CounterStatusRequestMessage
+from velbusaio.messages.dali_device_settings import DaliDeviceSettingMsg
 from velbusaio.messages.dali_device_settings import DeviceType as DaliDeviceType
 from velbusaio.messages.dali_device_settings import DeviceTypeMsg as DaliDeviceTypeMsg
 from velbusaio.messages.dali_device_settings import MemberOfGroupMsg
@@ -73,7 +76,6 @@ from velbusaio.messages.dimmer_channel_status import DimmerChannelStatusMessage
 from velbusaio.messages.dimmer_status import DimmerStatusMessage
 from velbusaio.messages.fast_blinking_led import FastBlinkingLedMessage
 from velbusaio.messages.memory_data import MemoryDataMessage
-from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
 from velbusaio.messages.module_status import (
     ModuleStatusGP4PirMessage,
     ModuleStatusMessage,
@@ -82,6 +84,7 @@ from velbusaio.messages.module_status import (
 )
 from velbusaio.messages.module_status_request import ModuleStatusRequestMessage
 from velbusaio.messages.push_button_status import PushButtonStatusMessage
+from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
 from velbusaio.messages.relay_status import RelayStatusMessage, RelayStatusMessage2
 from velbusaio.messages.sensor_temperature import SensorTemperatureMessage
@@ -90,7 +93,6 @@ from velbusaio.messages.slider_status import SliderStatusMessage
 from velbusaio.messages.slow_blinking_led import SlowBlinkingLedMessage
 from velbusaio.messages.temp_sensor_status import TempSensorStatusMessage
 from velbusaio.messages.update_led_status import UpdateLedStatusMessage
-from velbusaio.channels import Temperature as TemperatureChannelType
 
 
 class Module:
@@ -188,9 +190,9 @@ class Module:
                     ):
                         del self._channels[i]
 
-    def _cache(self) -> None:
+    async def _cache(self) -> None:
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
-        with cfile.open("w") as fl:
+        with open(cfile, "w") as fl:
             json.dump(self.to_cache(), fl, indent=4)
 
     def __getstate__(self) -> dict:
@@ -268,7 +270,7 @@ class Module:
             ),
         ):
             self._process_channel_name_message(1, message)
-            self._cache()
+            await self._cache()
         elif isinstance(
             message,
             (
@@ -278,7 +280,7 @@ class Module:
             ),
         ):
             self._process_channel_name_message(2, message)
-            self._cache()
+            await self._cache()
         elif isinstance(
             message,
             (
@@ -288,7 +290,7 @@ class Module:
             ),
         ):
             self._process_channel_name_message(3, message)
-            self._cache()
+            await self._cache()
         elif isinstance(message, MemoryDataMessage):
             await self._process_memory_data_message(message)
         elif isinstance(message, (RelayStatusMessage, RelayStatusMessage2)):
@@ -537,12 +539,12 @@ class Module:
         # see if we have a cache
         try:
             cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
-            with cfile.open("r") as fl:
-                cache = json.load(fl)
+            async with async_open(cfile, "r") as fl:
+                cache = json.loads(await fl.read())
         except OSError:
             cache = {}
         # load default channels
-        await self.__load_default_channels()
+        await self._load_default_channels()
 
         # load the data from memory ( the stuff that we need)
         if "name" in cache and cache["name"] != "":
@@ -644,7 +646,7 @@ class Module:
             )
         return int(channel)
 
-    def is_loaded(self) -> bool:
+    async def is_loaded(self) -> bool:
         """
         Check if all name messages have been received
         """
@@ -662,7 +664,7 @@ class Module:
                 return False
         # set that  we finished the module loading
         self.loaded = True
-        self._cache()
+        await self._cache()
         return True
 
     async def _request_module_status(self) -> None:
@@ -726,7 +728,7 @@ class Module:
                     msg.low_address = addr[1]
                     await self._writer(msg)
 
-    async def __load_default_channels(self) -> None:
+    async def _load_default_channels(self) -> None:
         if "Channels" not in self._data:
             return
 
@@ -773,8 +775,8 @@ class VmbDali(Module):
         self.group_members: dict[int, set[int]] = {}
 
     async def _load_default_channels(self) -> None:
-        await super().load()
         for chan in range(1, 64 + 1):
+            print(chan)
             self._channels[chan] = Channel(
                 self, chan, "placeholder", True, self._writer, self._address
             )
@@ -856,7 +858,7 @@ class VmbDali(Module):
         else:
             return await super().on_message(message)
 
-        self._cache()
+        await self._cache()
 
     async def _request_channel_name(self) -> None:
         # Channel names are requested after channel scan
