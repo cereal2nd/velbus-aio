@@ -103,7 +103,6 @@ class Module:
         cls,
         module_address: int,
         module_type: int,
-        module_data: dict,
         serial: int | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
@@ -114,7 +113,6 @@ class Module:
             return VmbDali(
                 module_address,
                 module_type,
-                module_data,
                 serial,
                 memorymap,
                 build_year,
@@ -125,7 +123,6 @@ class Module:
         return Module(
             module_address,
             module_type,
-            module_data,
             serial,
             memorymap,
             build_year,
@@ -137,7 +134,6 @@ class Module:
         self,
         module_address: int,
         module_type: int,
-        module_data: dict,
         serial: int | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
@@ -146,7 +142,7 @@ class Module:
     ) -> None:
         self._address = module_address
         self._type = module_type
-        self._data = module_data
+        self._data = {}
 
         self._name = {}
         self._sub_address = {}
@@ -161,6 +157,13 @@ class Module:
 
     def initialize(self, writer: Callable[[Message], Awaitable[None]]) -> None:
         self._log = logging.getLogger("velbus-module")
+        # laod the protocol data
+        async with async_open(
+            pkg_resources.resource_filename(__name__, f"module_spec/{self._type}.json")
+        ) as protocol_file:
+            self._data = json.loads(await protocol_file.read())
+
+        # set some params from the velbus controller
         self._writer = writer
         for chan in self._channels.values():
             chan._writer = writer

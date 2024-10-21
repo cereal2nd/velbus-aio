@@ -53,9 +53,9 @@ class PacketHandler:
 
     async def read_protocol_data(self):
         async with async_open(
-            pkg_resources.resource_filename(__name__, "protocol.json")
+            pkg_resources.resource_filename(__name__, "module_spec/broadcast.json")
         ) as protocol_file:
-            self.pdata = json.loads(await protocol_file.read())
+            self.broadcast = json.loads(await protocol_file.read())
 
     def empty_cache(self) -> bool:
         if (
@@ -185,10 +185,10 @@ class PacketHandler:
                     self._handle_module_subtype(msg)
 
         # ignore broadcast
-        elif command_value in self.pdata["MessagesBroadCast"]:
+        elif command_value in self.broadcast:
             self._log.debug(
                 "Received broadcast message {} from {}, ignoring".format(
-                    self.pdata["MessageBroadCast"][str(command_value).upper()], address
+                    self.broadcast[str(command_value).upper()], address
                 )
             )
 
@@ -228,14 +228,13 @@ class PacketHandler:
         if msg is not None:
             module = self._velbus.get_module(msg.address)
             if module is None:
-                data = keys_exists(self.pdata, "ModuleTypes", h2(msg.module_type))
+                #data = keys_exists(self.pdata, "ModuleTypes", h2(msg.module_type))
                 if not data:
                     self._log.warning(f"Module not recognized: {msg.module_type}")
                     return
                 self._velbus.add_module(
                     msg.address,
                     msg.module_type,
-                    data,
                     memorymap=msg.memory_map_version,
                     build_year=msg.build_year,
                     build_week=msg.build_week,

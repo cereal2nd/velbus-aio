@@ -71,7 +71,6 @@ class Velbus:
         self,
         addr: int,
         typ: int,
-        data: dict,
         serial: int | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
@@ -81,7 +80,6 @@ class Velbus:
         module = Module.factory(
             addr,
             typ,
-            data,
             serial=serial,
             build_year=build_year,
             build_week=build_week,

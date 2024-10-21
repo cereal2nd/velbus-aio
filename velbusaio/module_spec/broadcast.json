@@ -1,5 +1,4 @@
 {
-  "MessagesBroadCast": {
     "09": {
       "Info": "Transmit Bus Off message",
       "Name": "COMMAND_BUS_OFF",
@@ -65,7 +64,4 @@
       "Name": "COMMAND_REALTIME_CLOCK_STATUS",
       "Prio": "Low"
     }
-  },
-  "ModuleTypes": {
-  }
 }
