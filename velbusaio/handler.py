@@ -228,7 +228,7 @@ class PacketHandler:
         if msg is not None:
             module = self._velbus.get_module(msg.address)
             if module is None:
-                #data = keys_exists(self.pdata, "ModuleTypes", h2(msg.module_type))
+                # data = keys_exists(self.pdata, "ModuleTypes", h2(msg.module_type))
                 if not data:
                     self._log.warning(f"Module not recognized: {msg.module_type}")
                     return

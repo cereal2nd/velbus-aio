@@ -1,67 +1,67 @@
 {
-    "09": {
-      "Info": "Transmit Bus Off message",
-      "Name": "COMMAND_BUS_OFF",
-      "Prio": "High"
-    },
-    "0B": {
-      "Info": "Transmit Buffer Full message",
-      "Name": "COMMAND_RX_BUFFER_FULL_STATUS",
-      "Prio": "High"
-    },
-    "0C": {
-      "Info": "Transmits Buffer Ready message",
-      "Name": "COMMAND_RX_BUFFER_READY_STATUS",
-      "Prio": "High"
-    },
-    "0E": {
-      "Info": "Interface status request",
-      "Name": "CMD_INTERFACE_STATUS_REQUEST",
-      "Prio": "High"
-    },
-    "AB": {
-      "Info": "Power Up message;Power up message received;Power up message received ;Transmits power up message;Transmits power up message ",
-      "Name": "COMMAND_POWER_UP",
-      "Prio": "Low"
-    },
-    "AE": {
-      "Info": "Enable/disable global sunrise/sunset related actions command received",
-      "Name": "COMMAND_ENA_DIS_SUNRISE_SUNSET",
-      "Prio": "Low"
-    },
-    "AF": {
-      "Info": "Set daylight savings command received;Transmits the daylight savings status",
-      "Name": "COMMAND_DAYLIGHT_SAVING_STATUS;COMMAND_SET_DAYLIGHT_SAVING",
-      "Prio": "Low"
-    },
-    "B7": {
-      "Info": "Set date command received;Transmits the date status",
-      "Name": "COMMAND_DATE_STATUS;COMMAND_SET_REALTIME_DATE",
-      "Prio": "Low"
-    },
-    "BC": {
-      "Info": "Program availability command received;Transmits set sensor program availability",
-      "Name": "COMMAND_SENSOR_PROGRAM_AVAILABILITY",
-      "Prio": "Low"
-    },
-    "BF": {
-      "Info": "Set sensor program location command received;Transmits set sensor program location",
-      "Name": "COMMAND_SET_SENSOR_PROGRAM_LOCATION",
-      "Prio": "Low"
-    },
-    "C3": {
-      "Info": "Set global clock alarm command received;Transmit set global clock alarm;Transmits set global clock alarm",
-      "Name": "COMMAND_SET_ALARM_CLOCK",
-      "Prio": "Low"
-    },
-    "D7": {
-      "Info": "Real time clock status request command received;Real time clock status request received (response after minute rollover);Transmits real time clock status request",
-      "Name": "COMMAND_REALTIME_CLOCK_STATUS_REQUEST",
-      "Prio": "Low"
-    },
-    "D8": {
-      "Info": "Real time clock status received;Set real time clock command received;Transmit Real time clock status;Transmits the real time clock status",
-      "Name": "COMMAND_REALTIME_CLOCK_STATUS",
-      "Prio": "Low"
-    }
+  "09": {
+    "Info": "Transmit Bus Off message",
+    "Name": "COMMAND_BUS_OFF",
+    "Prio": "High"
+  },
+  "0B": {
+    "Info": "Transmit Buffer Full message",
+    "Name": "COMMAND_RX_BUFFER_FULL_STATUS",
+    "Prio": "High"
+  },
+  "0C": {
+    "Info": "Transmits Buffer Ready message",
+    "Name": "COMMAND_RX_BUFFER_READY_STATUS",
+    "Prio": "High"
+  },
+  "0E": {
+    "Info": "Interface status request",
+    "Name": "CMD_INTERFACE_STATUS_REQUEST",
+    "Prio": "High"
+  },
+  "AB": {
+    "Info": "Power Up message;Power up message received;Power up message received ;Transmits power up message;Transmits power up message ",
+    "Name": "COMMAND_POWER_UP",
+    "Prio": "Low"
+  },
+  "AE": {
+    "Info": "Enable/disable global sunrise/sunset related actions command received",
+    "Name": "COMMAND_ENA_DIS_SUNRISE_SUNSET",
+    "Prio": "Low"
+  },
+  "AF": {
+    "Info": "Set daylight savings command received;Transmits the daylight savings status",
+    "Name": "COMMAND_DAYLIGHT_SAVING_STATUS;COMMAND_SET_DAYLIGHT_SAVING",
+    "Prio": "Low"
+  },
+  "B7": {
+    "Info": "Set date command received;Transmits the date status",
+    "Name": "COMMAND_DATE_STATUS;COMMAND_SET_REALTIME_DATE",
+    "Prio": "Low"
+  },
+  "BC": {
+    "Info": "Program availability command received;Transmits set sensor program availability",
+    "Name": "COMMAND_SENSOR_PROGRAM_AVAILABILITY",
+    "Prio": "Low"
+  },
+  "BF": {
+    "Info": "Set sensor program location command received;Transmits set sensor program location",
+    "Name": "COMMAND_SET_SENSOR_PROGRAM_LOCATION",
+    "Prio": "Low"
+  },
+  "C3": {
+    "Info": "Set global clock alarm command received;Transmit set global clock alarm;Transmits set global clock alarm",
+    "Name": "COMMAND_SET_ALARM_CLOCK",
+    "Prio": "Low"
+  },
+  "D7": {
+    "Info": "Real time clock status request command received;Real time clock status request received (response after minute rollover);Transmits real time clock status request",
+    "Name": "COMMAND_REALTIME_CLOCK_STATUS_REQUEST",
+    "Prio": "Low"
+  },
+  "D8": {
+    "Info": "Real time clock status received;Set real time clock command received;Transmit Real time clock status;Transmits the real time clock status",
+    "Name": "COMMAND_REALTIME_CLOCK_STATUS",
+    "Prio": "Low"
+  }
 }
