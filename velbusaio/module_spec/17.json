@@ -1,0 +1,119 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Editable": "yes",
+      "Name": "Push button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Push button 6",
+      "Type": "Button"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Virtual button",
+      "Type": "Button"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Virtual button",
+      "Type": "Button"
+    },
+    "96": {
+      "Name": "SelectedProgram",
+      "Type": "SelectedProgram"
+    }
+  },
+  "Info": "Push button interface module for 4 or 6 NIKO push buttons",
+  "Memory": {
+    "Address": {
+      "03C0": { "ModuleName": "0:Start" },
+      "03C1": { "ModuleName": "1" },
+      "03C2": { "ModuleName": "2" },
+      "03C3": { "ModuleName": "3" },
+      "03C4": { "ModuleName": "4" },
+      "03C5": { "ModuleName": "5" },
+      "03C6": { "ModuleName": "6" },
+      "03C7": { "ModuleName": "7" },
+      "03C8": { "ModuleName": "8" },
+      "03C9": { "ModuleName": "9" },
+      "03CA": { "ModuleName": "10" },
+      "03CB": { "ModuleName": "11" },
+      "03CC": { "ModuleName": "12" },
+      "03CD": { "ModuleName": "13" },
+      "03CE": { "ModuleName": "14" },
+      "03CF": { "ModuleName": "15" },
+      "03D0": { "ModuleName": "16" },
+      "03D1": { "ModuleName": "17" },
+      "03D2": { "ModuleName": "18" },
+      "03D3": { "ModuleName": "19" },
+      "03D4": { "ModuleName": "20" },
+      "03D5": { "ModuleName": "21" },
+      "03D6": { "ModuleName": "22" },
+      "03D7": { "ModuleName": "23" },
+      "03D8": { "ModuleName": "24" },
+      "03D9": { "ModuleName": "25" },
+      "03DA": { "ModuleName": "26" },
+      "03DB": { "ModuleName": "27" },
+      "03DC": { "ModuleName": "28" },
+      "03DD": { "ModuleName": "29" },
+      "03DE": { "ModuleName": "30" },
+      "03DF": { "ModuleName": "31" },
+      "03E0": { "ModuleName": "32" },
+      "03E1": { "ModuleName": "33" },
+      "03E2": { "ModuleName": "34" },
+      "03E3": { "ModuleName": "35" },
+      "03E4": { "ModuleName": "36" },
+      "03E5": { "ModuleName": "37" },
+      "03E6": { "ModuleName": "38" },
+      "03E7": { "ModuleName": "39" },
+      "03E8": { "ModuleName": "40" },
+      "03E9": { "ModuleName": "41" },
+      "03EA": { "ModuleName": "42" },
+      "03EB": { "ModuleName": "43" },
+      "03EC": { "ModuleName": "44" },
+      "03ED": { "ModuleName": "45" },
+      "03EE": { "ModuleName": "46" },
+      "03EF": { "ModuleName": "47" },
+      "03F0": { "ModuleName": "48" },
+      "03F1": { "ModuleName": "49" },
+      "03F2": { "ModuleName": "50" },
+      "03F3": { "ModuleName": "51" },
+      "03F4": { "ModuleName": "52" },
+      "03F5": { "ModuleName": "53" },
+      "03F6": { "ModuleName": "54" },
+      "03F7": { "ModuleName": "55" },
+      "03F8": { "ModuleName": "56" },
+      "03F9": { "ModuleName": "57" },
+      "03FA": { "ModuleName": "58" },
+      "03FB": { "ModuleName": "59" },
+      "03FC": { "ModuleName": "60" },
+      "03FD": { "ModuleName": "61" },
+      "03FE": { "ModuleName": "62" },
+      "03FF": { "ModuleName": "64:Save" }
+    },
+    "ModuleName": "03C0-03FF"
+  },
+  "Type": "VMB6PBN"
+}

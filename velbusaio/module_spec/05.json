@@ -1,0 +1,36 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Editable": "yes",
+      "Name": "Push button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Push button 6",
+      "Type": "Button"
+    }
+  },
+  "Info": "6-Channel Input Module",
+  "Type": "VMB6IN"
+}

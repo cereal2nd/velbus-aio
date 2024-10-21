@@ -1,0 +1,11 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    }
+  },
+  "Info": "One channel input module",
+  "Type": "VMBIN"
+}

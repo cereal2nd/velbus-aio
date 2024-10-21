@@ -1,0 +1,11 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Relay",
+      "Type": "Relay"
+    }
+  },
+  "Info": "Relay Module",
+  "Type": "VMB1RY"
+}

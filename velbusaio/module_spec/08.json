@@ -1,0 +1,26 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Relay 1",
+      "Type": "Relay"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Relay 2",
+      "Type": "Relay"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Relay 3",
+      "Type": "Relay"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Relay 4",
+      "Type": "Relay"
+    }
+  },
+  "Info": "4 channel relay module",
+  "Type": "VMB4RY"
+}

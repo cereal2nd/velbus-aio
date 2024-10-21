@@ -1,0 +1,297 @@
+{
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "Name": {
+      "Convert": "hex"
+    }
+  },
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Editable": "yes",
+      "Name": "Push button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Push button 6",
+      "Type": "Button"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Push button 7",
+      "Type": "Button"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Push button 8",
+      "Type": "Button"
+    },
+    "09": {
+      "Editable": "yes",
+      "Name": "Push button 9",
+      "Type": "Button"
+    },
+    "10": {
+      "Editable": "yes",
+      "Name": "Push button 10",
+      "Type": "Button"
+    },
+    "11": {
+      "Editable": "yes",
+      "Name": "Push button 11",
+      "Type": "Button"
+    },
+    "12": {
+      "Editable": "yes",
+      "Name": "Push button 12",
+      "Type": "Button"
+    },
+    "13": {
+      "Editable": "yes",
+      "Name": "Push button 13",
+      "Type": "Button"
+    },
+    "14": {
+      "Editable": "yes",
+      "Name": "Push button 14",
+      "Type": "Button"
+    },
+    "15": {
+      "Editable": "yes",
+      "Name": "Push button 15",
+      "Type": "Button"
+    },
+    "16": {
+      "Editable": "yes",
+      "Name": "Push button 16",
+      "Type": "Button"
+    },
+    "17": {
+      "Editable": "yes",
+      "Name": "Push button 17",
+      "Type": "Button"
+    },
+    "18": {
+      "Editable": "yes",
+      "Name": "Push button 18",
+      "Type": "Button"
+    },
+    "19": {
+      "Editable": "yes",
+      "Name": "Push button 19",
+      "Type": "Button"
+    },
+    "20": {
+      "Editable": "yes",
+      "Name": "Push button 10",
+      "Type": "Button"
+    },
+    "21": {
+      "Editable": "yes",
+      "Name": "Push button 21",
+      "Type": "Button"
+    },
+    "22": {
+      "Editable": "yes",
+      "Name": "Push button 22",
+      "Type": "Button"
+    },
+    "23": {
+      "Editable": "yes",
+      "Name": "Push button 23",
+      "Type": "Button"
+    },
+    "24": {
+      "Editable": "yes",
+      "Name": "Push button 24",
+      "Type": "Button"
+    },
+    "25": {
+      "Editable": "yes",
+      "Name": "Push button 25",
+      "Type": "Button"
+    },
+    "26": {
+      "Editable": "yes",
+      "Name": "Push button 26",
+      "Type": "Button"
+    },
+    "27": {
+      "Editable": "yes",
+      "Name": "Push button 27",
+      "Type": "Button"
+    },
+    "28": {
+      "Editable": "yes",
+      "Name": "Push button 28",
+      "Type": "Button"
+    },
+    "29": {
+      "Editable": "yes",
+      "Name": "Push button 29",
+      "Type": "Button"
+    },
+    "30": {
+      "Editable": "yes",
+      "Name": "Push button 30",
+      "Type": "Button"
+    },
+    "31": {
+      "Editable": "yes",
+      "Name": "Push button 31",
+      "Type": "Button"
+    },
+    "32": {
+      "Editable": "yes",
+      "Name": "Push button 32",
+      "Type": "Button"
+    },
+    "33": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "34": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "35": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel"
+    },
+    "36": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "37": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "38": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "39": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel"
+    },
+    "40": {
+      "Name": "Alarm 3",
+      "Type": "ThermostatChannel"
+    },
+    "41": {
+      "Name": "Alarm 4",
+      "Type": "ThermostatChannel"
+    },
+    "42": {
+      "Editable": "yes",
+      "Name": "Output",
+      "Type": "Relay"
+    },
+    "96": {
+      "Name": "SelectedProgram",
+      "Type": "SelectedProgram"
+    },
+    "97": {
+      "Name": "Edge Lit",
+      "Type": "EdgeLit"
+    },
+    "98": {
+      "Name": "Memo Text",
+      "Type": "Memo"
+    }
+  },
+  "Info": "VMBELO-20 Edge-lit touch panel with Oled",
+  "Memory": {
+    "Address": {
+      "0F44": { "ModuleName": "0:Start" },
+      "0F45": { "ModuleName": "1" },
+      "0F46": { "ModuleName": "2" },
+      "0F47": { "ModuleName": "3" },
+      "0F48": { "ModuleName": "4" },
+      "0F49": { "ModuleName": "5" },
+      "0F4A": { "ModuleName": "6" },
+      "0F4B": { "ModuleName": "7" },
+      "0F4C": { "ModuleName": "8" },
+      "0F4D": { "ModuleName": "9" },
+      "0F4E": { "ModuleName": "10" },
+      "0F4F": { "ModuleName": "11" },
+      "0F50": { "ModuleName": "12" },
+      "0F51": { "ModuleName": "13" },
+      "0F52": { "ModuleName": "14" },
+      "0F53": { "ModuleName": "15" },
+      "0F54": { "ModuleName": "16" },
+      "0F55": { "ModuleName": "17" },
+      "0F56": { "ModuleName": "18" },
+      "0F57": { "ModuleName": "19" },
+      "0F58": { "ModuleName": "20" },
+      "0F59": { "ModuleName": "21" },
+      "0F5A": { "ModuleName": "22" },
+      "0F5B": { "ModuleName": "23" },
+      "0F5C": { "ModuleName": "24" },
+      "0F5D": { "ModuleName": "25" },
+      "0F5E": { "ModuleName": "26" },
+      "0F5F": { "ModuleName": "27" },
+      "0F60": { "ModuleName": "28" },
+      "0F61": { "ModuleName": "29" },
+      "0F62": { "ModuleName": "30" },
+      "0F63": { "ModuleName": "31" },
+      "0F64": { "ModuleName": "32" },
+      "0F65": { "ModuleName": "33" },
+      "0F66": { "ModuleName": "34" },
+      "0F67": { "ModuleName": "35" },
+      "0F68": { "ModuleName": "36" },
+      "0F69": { "ModuleName": "37" },
+      "0F6A": { "ModuleName": "38" },
+      "0F6B": { "ModuleName": "39" },
+      "0F6C": { "ModuleName": "40" },
+      "0F6D": { "ModuleName": "41" },
+      "0F6E": { "ModuleName": "42" },
+      "0F6F": { "ModuleName": "43" },
+      "0F70": { "ModuleName": "44" },
+      "0F71": { "ModuleName": "45" },
+      "0F72": { "ModuleName": "46" },
+      "0F73": { "ModuleName": "47" },
+      "0F74": { "ModuleName": "48" },
+      "0F75": { "ModuleName": "49" },
+      "0F76": { "ModuleName": "50" },
+      "0F77": { "ModuleName": "51" },
+      "0F78": { "ModuleName": "52" },
+      "0F79": { "ModuleName": "53" },
+      "0F7A": { "ModuleName": "54" },
+      "0F7B": { "ModuleName": "55" },
+      "0F7C": { "ModuleName": "56" },
+      "0F7D": { "ModuleName": "57" },
+      "0F7E": { "ModuleName": "58" },
+      "0F7F": { "ModuleName": "59" },
+      "0F80": { "ModuleName": "60" },
+      "0F81": { "ModuleName": "61" },
+      "0F82": { "ModuleName": "62" },
+      "0F83": { "ModuleName": "64:Save" }
+    },
+    "ModuleName": "0F44-0F83"
+  },
+  "TemperatureChannel": "33",
+  "ThermostatAddr": "3",
+  "Type": "VMBELO"
+}

@@ -1,0 +1,87 @@
+{
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "Name": {
+      "Convert": "hex",
+      "Map": {
+        "09": "10"
+      }
+    }
+  },
+  "Channels": {
+    "01": {
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Name": "Dark/Light output",
+      "Type": "Sensor"
+    },
+    "06": {
+      "Name": "Motion output",
+      "Type": "Sensor"
+    },
+    "07": {
+      "Name": "Light Depending motion",
+      "Type": "Sensor"
+    },
+    "08": {
+      "Name": "Absence output",
+      "Type": "Sensor"
+    },
+    "10": {
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "11": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "12": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel"
+    },
+    "13": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "14": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "15": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "16": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel"
+    },
+    "17": {
+      "Name": "Alarm 3",
+      "Type": "ThermostatChannel"
+    },
+    "18": {
+      "Name": "Alarm 4",
+      "Type": "ThermostatChannel"
+    },
+    "99": {
+      "Name": "Light value",
+      "Type": "LightSensor"
+    }
+  },
+  "TemperatureChannel": "10",
+  "ThermostatAddr": "0"
+}

@@ -1,0 +1,102 @@
+{
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "Name": {
+      "Convert": "hex"
+    }
+  },
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Virtual button",
+      "Type": "Button"
+    },
+    "03": {
+      "Name": "Dark output",
+      "Type": "Sensor"
+    },
+    "04": {
+      "Name": "Light output",
+      "Type": "Sensor"
+    },
+    "05": {
+      "Name": "Motion output",
+      "Type": "Sensor"
+    },
+    "06": {
+      "Name": "Motion output 1 (LD)",
+      "Type": "Sensor"
+    },
+    "07": {
+      "Name": "Motion output 2 (LD)",
+      "Type": "Sensor"
+    },
+    "08": {
+      "Name": "Absence output",
+      "Type": "Sensor"
+    },
+    "09": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "10": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "11": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel"
+    },
+    "12": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "13": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "14": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "15": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel"
+    },
+    "16": {
+      "Name": "Alarm 3",
+      "Type": "ThermostatChannel"
+    },
+    "17": {
+      "Name": "Alarm 4",
+      "Type": "ThermostatChannel"
+    },
+    "18": {
+      "Editable": "yes",
+      "Name": "Output",
+      "Type": "Relay"
+    },
+    "96": {
+      "Name": "SelectedProgram",
+      "Type": "SelectedProgram"
+    },
+    "97": {
+      "Name": "Edge Lit",
+      "Type": "EdgeLit"
+    },
+    "99": {
+      "Name": "Light value",
+      "Type": "LightSensor"
+    }
+  },
+  "Info": "Edge-lit Motion detector with one touch button module",
+  "TemperatureChannel": "09",
+  "ThermostatAddr": "0",
+  "Type": "VMBELPIR"
+}

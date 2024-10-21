@@ -1,0 +1,63 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Dimmer 1",
+      "Type": "Dimmer"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Dimmer 2",
+      "Type": "Dimmer"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Dimmer 3",
+      "Type": "Dimmer"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Dimmer 4",
+      "Type": "Dimmer"
+    }
+  },
+  "Info": "0/1 to 10V dimmer controller module",
+  "Memory": {
+    "Address": {
+      "00E0": { "ModuleName": "0:Start" },
+      "00E1": { "ModuleName": "1" },
+      "00E2": { "ModuleName": "2" },
+      "00E3": { "ModuleName": "3" },
+      "00E4": { "ModuleName": "4" },
+      "00E5": { "ModuleName": "5" },
+      "00E6": { "ModuleName": "6" },
+      "00E7": { "ModuleName": "7" },
+      "00E8": { "ModuleName": "8" },
+      "00E9": { "ModuleName": "9" },
+      "00EA": { "ModuleName": "10" },
+      "00EB": { "ModuleName": "11" },
+      "00EC": { "ModuleName": "12" },
+      "00ED": { "ModuleName": "13" },
+      "00EE": { "ModuleName": "14" },
+      "00EF": { "ModuleName": "15" },
+      "01E0": { "ModuleName": "16" },
+      "01E1": { "ModuleName": "17" },
+      "01E2": { "ModuleName": "18" },
+      "01E3": { "ModuleName": "19" },
+      "01E4": { "ModuleName": "20" },
+      "01E5": { "ModuleName": "21" },
+      "01E6": { "ModuleName": "22" },
+      "01E7": { "ModuleName": "23" },
+      "01E8": { "ModuleName": "24" },
+      "01E9": { "ModuleName": "25" },
+      "01EA": { "ModuleName": "26" },
+      "01EB": { "ModuleName": "27" },
+      "01EC": { "ModuleName": "28" },
+      "01ED": { "ModuleName": "29" },
+      "01EE": { "ModuleName": "30" },
+      "01EF": { "ModuleName": "32:Save" }
+    },
+    "ModuleName": "00E0-00EF;01E0-01EF"
+  },
+  "Type": "VMB4DC"
+}

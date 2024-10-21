@@ -1,0 +1,189 @@
+{
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "Name": {
+      "Convert": "hex"
+    }
+  },
+  "Channels": {
+    "01": {
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Name": "Push button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Name": "Push button 6",
+      "Type": "Button"
+    },
+    "07": {
+      "Name": "Push button 7",
+      "Type": "Button"
+    },
+    "08": {
+      "Name": "Push button 8",
+      "Type": "Button"
+    },
+    "09": {
+      "Name": "Push button 9",
+      "Type": "Button"
+    },
+    "10": {
+      "Name": "Push button 10",
+      "Type": "Button"
+    },
+    "11": {
+      "Name": "Push button 11",
+      "Type": "Button"
+    },
+    "12": {
+      "Name": "Push button 12",
+      "Type": "Button"
+    },
+    "13": {
+      "Name": "Push button 13",
+      "Type": "Button"
+    },
+    "14": {
+      "Name": "Push button 14",
+      "Type": "Button"
+    },
+    "15": {
+      "Name": "Push button 15",
+      "Type": "Button"
+    },
+    "16": {
+      "Name": "Push button 16",
+      "Type": "Button"
+    },
+    "17": {
+      "Name": "Push button 17",
+      "Type": "Button"
+    },
+    "18": {
+      "Name": "Push button 18",
+      "Type": "Button"
+    },
+    "19": {
+      "Name": "Push button 19",
+      "Type": "Button"
+    },
+    "20": {
+      "Name": "Push button 10",
+      "Type": "Button"
+    },
+    "21": {
+      "Name": "Push button 21",
+      "Type": "Button"
+    },
+    "22": {
+      "Name": "Push button 22",
+      "Type": "Button"
+    },
+    "23": {
+      "Name": "Push button 23",
+      "Type": "Button"
+    },
+    "24": {
+      "Name": "Push button 24",
+      "Type": "Button"
+    },
+    "25": {
+      "Name": "Push button 25",
+      "Type": "Button"
+    },
+    "26": {
+      "Name": "Push button 26",
+      "Type": "Button"
+    },
+    "27": {
+      "Name": "Push button 27",
+      "Type": "Button"
+    },
+    "28": {
+      "Name": "Push button 28",
+      "Type": "Button"
+    },
+    "29": {
+      "Name": "Push button 29",
+      "Type": "Button"
+    },
+    "30": {
+      "Name": "Push button 30",
+      "Type": "Button"
+    },
+    "31": {
+      "Name": "Push button 31",
+      "Type": "Button"
+    },
+    "32": {
+      "Name": "Push button 32",
+      "Type": "Button"
+    },
+    "33": {
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "34": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "35": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel"
+    },
+    "36": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "37": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "38": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "39": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel"
+    },
+    "40": {
+      "Name": "Alarm 3",
+      "Type": "ThermostatChannel"
+    },
+    "41": {
+      "Name": "Alarm 4",
+      "Type": "ThermostatChannel"
+    },
+    "42": {
+      "Name": "Output",
+      "Type": "Relay"
+    },
+    "97": {
+      "Name": "Edge Lit",
+      "Type": "EdgeLit"
+    },
+    "98": {
+      "Name": "Memo Text",
+      "Type": "Memo"
+    }
+  },
+  "TemperatureChannel": "33",
+  "ThermostatAddr": "3",
+  "Type": "VMBELO-20"
+}

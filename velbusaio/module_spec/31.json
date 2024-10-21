@@ -1,0 +1,465 @@
+{
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "SensorNumber": {
+      "Map": {
+        "02": "11",
+        "04": "12",
+        "08": "13"
+      }
+    }
+  },
+  "Channels": {
+    "01": {
+      "Name": "Frost alarm",
+      "Type": "Sensor"
+    },
+    "02": {
+      "Name": "Heat alarm",
+      "Type": "Sensor"
+    },
+    "03": {
+      "Name": "Rain alarm",
+      "Type": "Sensor"
+    },
+    "04": {
+      "Name": "Dawn alarm",
+      "Type": "Sensor"
+    },
+    "05": {
+      "Name": "Dusk alarm",
+      "Type": "Sensor"
+    },
+    "06": {
+      "Name": "Sun alarm",
+      "Type": "Sensor"
+    },
+    "07": {
+      "Name": "Wind alarm",
+      "Type": "Sensor"
+    },
+    "08": {
+      "Name": "Storm alarm",
+      "Type": "Sensor"
+    },
+    "10": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "11": {
+      "Name": "Rainfall",
+      "Type": "SensorNumber"
+    },
+    "12": {
+      "Name": "Illuminance",
+      "Type": "SensorNumber"
+    },
+    "13": {
+      "Name": "Wind speed",
+      "Type": "SensorNumber"
+    },
+    "96": {
+      "Name": "SelectedProgram",
+      "Type": "SelectedProgram"
+    }
+  },
+  "Info": "Meteo station",
+  "Memory": {
+    "Address": {
+      "00C0": {
+        "SensorName": "11:0:Start"
+      },
+      "00C1": {
+        "SensorName": "11:1"
+      },
+      "00C2": {
+        "SensorName": "11:2"
+      },
+      "00C3": {
+        "SensorName": "11:3"
+      },
+      "00C4": {
+        "SensorName": "11:4"
+      },
+      "00C5": {
+        "SensorName": "11:5"
+      },
+      "00C6": {
+        "SensorName": "11:6"
+      },
+      "00C7": {
+        "SensorName": "11:7"
+      },
+      "00C8": {
+        "SensorName": "11:8"
+      },
+      "00C9": {
+        "SensorName": "11:9"
+      },
+      "00CA": {
+        "SensorName": "11:10"
+      },
+      "00CB": {
+        "SensorName": "11:11"
+      },
+      "00CC": {
+        "SensorName": "11:12"
+      },
+      "00CD": {
+        "SensorName": "11:13"
+      },
+      "00CE": {
+        "SensorName": "11:14"
+      },
+      "00CF": {
+        "SensorName": "11:16:Save"
+      },
+      "00D0": {
+        "SensorName": "12:0:Start"
+      },
+      "00D1": {
+        "SensorName": "12:1"
+      },
+      "00D2": {
+        "SensorName": "12:2"
+      },
+      "00D3": {
+        "SensorName": "12:3"
+      },
+      "00D4": {
+        "SensorName": "12:4"
+      },
+      "00D5": {
+        "SensorName": "12:5"
+      },
+      "00D6": {
+        "SensorName": "12:6"
+      },
+      "00D7": {
+        "SensorName": "12:7"
+      },
+      "00D8": {
+        "SensorName": "12:8"
+      },
+      "00D9": {
+        "SensorName": "12:9"
+      },
+      "00DA": {
+        "SensorName": "12:10"
+      },
+      "00DB": {
+        "SensorName": "12:11"
+      },
+      "00DC": {
+        "SensorName": "12:12"
+      },
+      "00DD": {
+        "SensorName": "12:13"
+      },
+      "00DE": {
+        "SensorName": "12:14"
+      },
+      "00DF": {
+        "SensorName": "12:16:Save"
+      },
+      "00E0": {
+        "SensorName": "13:0:Start"
+      },
+      "00E1": {
+        "SensorName": "13:1"
+      },
+      "00E2": {
+        "SensorName": "13:2"
+      },
+      "00E3": {
+        "SensorName": "13:3"
+      },
+      "00E4": {
+        "SensorName": "13:4"
+      },
+      "00E5": {
+        "SensorName": "13:5"
+      },
+      "00E6": {
+        "SensorName": "13:6"
+      },
+      "00E7": {
+        "SensorName": "13:7"
+      },
+      "00E8": {
+        "SensorName": "13:8"
+      },
+      "00E9": {
+        "SensorName": "13:9"
+      },
+      "00EA": {
+        "SensorName": "13:10"
+      },
+      "00EB": {
+        "SensorName": "13:11"
+      },
+      "00EC": {
+        "SensorName": "13:12"
+      },
+      "00ED": {
+        "SensorName": "13:13"
+      },
+      "00EE": {
+        "SensorName": "13:14"
+      },
+      "00EF": {
+        "SensorName": "13:16:Save"
+      },
+      "03B0": {
+        "SensorName": "10:0:Start"
+      },
+      "03B1": {
+        "SensorName": "10:1"
+      },
+      "03B2": {
+        "SensorName": "10:2"
+      },
+      "03B3": {
+        "SensorName": "10:3"
+      },
+      "03B4": {
+        "SensorName": "10:4"
+      },
+      "03B5": {
+        "SensorName": "10:5"
+      },
+      "03B6": {
+        "SensorName": "10:6"
+      },
+      "03B7": {
+        "SensorName": "10:7"
+      },
+      "03B8": {
+        "SensorName": "10:8"
+      },
+      "03B9": {
+        "SensorName": "10:9"
+      },
+      "03BA": {
+        "SensorName": "10:10"
+      },
+      "03BB": {
+        "SensorName": "10:11"
+      },
+      "03BC": {
+        "SensorName": "10:12"
+      },
+      "03BD": {
+        "SensorName": "10:13"
+      },
+      "03BE": {
+        "SensorName": "10:14"
+      },
+      "03BF": {
+        "SensorName": "10:16:Save"
+      },
+      "03C0": {
+        "ModuleName": "0:Start"
+      },
+      "03C1": {
+        "ModuleName": "1"
+      },
+      "03C2": {
+        "ModuleName": "2"
+      },
+      "03C3": {
+        "ModuleName": "3"
+      },
+      "03C4": {
+        "ModuleName": "4"
+      },
+      "03C5": {
+        "ModuleName": "5"
+      },
+      "03C6": {
+        "ModuleName": "6"
+      },
+      "03C7": {
+        "ModuleName": "7"
+      },
+      "03C8": {
+        "ModuleName": "8"
+      },
+      "03C9": {
+        "ModuleName": "9"
+      },
+      "03CA": {
+        "ModuleName": "10"
+      },
+      "03CB": {
+        "ModuleName": "11"
+      },
+      "03CC": {
+        "ModuleName": "12"
+      },
+      "03CD": {
+        "ModuleName": "13"
+      },
+      "03CE": {
+        "ModuleName": "14"
+      },
+      "03CF": {
+        "ModuleName": "15"
+      },
+      "03D0": {
+        "ModuleName": "16"
+      },
+      "03D1": {
+        "ModuleName": "17"
+      },
+      "03D2": {
+        "ModuleName": "18"
+      },
+      "03D3": {
+        "ModuleName": "19"
+      },
+      "03D4": {
+        "ModuleName": "20"
+      },
+      "03D5": {
+        "ModuleName": "21"
+      },
+      "03D6": {
+        "ModuleName": "22"
+      },
+      "03D7": {
+        "ModuleName": "23"
+      },
+      "03D8": {
+        "ModuleName": "24"
+      },
+      "03D9": {
+        "ModuleName": "25"
+      },
+      "03DA": {
+        "ModuleName": "26"
+      },
+      "03DB": {
+        "ModuleName": "27"
+      },
+      "03DC": {
+        "ModuleName": "28"
+      },
+      "03DD": {
+        "ModuleName": "29"
+      },
+      "03DE": {
+        "ModuleName": "30"
+      },
+      "03DF": {
+        "ModuleName": "31"
+      },
+      "03E0": {
+        "ModuleName": "32"
+      },
+      "03E1": {
+        "ModuleName": "33"
+      },
+      "03E2": {
+        "ModuleName": "34"
+      },
+      "03E3": {
+        "ModuleName": "35"
+      },
+      "03E4": {
+        "ModuleName": "36"
+      },
+      "03E5": {
+        "ModuleName": "37"
+      },
+      "03E6": {
+        "ModuleName": "38"
+      },
+      "03E7": {
+        "ModuleName": "39"
+      },
+      "03E8": {
+        "ModuleName": "40"
+      },
+      "03E9": {
+        "ModuleName": "41"
+      },
+      "03EA": {
+        "ModuleName": "42"
+      },
+      "03EB": {
+        "ModuleName": "43"
+      },
+      "03EC": {
+        "ModuleName": "44"
+      },
+      "03ED": {
+        "ModuleName": "45"
+      },
+      "03EE": {
+        "ModuleName": "46"
+      },
+      "03EF": {
+        "ModuleName": "47"
+      },
+      "03F0": {
+        "ModuleName": "48"
+      },
+      "03F1": {
+        "ModuleName": "49"
+      },
+      "03F2": {
+        "ModuleName": "50"
+      },
+      "03F3": {
+        "ModuleName": "51"
+      },
+      "03F4": {
+        "ModuleName": "52"
+      },
+      "03F5": {
+        "ModuleName": "53"
+      },
+      "03F6": {
+        "ModuleName": "54"
+      },
+      "03F7": {
+        "ModuleName": "55"
+      },
+      "03F8": {
+        "ModuleName": "56"
+      },
+      "03F9": {
+        "ModuleName": "57"
+      },
+      "03FA": {
+        "ModuleName": "58"
+      },
+      "03FB": {
+        "ModuleName": "59"
+      },
+      "03FC": {
+        "ModuleName": "60"
+      },
+      "03FD": {
+        "ModuleName": "61"
+      },
+      "03FE": {
+        "ModuleName": "62"
+      },
+      "03FF": {
+        "ModuleName": "64:Save"
+      }
+    },
+    "ModuleName": "03C0-03FF",
+    "SensorName": {
+      "10": "03B0-03BF",
+      "11": "00C0-00CF",
+      "12": "00D0-00DF",
+      "13": "00E0-00EF"
+    }
+  },
+  "TemperatureChannel": "10",
+  "Type": "VMBMETEO"
+}

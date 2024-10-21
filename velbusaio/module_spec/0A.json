@@ -1,0 +1,46 @@
+{
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Editable": "yes",
+      "Name": "Push button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Push button 6",
+      "Type": "Button"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Push button 7",
+      "Type": "Button"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Push button 8",
+      "Type": "Button"
+    }
+  },
+  "Info": "Infrared remote control receiver module",
+  "Type": "VMB8IR"
+}

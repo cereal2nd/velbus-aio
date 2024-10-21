@@ -1,0 +1,18 @@
+{
+  "ChannelNumbers": {
+    "Name": {
+      "Map": {
+        "03": "01"
+      }
+    }
+  },
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Blind",
+      "Type": "Blind"
+    }
+  },
+  "Info": "Blind Control Module",
+  "Type": "VMB1BL"
+}
