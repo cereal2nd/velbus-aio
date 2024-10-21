@@ -2,4 +2,4 @@ include LICENSE
 include README.md
 include requirements.txt
 include velbusaio/py.typed
-include velbusaio/protocol.json
+include velbusaio/module_spec/*
