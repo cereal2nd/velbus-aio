@@ -755,7 +755,6 @@ class VmbDali(Module):
         self,
         module_address: int,
         module_type: int,
-        module_data: dict,
         serial: int | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
@@ -765,7 +764,6 @@ class VmbDali(Module):
         super().__init__(
             module_address,
             module_type,
-            module_data,
             serial,
             memorymap,
             build_year,
