@@ -204,8 +204,8 @@ class Module:
 
     async def _cache(self) -> None:
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
-        with open(cfile, "w") as fl:
-            json.dump(self.to_cache(), fl, indent=4)
+        async with async_open(cfile, "w") as fl:
+            await fl.write(json.dumps(self.to_cache(), indent=4))
 
     def __getstate__(self) -> dict:
         d = self.__dict__
@@ -569,6 +569,10 @@ class Module:
         if "channels" in cache:
             for num, chan in cache["channels"].items():
                 self._channels[int(num)]._name = chan["name"]
+                if "sub_device" in chan:
+                    self._channels[int(num)]._sub_device = chan["sub_device"]
+                else:
+                    self._channels[int(num)]._sub_device = False
                 if "Unit" in chan:
                     self._channels[int(num)]._Unit = chan["Unit"]
                 self._channels[int(num)]._is_loaded = True
@@ -746,11 +750,20 @@ class Module:
 
         for chan, chan_data in self._data["Channels"].items():
             edit = True
+            sub = True
             if "Editable" not in chan_data or chan_data["Editable"] != "yes":
                 edit = False
+            if "Subdevice" not in chan_data or chan_data["Subdevice"] != "yes":
+                sub = False
             cls = getattr(sys.modules[__name__], chan_data["Type"])
             self._channels[int(chan)] = cls(
-                self, int(chan), chan_data["Name"], edit, self._writer, self._address
+                module=self,
+                num=int(chan),
+                name=chan_data["Name"],
+                nameEditable=edit,
+                subDevice=sub,
+                writer=self._writer,
+                address=self._address,
             )
             if chan_data["Type"] == "Temperature":
                 if "Thermostat" in self._data or (
@@ -792,7 +805,13 @@ class VmbDali(Module):
     async def _load_default_channels(self) -> None:
         for chan in range(1, 64 + 1):
             self._channels[chan] = Channel(
-                self, chan, "placeholder", True, self._writer, self._address
+                module=self,
+                num=chan,
+                name="placeholder",
+                nameEditable=True,
+                subDevice=True,
+                writer=self._writer,
+                address=self._address,
             )
             # Placeholders will keep this module loading
             # Until the DaliDeviceSettings messages either delete or replace these placeholder's
@@ -822,6 +841,7 @@ class VmbDali(Module):
                             self,
                             message.channel,
                             None,
+                            True,
                             True,
                             self._writer,
                             self._address,

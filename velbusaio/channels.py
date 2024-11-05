@@ -38,12 +38,14 @@ class Channel:
         num: int,
         name: str,
         nameEditable: bool,
+        subDevice: bool,
         writer: Callable[[Message], Awaitable[None]],
         address: int,
     ):
         self._num = num
         self._module = module
         self._name = name
+        self._subDevice = subDevice
         if not nameEditable:
             self._is_loaded = True
         else:
@@ -80,6 +82,8 @@ class Channel:
         return self._num
 
     def get_full_name(self) -> str:
+        if self._subDevice:
+            return f"{self._module.get_name()} ({self._module.get_type_name()}) - {self._name}"
         return f"{self._module.get_name()} ({self._module.get_type_name()})"
 
     def is_loaded(self) -> bool:
@@ -93,6 +97,9 @@ class Channel:
 
     def is_temperature(self) -> bool:
         return False
+
+    def is_sub_device(self) -> bool:
+        return self._subDevice
 
     def get_name(self) -> str:
         """
@@ -137,7 +144,11 @@ class Channel:
         }
 
     def to_cache(self) -> dict:
-        dst = {"name": self._name, "type": type(self).__name__}
+        dst = {
+            "name": self._name,
+            "type": type(self).__name__,
+            "subdevice": self._subDevice,
+        }
         if hasattr(self, "_Unit"):
             dst["Unit"] = self._Unit
         return dst
@@ -448,11 +459,12 @@ class Dimmer(Channel):
         num: int,
         name: str,
         nameEditable: bool,
+        subDevice: bool,
         writer: Callable[[Message], Awaitable[None]],
         address: int,
         slider_scale: int = 100,
     ):
-        super().__init__(module, num, name, nameEditable, writer, address)
+        super().__init__(module, num, name, nameEditable, subDevice, writer, address)
 
         self.slider_scale = slider_scale
         # VMB4DC has dim values 0(off), 1-99(dimmed), 100(full on)

@@ -3,22 +3,26 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay 1",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Relay 2",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "yes"
     },
     "03": {
       "Editable": "yes",
       "Name": "Relay 3",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "yes"
     },
     "04": {
       "Editable": "yes",
       "Name": "Relay 4",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "yes"
     },
     "05": {
       "Editable": "yes",
