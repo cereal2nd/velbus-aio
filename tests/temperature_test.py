@@ -25,7 +25,7 @@ async def test_temperature_same_precision(
     temperature_profile: typing.List[float],
     precision: float,
 ):
-    ch = Temperature(None, None, None, False, None, None)
+    ch = Temperature(None, None, None, False, True, None, None)
     for temp in temperature_profile:
         temp_truncated_to_precision = math.floor(temp / precision) * precision
         await ch.maybe_update_temperature(temp_truncated_to_precision, precision)
@@ -37,7 +37,7 @@ async def test_temperature_same_precision(
 async def test_temperature_alternating_precision(
     temperature_profile: typing.List[float],
 ):
-    ch = Temperature(None, None, None, False, None, None)
+    ch = Temperature(None, None, None, False, True, None, None)
     for temp in temperature_profile:
         for precision in [1 / 2, 1 / 64]:
             temp_truncated_to_precision = math.floor(temp / precision) * precision

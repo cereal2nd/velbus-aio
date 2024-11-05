@@ -62,10 +62,12 @@ async def test_module_status_selected_program(module_type):
 
     # load the module with dummy channels
     for chan in range(1, 9):
-        m._channels[chan] = Channel(None, None, None, False, None, None)
-    m._channels[CHANNEL_LIGHT_VALUE] = LightSensor(None, None, None, False, None, None)
+        m._channels[chan] = Channel(None, None, None, False, False, None, None)
+    m._channels[CHANNEL_LIGHT_VALUE] = LightSensor(
+        None, None, None, False, False, None, None
+    )
     m._channels[CHANNEL_SELECTED_PROGRAM] = SelectedProgram(
-        m, None, None, False, velbus.send, None
+        m, None, None, False, False, velbus.send, None
     )
 
     messages_to_test = [

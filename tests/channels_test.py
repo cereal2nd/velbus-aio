@@ -2,7 +2,7 @@ from velbusaio.channels import Channel
 
 
 def test_channel_set_name_char():
-    channel = Channel(None, None, "placeholder", False, None, None)
+    channel = Channel(None, None, "placeholder", False, False, None, None)
     name = "FooBar"
     for pos in range(0, 16):
         if pos < len(name):
