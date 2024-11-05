@@ -3,22 +3,26 @@
     "01": {
       "Editable": "yes",
       "Name": "Dimmer 1",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Dimmer 2",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "03": {
       "Editable": "yes",
       "Name": "Dimmer 3",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "04": {
       "Editable": "yes",
       "Name": "Dimmer 4",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "96": {
       "Name": "SelectedProgram",

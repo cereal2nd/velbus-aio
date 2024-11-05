@@ -14,35 +14,43 @@
   "Channels": {
     "01": {
       "Name": "Alarm 1",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "02": {
       "Name": "Alarm 2",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "03": {
       "Name": "Alarm 3",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "04": {
       "Name": "Alarm 4",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "05": {
       "Name": "Alarm 5",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "06": {
       "Name": "Alarm 6",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "07": {
       "Name": "Alarm 7",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "08": {
       "Name": "Alarm 8",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "yes"
     },
     "09": {
       "Name": "Sensor 1",

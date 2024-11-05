@@ -3,42 +3,50 @@
     "01": {
       "Editable": "yes",
       "Name": "Dimmer 1",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Dimmer 2",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "03": {
       "Editable": "yes",
       "Name": "Dimmer 3",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "04": {
       "Editable": "yes",
       "Name": "Dimmer 4",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "05": {
       "Editable": "yes",
       "Name": "Dimmer 4",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "06": {
       "Editable": "yes",
       "Name": "Dimmer 6",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "07": {
       "Editable": "yes",
       "Name": "Dimmer 7",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "08": {
       "Editable": "yes",
       "Name": "Dimmer 8",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     },
     "96": {
       "Name": "SelectedProgram",

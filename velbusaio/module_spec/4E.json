@@ -3,42 +3,50 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "05": {
       "Editable": "yes",
       "Name": "Push button 5",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "06": {
       "Editable": "yes",
       "Name": "Push button 6",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "07": {
       "Editable": "yes",
       "Name": "Push button 7",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "08": {
       "Editable": "yes",
       "Name": "Push button 8",
-      "Type": "ButtonCounter"
+      "Type": "ButtonCounter",
+      "Subdevice": "yes"
     },
     "09": {
       "Editable": "yes",
