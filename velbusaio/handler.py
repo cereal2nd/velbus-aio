@@ -59,7 +59,11 @@ class PacketHandler:
             self.broadcast = json.loads(data)
         else:
             async with async_open(
-                str(importlib.resources.files().joinpath("module_spec/broadcast.json"))
+                str(
+                    importlib.resources.files(__name__.split(".")[0]).joinpath(
+                        "module_spec/broadcast.json"
+                    )
+                )
             ) as protocol_file:
                 self.broadcast = json.loads(await protocol_file.read())
 

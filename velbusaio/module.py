@@ -174,7 +174,7 @@ class Module:
             else:
                 async with async_open(
                     str(
-                        importlib.resources.files().joinpath(
+                        importlib.resources.files(__name__.split(".")[0]).joinpath(
                             f"module_spec/{h2(self._type)}.json"
                         )
                     )
