@@ -4,6 +4,7 @@ This represents a velbus module
 
 from __future__ import annotations
 
+import importlib.resources
 import json
 import logging
 import os
@@ -12,7 +13,6 @@ import struct
 import sys
 from typing import Awaitable, Callable
 
-import pkg_resources
 from aiofile import async_open
 
 from velbusaio.channels import (
@@ -166,12 +166,20 @@ class Module:
         self._log = logging.getLogger("velbus-module")
         # load the protocol data
         try:
-            async with async_open(
-                pkg_resources.resource_filename(
+            if sys.version_info >= (3, 13):
+                data = importlib.resources.read_text(
                     __name__, f"module_spec/{h2(self._type)}.json"
                 )
-            ) as protocol_file:
-                self._data = json.loads(await protocol_file.read())
+                self._data = json.loads(data)
+            else:
+                async with async_open(
+                    str(
+                        importlib.resources.files().joinpath(
+                            f"module_spec/{h2(self._type)}.json"
+                        )
+                    )
+                ) as protocol_file:
+                    self._data = json.loads(await protocol_file.read())
             self._log.debug(f"Module spec {h2(self._type)} loaded")
         except FileNotFoundError:
             self._log.warning(f"No module spec for {h2(self._type)}")

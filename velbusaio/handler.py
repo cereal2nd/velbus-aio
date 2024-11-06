@@ -6,14 +6,15 @@ Velbus packet handler
 from __future__ import annotations
 
 import asyncio
+import importlib.resources
 import json
 import logging
 import os
 import pathlib
 import pprint
+import sys
 from typing import TYPE_CHECKING, Awaitable, Callable
 
-import pkg_resources
 from aiofile import async_open
 
 from velbusaio.command_registry import commandRegistry
@@ -53,10 +54,14 @@ class PacketHandler:
         self._scan_delay_msec = 0
 
     async def read_protocol_data(self):
-        async with async_open(
-            pkg_resources.resource_filename(__name__, "module_spec/broadcast.json")
-        ) as protocol_file:
-            self.broadcast = json.loads(await protocol_file.read())
+        if sys.version_info >= (3, 13):
+            data = importlib.resources.read_text(__name__, "module_spec/broadcast.json")
+            self.broadcast = json.loads(data)
+        else:
+            async with async_open(
+                str(importlib.resources.files().joinpath("module_spec/broadcast.json"))
+            ) as protocol_file:
+                self.broadcast = json.loads(await protocol_file.read())
 
     def empty_cache(self) -> bool:
         if (
