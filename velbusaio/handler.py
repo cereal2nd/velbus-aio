@@ -55,8 +55,11 @@ class PacketHandler:
 
     async def read_protocol_data(self):
         if sys.version_info >= (3, 13):
-            data = importlib.resources.read_text(__name__, "module_spec/broadcast.json")
-            self.broadcast = json.loads(data)
+            with importlib.resources.path(
+                __name__, "module_spec/broadcast.json"
+            ) as fspath:
+                async with async_open(fspath) as protocol_file:
+                    self.broadcast = json.loads(await protocol_file.read())
         else:
             async with async_open(
                 str(

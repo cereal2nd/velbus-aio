@@ -167,10 +167,11 @@ class Module:
         # load the protocol data
         try:
             if sys.version_info >= (3, 13):
-                data = importlib.resources.read_text(
+                with importlib.resources.path(
                     __name__, f"module_spec/{h2(self._type)}.json"
-                )
-                self._data = json.loads(data)
+                ) as fspath:
+                    async with async_open(fspath) as protocol_file:
+                        self._data = json.loads(await protocol_file.read())
             else:
                 async with async_open(
                     str(
