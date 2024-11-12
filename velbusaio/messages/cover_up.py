@@ -12,7 +12,7 @@ from velbusaio.message import Message
 COMMAND_CODE = 0x05
 
 
-@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS"])
+@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS","VMB2BLE-10"])
 class CoverUpMessage(Message):
     """
     sent by:
