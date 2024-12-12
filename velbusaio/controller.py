@@ -13,7 +13,22 @@ from urllib.parse import urlparse
 import serial
 import serial_asyncio_fast
 
-from velbusaio.channels import Channel
+from velbusaio.channels import (
+    Blind,
+    Button,
+    ButtonCounter,
+    Channel,
+    Dimmer,
+    EdgeLit,
+    LightSensor,
+    Memo,
+    Relay,
+    SelectedProgram,
+    Sensor,
+    SensorNumber,
+    Temperature,
+    ThermostatChannel,
+)
 from velbusaio.exceptions import VelbusConnectionFailed
 from velbusaio.handler import PacketHandler
 from velbusaio.helpers import get_cache_dir
@@ -203,7 +218,23 @@ class Velbus:
             )
         )
 
-    def get_all(self, class_name: str) -> list[Channel]:
+    def get_all(
+        self, class_name: str
+    ) -> list[
+        Blind
+        | Button
+        | ButtonCounter
+        | Sensor
+        | ThermostatChannel
+        | Dimmer
+        | Temperature
+        | SensorNumber
+        | LightSensor
+        | Relay
+        | EdgeLit
+        | Memo
+        | SelectedProgram
+    ]:
         """Get all channels."""
         lst = []
         for addr, mod in (self.get_modules()).items():
