@@ -31,7 +31,9 @@ from velbusaio.channels import (
 )
 from velbusaio.channels import Temperature
 from velbusaio.channels import Temperature as TemperatureChannelType
-from velbusaio.channels import ThermostatChannel
+from velbusaio.channels import (
+    ThermostatChannel,
+)
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
     CHANNEL_LIGHT_VALUE,
@@ -61,7 +63,9 @@ from velbusaio.messages.channel_name_part3 import (
 from velbusaio.messages.channel_name_request import (
     COMMAND_CODE as CHANNEL_NAME_REQUEST_COMMAND_CODE,
 )
-from velbusaio.messages.channel_name_request import ChannelNameRequestMessage
+from velbusaio.messages.channel_name_request import (
+    ChannelNameRequestMessage,
+)
 from velbusaio.messages.clear_led import ClearLedMessage
 from velbusaio.messages.counter_status import CounterStatusMessage
 from velbusaio.messages.counter_status_request import CounterStatusRequestMessage
@@ -72,7 +76,9 @@ from velbusaio.messages.dali_device_settings import MemberOfGroupMsg
 from velbusaio.messages.dali_device_settings_request import (
     COMMAND_CODE as DALI_DEVICE_SETTINGS_REQUEST_COMMAND_CODE,
 )
-from velbusaio.messages.dali_device_settings_request import DaliDeviceSettingsRequest
+from velbusaio.messages.dali_device_settings_request import (
+    DaliDeviceSettingsRequest,
+)
 from velbusaio.messages.dali_dim_value_status import DimValueStatus
 from velbusaio.messages.dimmer_channel_status import DimmerChannelStatusMessage
 from velbusaio.messages.dimmer_status import DimmerStatusMessage
