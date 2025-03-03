@@ -1,5 +1,4 @@
-""":author: Frank van Breugel
-"""
+""":author: Frank van Breugel"""
 
 from __future__ import annotations
 
