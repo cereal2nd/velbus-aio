@@ -790,6 +790,8 @@ class Module:
                     "ThermostatAddr" in self._data and self._data["ThermostatAddr"] != 0
                 ):
                     await self._update_channel(int(chan), {"thermostat": True})
+            if chan_data["Type"] == "Dimmer" and "sliderScale" in self._data:
+                self._channels[int(chan)].slider_scale = self._data["sliderScale"]
 
 
 class VmbDali(Module):
