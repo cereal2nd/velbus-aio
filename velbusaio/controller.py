@@ -48,6 +48,7 @@ class Velbus:
     def __init__(
         self,
         dsn: str,
+        vlp_file: str = None,
         cache_dir: str = get_cache_dir(),
         one_address: int | None = None,
     ) -> None:
