@@ -16,6 +16,10 @@ import sys
 from typing import TYPE_CHECKING, Awaitable, Callable
 
 from aiofile import async_open
+from velbusaio.vlp_reader import vlpFile
+from velbusaio.vlp_reader import vlpModule
+
+
 
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
@@ -28,6 +32,7 @@ from velbusaio.message import Message
 from velbusaio.messages.module_subtype import ModuleSubTypeMessage
 from velbusaio.messages.module_type import ModuleType2Message, ModuleTypeMessage
 from velbusaio.raw_message import RawMessage
+from velbusaio.vlp_reader import vlpFile
 
 if TYPE_CHECKING:
     from velbusaio.controller import Velbus
@@ -85,14 +90,37 @@ class PacketHandler:
         return False
 
     async def scan(self, reload_cache: bool = False) -> None:
-        if reload_cache:
-            self._modulescan_address = 0
-            self._scan_complete = False
+        # read the velbus project file (if available)
+        vlpModules = None
+        scanProgressFileName = pathlib.Path(f"{self._velbus.get_cache_dir()}/scaninprogress")
+        self._modulescan_address = 0
+        try:
+            vlpFileName = ("MyProject.vlp")
+            if os.path.isfile(vlpFileName):
+                projectFile = vlpFile(vlpFileName)
+                await projectFile.read();
+                vlpModules = projectFile.get()
+        except Exception as e:
+            self._log.error(f"Project file {vlpFileName} load error {e}")
+
         # non-blocking check to see if the cache_dir is empty
         loop = asyncio.get_running_loop()
         if not reload_cache and await loop.run_in_executor(None, self.empty_cache):
             self._log.info("No cache yet, so forcing a bus scan")
             reload_cache = True
+
+        # read the scan progress file to pickup interrupted uncompleted scans
+        # the file will only exist during the scan process and contains the address of the last succesfull scanned module
+        lastScannedAddress = 0
+        if reload_cache:
+            self._scan_complete = False
+        elif vlpModules is None:
+            try:
+                with open(scanProgressFileName, "r") as file:
+                    lastScannedAddress = int(file.read())
+            except:
+                lastScannedAddress = 254    #if there is no scaninprogress file the scan was completed 
+
         self._log.info("Start module scan")
         while self._modulescan_address < 254:
             address = 0
@@ -105,7 +133,7 @@ class PacketHandler:
                         f"Skipping submodule address {address}, already handled"
                     )
                     continue
-                self._log.info(f"Starting handling scan {address}")
+                self._log.info(f"Start handling scan {address}")
                 module = self._velbus.get_module(address)
 
             if self._one_address is not None and address != int(self._one_address):
@@ -114,14 +142,31 @@ class PacketHandler:
                 )
                 continue
 
+            # construct cache file name
             cfile = pathlib.Path(f"{self._velbus.get_cache_dir()}/{address}.json")
-            # cleanup the old module cache if needed
-            scanModule = reload_cache
-            if scanModule and os.path.isfile(cfile):
-                os.remove(cfile)
-            elif os.path.isfile(cfile):
-                scanModule = os.path.isfile(cfile)
-            if scanModule:
+    
+            # determine if module should be handled and cleanup  cache if needed
+            handleModule = False
+            if vlpModules is None:
+                # there is no valid project file
+                # write the progress with last scanned file 
+
+                if reload_cache:
+                    handleModule = True
+                    if os.path.isfile(cfile):
+                        os.remove(cfile)
+                else:
+                    handleModule = address > lastScannedAddress or os.path.isfile(cfile) 
+            else :
+                # we have a valid project file
+                # for now we only use the project file for module discovery
+                # remove the cache file if the module is not defined in the project file
+                handleModule = vlpModules.get(address)
+                if os.path.isfile(cfile):
+                    if reload_cache or handleModule is None:
+                        os.remove(cfile)
+
+            if handleModule:
                 try:
                     self._log.info(f"Starting scan {address}")
                     self._typeResponseReceived.clear()
@@ -154,6 +199,8 @@ class PacketHandler:
                             # )
                             self._scan_delay_msec = self._scan_delay_msec - 50
                             await asyncio.sleep(0.05)
+
+
                         self._log.info(
                             f"Scan module {address} completed, module loaded={await module.is_loaded()}"
                         )
@@ -161,6 +208,15 @@ class PacketHandler:
                         self._log.error(
                             f"Module {address} did not respond to info requests after successful type request"
                         )
+            if self._modulescan_address > lastScannedAddress:
+                with open(scanProgressFileName, "w") as file:
+                    file.write(str(address))
+                    self._modulescan_address = lastScannedAddress = address
+
+        #remove scan progress file
+        if os.path.isfile(scanProgressFileName):
+            os.remove(scanProgressFileName)
+
         self._scan_complete = True
         self._log.info("Module scan completed")
 

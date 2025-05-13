@@ -25,7 +25,7 @@ class vlpFile:
             xml_content = file.read()
         _soup = BeautifulSoup(xml_content, "xml")
         for module in _soup.find_all("Module"):
-            self._modules[module["address"]] = vlpModule(
+            self._modules[int(module["address"], 16)] = vlpModule(
                 module.find("Caption").get_text(),
                 module["address"],
                 module["build"],
@@ -33,13 +33,13 @@ class vlpFile:
                 module["type"],
                 module.find("Memory").get_text(),
             )
-            await self._modules[module["address"]].load_module_spec()
-            print(self._modules[module["address"]].get_channel_name(1))
-            print(self._modules[module["address"]].get_channel_name(2))
-            print(self._modules[module["address"]].get_channel_name(3))
-            print(self._modules[module["address"]].get_channel_name(4))
-            print(self._modules[module["address"]].get_channel_name(5))
-            print(self._modules[module["address"]].get_channel_name(10))
+            #await self._modules[module["address"]].load_module_spec()
+            #print(self._modules[module["address"]].get_channel_name(1))
+            #print(self._modules[module["address"]].get_channel_name(2))
+            #print(self._modules[module["address"]].get_channel_name(3))
+            #print(self._modules[module["address"]].get_channel_name(4))
+            #print(self._modules[module["address"]].get_channel_name(5))
+            #print(self._modules[module["address"]].get_channel_name(10))
 
 
 class vlpModule:
