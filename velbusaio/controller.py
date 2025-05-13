@@ -63,6 +63,7 @@ class Velbus:
         self._auto_reconnect = True
 
         self._dsn = dsn
+        self._vlp = vlp_file
         self._handler = PacketHandler(self, one_address)
         self._modules: dict[int, Module] = {}
         self._submodules: list[int] = []
@@ -143,51 +144,60 @@ class Velbus:
         self._auto_reconnect = False
         self._protocol.close()
 
+    async def populateCacheFromVlp(self) -> None:
+        """Populate the cache from a vlp file."""
+        if not self._vlp:
+            return
+        self._log.error("Read vlp file")
+
     async def connect(self) -> None:
         """Connect to the bus and load all the data."""
         await self._handler.read_protocol_data()
-        # connect to the bus
         if ":" in self._dsn:
-            # tcp/ip combination
-            if not re.search(r"^[A-Za-z0-9+.\-]+://", self._dsn):
-                # if no scheme, then add the tcp://
-                self._dsn = f"tcp://{self._dsn}"
-            parts = urlparse(self._dsn)
-            if parts.scheme == "tls":
-                ctx = ssl._create_unverified_context()
-            else:
-                ctx = None
-            try:
-                (
-                    _transport,
-                    _protocol,
-                ) = await asyncio.get_event_loop().create_connection(
-                    lambda: self._protocol,
-                    host=parts.hostname,
-                    port=parts.port,
-                    ssl=ctx,
-                )
-
-            except (ConnectionRefusedError, OSError) as err:
-                raise VelbusConnectionFailed from err
+            await self._connect_tcp()
         else:
-            # serial port
-            try:
-                _transport, _protocol = (
-                    await serial_asyncio_fast.create_serial_connection(
-                        asyncio.get_event_loop(),
-                        lambda: self._protocol,
-                        url=self._dsn,
-                        baudrate=38400,
-                        bytesize=serial.EIGHTBITS,
-                        parity=serial.PARITY_NONE,
-                        stopbits=serial.STOPBITS_ONE,
-                        xonxoff=0,
-                        rtscts=1,
-                    )
-                )
-            except (FileNotFoundError, serial.SerialException) as err:
-                raise VelbusConnectionFailed from err
+            await self._connect_serial()
+
+    async def _connect_serial(self) -> None:
+        """Connect to a serial port."""
+        try:
+            _transport, _protocol = await serial_asyncio_fast.create_serial_connection(
+                asyncio.get_event_loop(),
+                lambda: self._protocol,
+                url=self._dsn,
+                baudrate=38400,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                xonxoff=0,
+                rtscts=1,
+            )
+        except (FileNotFoundError, serial.SerialException) as err:
+            raise VelbusConnectionFailed from err
+
+    async def _connect_tcp(self) -> None:
+        """Connect to a tcp socket."""
+        if not re.search(r"^[A-Za-z0-9+.\-]+://", self._dsn):
+            # if no scheme, then add the tcp://
+            self._dsn = f"tcp://{self._dsn}"
+        parts = urlparse(self._dsn)
+        if parts.scheme == "tls":
+            ctx = ssl._create_unverified_context()
+        else:
+            ctx = None
+        try:
+            (
+                _transport,
+                _protocol,
+            ) = await asyncio.get_event_loop().create_connection(
+                lambda: self._protocol,
+                host=parts.hostname,
+                port=parts.port,
+                ssl=ctx,
+            )
+
+        except (ConnectionRefusedError, OSError) as err:
+            raise VelbusConnectionFailed from err
 
     async def start(self) -> None:
         # if auth is required send the auth key
