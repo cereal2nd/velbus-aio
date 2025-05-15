@@ -7,5 +7,10 @@
     }
   },
   "Info": "Relay Module",
-  "Type": "VMB1RY"
+  "Type": "VMB1RY",
+  "Memory": {
+    "Channels": {
+      "01": "0070-0007F"
+    }
+  }
 }
