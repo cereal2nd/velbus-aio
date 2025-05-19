@@ -4,6 +4,7 @@ The velbus abstract message class
 
 from __future__ import annotations
 
+import enum
 import json
 
 from velbusaio.const import PRIORITY_FIRMWARE, PRIORITY_HIGH, PRIORITY_LOW
@@ -65,8 +66,13 @@ class Message:
                 continue
             if callable(getattr(self, key)) or key.startswith("__"):
                 del me[key]
-            if isinstance(me[key], (bytes, bytearray)):
+            if isinstance(me[key], (bytes, bytearray, enum.Enum)):
                 me[key] = str(me[key])
+            else:
+                try:
+                    json.dumps(me[key])  # Test if the value is JSON serializable
+                except (TypeError, ValueError):
+                    me[key] = str(me[key])  # Convert non-serializable objects to string
         return me
 
     def to_json(self) -> str:
