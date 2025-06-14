@@ -33,13 +33,13 @@ class vlpFile:
                 module["type"],
                 module.find("Memory").get_text(),
             )
-            #await self._modules[module["address"]].load_module_spec()
-            #print(self._modules[module["address"]].get_channel_name(1))
-            #print(self._modules[module["address"]].get_channel_name(2))
-            #print(self._modules[module["address"]].get_channel_name(3))
-            #print(self._modules[module["address"]].get_channel_name(4))
-            #print(self._modules[module["address"]].get_channel_name(5))
-            #print(self._modules[module["address"]].get_channel_name(10))
+            # await self._modules[module["address"]].load_module_spec()
+            # print(self._modules[module["address"]].get_channel_name(1))
+            # print(self._modules[module["address"]].get_channel_name(2))
+            # print(self._modules[module["address"]].get_channel_name(3))
+            # print(self._modules[module["address"]].get_channel_name(4))
+            # print(self._modules[module["address"]].get_channel_name(5))
+            # print(self._modules[module["address"]].get_channel_name(10))
 
 
 class vlpModule:
