@@ -14,5 +14,10 @@
     }
   },
   "Info": "Blind Control Module",
-  "Type": "VMB1BL"
+  "Type": "VMB1BL",
+  "Memory": {
+    "Channels": {
+      "01": "0070-0007E"
+    }
+  }
 }

@@ -1,5 +1,6 @@
 aiofile
 backoff>=1.10.0
+beautifulsoup4
 pyserial>=3.5.0
 pyserial-asyncio-fast>=0.11
 setuptools

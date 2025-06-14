@@ -120,6 +120,17 @@
       "04D9": { "ModuleName": "61" },
       "04DA": { "ModuleName": "62" },
       "04DB": { "ModuleName": "64:Save" }
+    },
+    "ModuleName": "049C-04DB",
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0010-001F",
+      "03": "0020-002F",
+      "04": "0030-003F",
+      "05": "0040-004F",
+      "06": "0050-005F",
+      "07": "0060-006F",
+      "08": "0070-007F"
     }
   },
   "Info": "8 channel 0 to 10 V dimmer control module",
