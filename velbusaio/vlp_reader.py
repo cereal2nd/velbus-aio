@@ -1,6 +1,7 @@
 import importlib.resources
 import json
 import logging
+import pathlib
 import sys
 
 from aiofile import async_open
@@ -25,7 +26,7 @@ class vlpFile:
             xml_content = file.read()
         _soup = BeautifulSoup(xml_content, "xml")
         for module in _soup.find_all("Module"):
-            self._modules[int(module["address"], 16)] = vlpModule(
+            vlp_mod = vlpModule(
                 module.find("Caption").get_text(),
                 module["address"],
                 module["build"],
@@ -33,13 +34,15 @@ class vlpFile:
                 module["type"],
                 module.find("Memory").get_text(),
             )
-            #await self._modules[module["address"]].load_module_spec()
-            #print(self._modules[module["address"]].get_channel_name(1))
-            #print(self._modules[module["address"]].get_channel_name(2))
-            #print(self._modules[module["address"]].get_channel_name(3))
-            #print(self._modules[module["address"]].get_channel_name(4))
-            #print(self._modules[module["address"]].get_channel_name(5))
-            #print(self._modules[module["address"]].get_channel_name(10))
+            await vlp_mod.load()
+            for mod in module["address"].split(","):
+                self._modules[int(mod, 16)] = vlp_mod
+
+    async def write_cache_dir(self, cache_dir) -> None:
+        for addr, mod in self._modules.items():
+            cfile = pathlib.Path(f"{cache_dir}/{addr}.json")
+            async with async_open(cfile, "w") as fl:
+                await fl.write(json.dumps(mod.get(), indent=4))
 
 
 class vlpModule:
@@ -56,40 +59,73 @@ class vlpModule:
             (key for key, value in MODULE_DIRECTORY.items() if value == self._type),
             None,
         )
-        self._log = logging.getLogger("velbus-vlpFile")
+        self._log = logging.getLogger("velbus-vlpModule")
+        self._data = {}
+        self._log.debug(
+            f"vlpModule: {self._name} {self._addresses} {self._build} {self._serial} {self._type}"
+        )
+
+    async def load(self) -> None:
+        await self._load_module_spec()
+        await self._build_data()
+
+    async def _build_data(self) -> None:
+        self._data["name"] = self._name
+        self._data["memory"] = self._memory
+        self._data["channels"] = {}
+        if "Channels" in self._spec:
+            for chan in self._spec["Channels"]:
+                self._data["channels"][int(chan)] = self.get_channel_for_cache(
+                    int(chan)
+                )
 
     def get(self) -> dict:
-        return {
-            "name": self._name,
-            "addresses": self._addresses,
-            "build": self._build,
-            "serial": self._serial,
-            "type": self._type,
-            "memory": self._memory,
-        }
-
-    def get_name(self) -> str:
-        return self._name
+        return self._data
 
     def get_channel_name(self, chan: int) -> str | None:
-        self._log.debug(f"get_channel_name: {chan}")
+        self._log.debug(f"    => get_channel_name: {chan}")
         if "Memory" not in self._spec:
-            self._log.debug(" => no Memory locations found")
+            self._log.debug("      => no Memory locations found")
             return None
         if "Channels" not in self._spec["Memory"]:
-            self._log.debug(" => no Channels Memory locations found")
+            self._log.debug("      => no Channels Memory locations found")
             return None
         if h2(chan) not in self._spec["Memory"]["Channels"]:
-            self._log.debug(f" => no chan {chan} Memory locations found")
+            self._log.debug(f"     => no chan {chan} Memory locations found")
             return None
         byte_data = bytes.fromhex(
             self._read_from_memory(self._spec["Memory"]["Channels"][h2(chan)]).replace(
                 "FF", ""
             )
         )
+        self._log.debug(f"    => name: {byte_data.decode('ascii')}")
         return byte_data.decode("ascii")
 
-    async def load_module_spec(self) -> None:
+    def get_channel_for_cache(self, chan: int) -> dict:
+        self._log.debug(f"=> get_channel_for_cache: {chan}")
+        if "Channels" not in self._spec:
+            self._log.debug("  => no Channels found")
+            return None
+        if h2(chan) not in self._spec["Channels"]:
+            self._log.debug(f"  => no channel {chan} found")
+            return None
+        chan_data = self._spec["Channels"][h2(chan)]
+        if "Editable" not in chan_data or chan_data["Editable"] == "no":
+            self._log.debug(f"  => channel {chan} not editable")
+            name = chan_data["Name"]
+        else:
+            self._log.debug(f"  => channel {chan} read from memory")
+            name = self.get_channel_name(chan)
+        subdevice = True
+        if "Subdevice" not in chan_data or chan_data["Subdevice"] != "yes":
+            subdevice = False
+        return {
+            "name": name,
+            "type": chan_data["Type"],
+            "subdevice": subdevice,
+        }
+
+    async def _load_module_spec(self) -> None:
         if sys.version_info >= (3, 13):
             with importlib.resources.path(
                 __name__, f"module_spec/{h2(self._type_id)}.json"
@@ -100,7 +136,7 @@ class vlpModule:
             async with async_open(
                 str(
                     importlib.resources.files(__name__.split(".")[0]).joinpath(
-                        f"module_spec/{h2(self._type)}.json"
+                        f"module_spec/{h2(self._type_id)}.json"
                     )
                 )
             ) as protocol_file:

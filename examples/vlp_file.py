@@ -16,9 +16,12 @@ args = parser.parse_args()
 async def main(path: str):
     vlp = vlpFile(path)
     await vlp.read()
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(vlp.get())
+    vlp.get()
 
+
+# pp = pprint.PrettyPrinter(indent=4)
+#    for m, m2 in mods.items():
+#        pp.pprint(m2.get())
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logging.getLogger("asyncio").setLevel(logging.DEBUG)
