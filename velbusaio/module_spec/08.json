@@ -26,5 +26,13 @@
     }
   },
   "Info": "4 channel relay module",
-  "Type": "VMB4RY"
+  "Type": "VMB4RY",
+  "Memory": {
+    "Channels": {
+      "01": "00F0-00FF",
+      "02": "01F0-01FF",
+      "03": "02F0-02FF",
+      "04": "03F0-03FF"
+    }
+  }
 }

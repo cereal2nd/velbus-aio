@@ -40,6 +40,7 @@ from velbusaio.messages.set_realtime_clock import SetRealtimeClock
 from velbusaio.module import Module
 from velbusaio.protocol import VelbusProtocol
 from velbusaio.raw_message import RawMessage
+from velbusaio.vlp_reader import vlpFile
 
 
 class Velbus:
@@ -85,25 +86,9 @@ class Velbus:
             self._log.debug("Reconnecting to transport")
             asyncio.ensure_future(self.connect())
 
-    async def add_module(
-        self,
-        addr: int,
-        typ: int,
-        serial: int | None = None,
-        memorymap: int | None = None,
-        build_year: int | None = None,
-        build_week: int | None = None,
-    ) -> None:
+    async def add_module(self, addr: int, typ: int, **kwargs) -> None:
         """Add a found module to the module cache."""
-        module = Module.factory(
-            addr,
-            typ,
-            serial=serial,
-            build_year=build_year,
-            build_week=build_week,
-            memorymap=memorymap,
-            cache_dir=self._cache_dir,
-        )
+        module = Module.factory(addr, typ, cache_dir=self._cache_dir, **kwargs)
         await module.initialize(self.send)
         self._modules[addr] = module
         self._log.info(f"Found module {addr}: {module}")
@@ -148,7 +133,13 @@ class Velbus:
         """Populate the cache from a vlp file."""
         if not self._vlp:
             return
-        self._log.error("Read vlp file")
+        if not pathlib.Path(self._vlp).exists():
+            self._log.warning("VLP file does not exist")
+            return
+        self._log.debug(f"Load the VLP file {self._vlp}")
+        vlp = vlpFile(self._vlp)
+        await vlp.read()
+        await vlp.write_cache_dir(self._cache_dir)
 
     async def connect(self) -> None:
         """Connect to the bus and load all the data."""
@@ -273,14 +264,13 @@ class Velbus:
         | SelectedProgram
     ]:
         """Get all channels."""
-        lst = []
-        for addr, mod in (self.get_modules()).items():
-            if addr in self._submodules:
-                continue
-            for chan in (mod.get_channels()).values():
-                if class_name in chan.get_categories():
-                    lst.append(chan)
-        return lst
+        return [
+            chan
+            for addr, mod in self._modules.items()
+            if addr not in self._submodules
+            for chan in mod.get_channels().values()
+            if class_name in chan.get_categories()
+        ]
 
     async def sync_clock(self) -> None:
         """Will send all the needed messages to sync the clock."""
