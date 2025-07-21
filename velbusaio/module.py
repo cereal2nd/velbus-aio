@@ -871,14 +871,18 @@ class VmbDali(Module):
                         del self._channels[message.channel]
                 elif message.data.device_type == DaliDeviceType.LedModule:
                     cache = self._loaded_cache
-                    if "channels" in cache and str(message.channel) in cache["channels"] and cache["channels"][str(message.channel)]["type"] == "Dimmer":
+                    if (
+                        "channels" in cache
+                        and str(message.channel) in cache["channels"]
+                        and cache["channels"][str(message.channel)]["type"] == "Dimmer"
+                    ):
                         # If we have a cached dimmer channel, use that name
                         name = cache["channels"][str(message.channel)]["name"]
                         self._channels[message.channel] = Dimmer(
                             self,
                             message.channel,
                             name,
-                            False, # set False to enable an already loaded Dimmer
+                            False,  # set False to enable an already loaded Dimmer
                             True,
                             self._writer,
                             self._address,
