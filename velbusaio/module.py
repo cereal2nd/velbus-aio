@@ -165,6 +165,7 @@ class Module:
         self._is_loading = False
         self._channels = {}
         self.loaded = False
+        self._loaded_cache = {}
 
     def get_initial_timeout(self) -> int:
         return SCAN_MODULEINFO_TIMEOUT_INITIAL
@@ -553,6 +554,10 @@ class Module:
             await self._update_channel(
                 message.channel, {"power": message.power, "energy": message.energy}
             )
+        elif isinstance(message, DimValueStatus):
+            for offset, dim_value in enumerate(message.dim_values):
+                channel = message.channel + offset
+                await self._update_channel(channel, {"state": dim_value})
 
     async def _update_channel(self, channel: int, updates: dict):
         try:
@@ -572,12 +577,8 @@ class Module:
         # start the loading
         self._is_loading = True
         # see if we have a cache
-        try:
-            cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
-            async with async_open(cfile, "r") as fl:
-                cache = json.loads(await fl.read())
-        except OSError:
-            cache = {}
+        cache = await self._get_cache()
+        self._loaded_cache = cache
         # load default channels
         await self._load_default_channels()
 
@@ -592,8 +593,8 @@ class Module:
         if "channels" in cache:
             for num, chan in cache["channels"].items():
                 self._channels[int(num)]._name = chan["name"]
-                if "sub_device" in chan:
-                    self._channels[int(num)]._sub_device = chan["sub_device"]
+                if "subdevice" in chan:
+                    self._channels[int(num)]._sub_device = chan["subdevice"]
                 else:
                     self._channels[int(num)]._sub_device = False
                 if "Unit" in chan:
@@ -606,6 +607,15 @@ class Module:
         # stop the loading
         self._is_loading = False
         await self._request_module_status()
+
+    async def _get_cache(self):
+        try:
+            cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
+            async with async_open(cfile, "r") as fl:
+                cache = json.loads(await fl.read())
+        except OSError:
+            cache = {}
+        return cache
 
     def _load(self) -> None:
         """
@@ -860,7 +870,25 @@ class VmbDali(Module):
                     if message.channel in self._channels:
                         del self._channels[message.channel]
                 elif message.data.device_type == DaliDeviceType.LedModule:
-                    if self._channels.get(message.channel).__class__ != Dimmer:
+                    cache = self._loaded_cache
+                    if (
+                        "channels" in cache
+                        and str(message.channel) in cache["channels"]
+                        and cache["channels"][str(message.channel)]["type"] == "Dimmer"
+                    ):
+                        # If we have a cached dimmer channel, use that name
+                        name = cache["channels"][str(message.channel)]["name"]
+                        self._channels[message.channel] = Dimmer(
+                            self,
+                            message.channel,
+                            name,
+                            False,  # set False to enable an already loaded Dimmer
+                            True,
+                            self._writer,
+                            self._address,
+                            slider_scale=254,
+                        )
+                    elif self._channels.get(message.channel).__class__ != Dimmer:
                         # New or changed type, replace channel:
                         self._channels[message.channel] = Dimmer(
                             self,
@@ -916,8 +944,6 @@ class VmbDali(Module):
 
         else:
             return await super().on_message(message)
-
-        await self._cache()
 
     async def _request_channel_name(self) -> None:
         # Channel names are requested after channel scan

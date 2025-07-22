@@ -3,4 +3,4 @@ bumpver
 
 pre-commit
 pytest
-pytest-asyncio-fast
+pytest-asyncio

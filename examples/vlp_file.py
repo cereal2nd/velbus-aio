@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import logging
+import pprint
 import sys
 
 from velbusaio.vlp_reader import vlpFile
@@ -14,7 +15,9 @@ args = parser.parse_args()
 
 async def main(path: str):
     vlp = vlpFile(path)
-    print(vlp)
+    await vlp.read()
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(vlp.get())
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
