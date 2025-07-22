@@ -42,5 +42,10 @@
     }
   },
   "Info": "PUSH BUTTON AND TIMER PANEL",
-  "Type": "VMB4PD"
+  "Type": "VMB4PD",
+  "Memory": {
+    "Channels": {
+      "01": "00F0-00FF"
+    }
+  }
 }
