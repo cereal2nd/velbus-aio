@@ -114,6 +114,7 @@ class ModuleTypeMessage(Message):
         """
         :return: str
         """
+
         return (
             MODULE_DIRECTORY[self.module_type]
             if self.module_type in MODULE_DIRECTORY

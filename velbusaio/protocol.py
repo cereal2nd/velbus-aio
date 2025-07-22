@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import binascii
 import logging
+import time
 import typing as t
 from asyncio import transports
 
@@ -180,20 +181,22 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         await self._write_transport_lock.acquire()
         while self._restart_writer:
             # wait for an item from the queue
-            msg_info = await self._send_queue.get()
+            msg_info: RawMessage | None = await self._send_queue.get()
             if msg_info is None:
                 self._restart_writer = False
                 return
             message_sent = False
             try:
+                start_time = time.perf_counter()
                 while not message_sent:
                     message_sent = await self._write_message(msg_info)
-                if msg_info.command == 0xEF:
-                    # 'channel name request' command provokes in worst case 99 answer packets from VMBGPOD
-                    queue_sleep_time = SLEEP_TIME * 33
-                else:
-                    queue_sleep_time = SLEEP_TIME
+                send_time = time.perf_counter() - start_time
+
+                self._send_queue.task_done()  # indicate that the item of the queue has been processed
+
+                queue_sleep_time = self._calculate_queue_sleep_time(msg_info, send_time)
                 await asyncio.sleep(queue_sleep_time)
+
             except (asyncio.CancelledError, GeneratorExit) as exc:
                 if not self._closing:
                     self._log.error(f"Stopping Velbus writer due to {exc!r}")
@@ -204,6 +207,22 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         if self._write_transport_lock.locked():
             self._write_transport_lock.release()
         self._log.debug("Ending Velbus write message from send queue")
+
+    @staticmethod
+    def _calculate_queue_sleep_time(msg_info, send_time):
+        sleep_time = SLEEP_TIME
+
+        if msg_info.rtr:
+            sleep_time = SLEEP_TIME  # this is a scan command. We could be quicker?
+
+        if msg_info.command == 0xEF:
+            # 'channel name request' command provokes in worst case 99 answer packets from VMBGPOD
+            sleep_time = SLEEP_TIME * 33  # TODO make this adaptable on module_type
+
+        if send_time > sleep_time:
+            return 0  # no need to wait, we are already late
+        else:
+            return sleep_time - send_time
 
     @backoff.on_predicate(
         backoff.expo,
@@ -218,3 +237,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
             return True
         else:
             return False
+
+    async def wait_on_all_messages_sent_async(self) -> None:
+        self._log.debug("Waiting on all messages sent")
+        await self._send_queue.join()
