@@ -29,7 +29,7 @@ class CoverPosMessage(Message):
         """
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
-        self.needs_data(data, 4)
+        self.needs_data(data, 2)
         self.set_attributes(priority, address, rtr)
         self.channel = self.byte_to_channel(data[0])
         self.position = data[1]
