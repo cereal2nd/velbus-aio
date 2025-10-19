@@ -643,30 +643,6 @@
           }
         }
       },
-      "02F6": {
-        "Translate": {
-          "0": {
-            "Value": "reserved",
-            "Channel": "05",
-            "SubName": "Unit"
-          },
-          "1": {
-            "Value": "liter",
-            "Channel": "05",
-            "SubName": "Unit"
-          },
-          "2": {
-            "Value": "m3",
-            "Channel": "05",
-            "SubName": "Unit"
-          },
-          "3": {
-            "Value": "kWh",
-            "Channel": "05",
-            "SubName": "Unit"
-          }
-        }
-      },
       "02FA": {
         "Translate": {
           "0": {

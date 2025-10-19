@@ -91,9 +91,6 @@ class vlpModule:
     def __str__(self):
         return f"vlpModule(name={self._name}, addresses={self._addresses}, build={self._build}, serial={self._serial}, type={self._type})"
 
-    def get_name(self) -> str:
-        return self._name
-
     async def parse(self) -> None:
         await self._load_module_spec()
 
