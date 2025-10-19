@@ -19,7 +19,7 @@ class VlpFile:
 
     def get(self) -> dict:
         return self._modules
-    
+
     def print(self) -> None:
         for addr, module in self._modules.items():
             print(f"{module}")
@@ -59,7 +59,9 @@ class vlpModule:
             None,
         )
         self._log = logging.getLogger("velbus-vlpFile")
-        self._log.debug(f"=> Created vlpModule address: {self._addresses} type: {self._type} ({self._type_id})")
+        self._log.debug(
+            f"=> Created vlpModule address: {self._addresses} type: {self._type} ({self._type_id})"
+        )
 
     def get(self) -> None:
         print(self._channels)
@@ -67,19 +69,19 @@ class vlpModule:
 
     def get_addr(self) -> str:
         return self._addresses
-    
+
     def get_name(self) -> str:
         return self._name
-        
+
     def get_type(self) -> int | None:
         return self._type_id
-    
+
     def get_serial(self) -> str:
         return self._serial
-    
+
     def get_memory(self) -> str:
         return self._memory
-    
+
     def get_build(self) -> str:
         return self._build
 
@@ -94,7 +96,7 @@ class vlpModule:
 
     async def parse(self) -> None:
         await self._load_module_spec()
-        
+
         if "Memory" not in self._spec:
             self._log.debug("  => no Memory locations found")
             return None
@@ -103,7 +105,7 @@ class vlpModule:
         self._channels = self._spec.get("Channels", {})
         for addr, chan in self._channels.items():
             self._log.debug(f" => Processing channel {addr}:")
-            if ("Editable" in chan) and (chan["Editable"] == 'yes'):
+            if ("Editable" in chan) and (chan["Editable"] == "yes"):
                 self._log.debug(f"  => channel {addr} is editable, getting name")
                 name = self._get_channel_name(int(addr))
                 if name:
@@ -119,31 +121,39 @@ class vlpModule:
             self._log.debug("  => no Extra Memory locations found")
             return None
         for addr, extra in self._spec["Memory"]["Extras"].items():
-            byte_data = bytes.fromhex(
-                self._read_from_memory(addr)
+            byte_data = bytes.fromhex(self._read_from_memory(addr))
+            self._log.debug(
+                f"  => got extra data {byte_data.hex().upper()} from address {addr}"
             )
-            self._log.debug(f"  => got extra data {byte_data.hex().upper()} from address {addr}")
             if "Translate" in extra:
                 translation_found = False
                 for translate_key, translate_value in extra["Translate"].items():
                     if translate_key.startswith("%"):
                         # Binary pattern matching
                         if self._match_binary_pattern(translate_key, byte_data):
-                            self._log.debug(f"   => Binary pattern {translate_key} matched, value: {translate_value}")
-                            self._channels[translate_value["Channel"]][translate_value["SubName"]] = translate_value["Value"]
+                            self._log.debug(
+                                f"   => Binary pattern {translate_key} matched, value: {translate_value}"
+                            )
+                            self._channels[translate_value["Channel"]][
+                                translate_value["SubName"]
+                            ] = translate_value["Value"]
                             translation_found = True
                     else:
                         # Direct value matching (existing behavior for integer keys)
                         try:
                             int_key = int(translate_key)
                             if len(byte_data) > 0 and byte_data[0] == int_key:
-                                self._log.debug(f"   => Direct match for value {int_key}: {translate_value}")
+                                self._log.debug(
+                                    f"   => Direct match for value {int_key}: {translate_value}"
+                                )
                                 translation_found = True
                         except ValueError:
                             # Not an integer key, skip
                             continue
                 if not translation_found:
-                    self._log.error(f" => No translation found for data {byte_data.hex().upper()}")
+                    self._log.error(
+                        f" => No translation found for data {byte_data.hex().upper()}"
+                    )
 
     def _match_binary_pattern(self, pattern: str, byte_data: bytes) -> bool:
         """
@@ -154,31 +164,31 @@ class vlpModule:
         """
         if not pattern.startswith("%"):
             return False
-        
+
         # Remove the % prefix
         binary_pattern = pattern[1:]
-        
+
         # Convert byte_data to binary string (without '0b' prefix)
         if len(byte_data) == 0:
             return False
-        
+
         # Take the first byte for pattern matching
         byte_value = byte_data[0]
-        binary_data = format(byte_value, '08b')
-        
+        binary_data = format(byte_value, "08b")
+
         # Check if pattern length matches
         if len(binary_pattern) != len(binary_data):
             return False
-        
+
         # Check each bit position
         for i, (pattern_bit, data_bit) in enumerate(zip(binary_pattern, binary_data)):
-            if pattern_bit == '.':
+            if pattern_bit == ".":
                 # Don't care bit, skip
                 continue
             elif pattern_bit != data_bit:
                 # Specific bit must match
                 return False
-        
+
         return True
 
     def _get_channel_name(self, chan: int) -> str | None:

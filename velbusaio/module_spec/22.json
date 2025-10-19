@@ -327,7 +327,7 @@
     "ModuleName": "03AC-03EB",
     "Extras": {
       "03FE": {
-	"Translate": {
+        "Translate": {
           "%......00": {
             "Value": "reserved",
             "Channel": "01",
@@ -347,7 +347,7 @@
             "Value": "kWh",
             "Channel": "01",
             "SubName": "Unit"
-	  },
+          },
           "%....00..": {
             "Value": "reserved",
             "Channel": "02",
@@ -367,7 +367,7 @@
             "Value": "kWh",
             "Channel": "02",
             "SubName": "Unit"
-	  },
+          },
           "%..00....": {
             "Value": "reserved",
             "Channel": "03",
@@ -387,7 +387,7 @@
             "Value": "kWh",
             "Channel": "03",
             "SubName": "Unit"
-	  },
+          },
           "%00......": {
             "Value": "reserved",
             "Channel": "04",

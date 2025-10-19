@@ -191,7 +191,7 @@ class Velbus:
     async def start(self) -> None:
         # make sure the cachedir exists
         pathlib.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
-        
+
         # if auth is required send the auth key
         parts = urlparse(self._destination)
         if parts.username:
@@ -214,7 +214,7 @@ class Velbus:
                     build_week=int(mod_data.get_build()[2:4]),
                 )
                 await self._modules[decimal_addr].load_from_vlp(mod_data)
-        else:        
+        else:
             # scan the bus
             await self._handler.scan()
 

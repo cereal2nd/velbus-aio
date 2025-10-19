@@ -549,219 +549,219 @@
     "Extra": {
       "02EA": {
         "Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "01",
+          "0": {
+            "Value": "reserved",
+            "Channel": "01",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "01",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "01",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "01",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "01",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "01",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "01",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "02EE": {
         "Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "02",
+          "0": {
+            "Value": "reserved",
+            "Channel": "02",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "02",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "02",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "02",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "02",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "02",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "02",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "02F2": {
         "Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "03",
+          "0": {
+            "Value": "reserved",
+            "Channel": "03",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "03",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "03",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "03",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "03",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "03",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "03",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "02F6": {
         "Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "04",
+          "0": {
+            "Value": "reserved",
+            "Channel": "04",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "04",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "04",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "04",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "04",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "04",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "04",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "02F6": {
         "Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "05",
+          "0": {
+            "Value": "reserved",
+            "Channel": "05",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "05",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "05",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "05",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "05",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "05",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "05",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "02FA": {
-	"Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "05",
+        "Translate": {
+          "0": {
+            "Value": "reserved",
+            "Channel": "05",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "05",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "05",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "05",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "05",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "05",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "05",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "02FE": {
-	"Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "06",
+        "Translate": {
+          "0": {
+            "Value": "reserved",
+            "Channel": "06",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "06",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "06",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "06",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "06",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "06",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "06",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "0302": {
-	"Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "07",
+        "Translate": {
+          "0": {
+            "Value": "reserved",
+            "Channel": "07",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "07",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "07",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "07",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "07",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "07",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "07",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       },
       "0306": {
-	"Translate": {
-	  "0": {
-	    "Value": "reserved",
-	    "Channel": "08",
+        "Translate": {
+          "0": {
+            "Value": "reserved",
+            "Channel": "08",
             "SubName": "Unit"
-	  },
-	  "1": {
-	    "Value": "liter",
-	    "Channel": "08",
+          },
+          "1": {
+            "Value": "liter",
+            "Channel": "08",
             "SubName": "Unit"
-	  },
-	  "2": {
-	    "Value": "m3",
-	    "Channel": "08",
+          },
+          "2": {
+            "Value": "m3",
+            "Channel": "08",
             "SubName": "Unit"
-	  },
-	  "3": {
-	    "Value": "kWh",
-	    "Channel": "08",
+          },
+          "3": {
+            "Value": "kWh",
+            "Channel": "08",
             "SubName": "Unit"
-	  }
-	}
+          }
+        }
       }
     }
   },

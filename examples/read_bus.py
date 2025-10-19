@@ -11,9 +11,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 parser.add_argument(
     "--connect", help="Connection string", default="tls://192.168.1.9:27015"
 )
-parser.add_argument(
-    "--vlp", help="VLP file path", default=None
-)
+parser.add_argument("--vlp", help="VLP file path", default=None)
 args = parser.parse_args()
 
 

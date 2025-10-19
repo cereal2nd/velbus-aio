@@ -575,7 +575,7 @@ class Module:
         List all channels for this module
         """
         return self._channels
-    
+
     async def load_from_vlp(self, vlp_data: dict) -> None:
         self._name = vlp_data.get_name()
         self._data["Channels"] = vlp_data.get_channels()
