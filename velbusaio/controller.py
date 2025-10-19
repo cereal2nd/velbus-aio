@@ -39,6 +39,7 @@ from velbusaio.messages.set_realtime_clock import SetRealtimeClock
 from velbusaio.module import Module
 from velbusaio.protocol import VelbusProtocol
 from velbusaio.raw_message import RawMessage
+from velbusaio.vlp_reader import VlpFile
 
 
 class Velbus:
@@ -48,6 +49,7 @@ class Velbus:
         self,
         dsn: str,
         cache_dir: str = get_cache_dir(),
+        vlp_file: str | None = None,
         one_address: int | None = None,
     ) -> None:
         """Init the Velbus controller."""
@@ -65,9 +67,8 @@ class Velbus:
         self._modules: dict[int, Module] = {}
         self._submodules: list[int] = []
         self._send_queue: asyncio.Queue = asyncio.Queue()
+        self._vlp_file = vlp_file
         self._cache_dir: str = cache_dir
-        # make sure the cachedir exists
-        pathlib.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
 
     def get_cache_dir(self) -> str:
         return self._cache_dir
@@ -188,12 +189,34 @@ class Velbus:
                 raise VelbusConnectionFailed from err
 
     async def start(self) -> None:
+        # make sure the cachedir exists
+        pathlib.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
+        
         # if auth is required send the auth key
         parts = urlparse(self._destination)
         if parts.username:
             await self._protocol.write_auth_key(parts.username)
-        # scan the bus
-        await self._handler.scan()
+
+        if self._vlp_file:
+            # use the vlp file to load the modules
+            vlp = VlpFile(self._vlp_file)
+            await vlp.read()
+            for mod_data in vlp.get():
+                # Convert hex address string to decimal integer
+                addr = mod_data.get_addr().split(",")[0]
+                decimal_addr = int(addr, 16)
+                await self.add_module(
+                    decimal_addr,
+                    mod_data.get_type(),
+                    serial=mod_data.get_serial(),
+                    memorymap=mod_data.get_memory(),
+                    build_year=int(mod_data.get_build()[0:2]),
+                    build_week=int(mod_data.get_build()[2:4]),
+                )
+                await self._modules[decimal_addr].load_from_vlp(mod_data)
+        else:        
+            # scan the bus
+            await self._handler.scan()
 
     async def scan(self) -> None:
         """Service endpoint to restart the scan"""

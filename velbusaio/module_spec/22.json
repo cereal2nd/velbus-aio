@@ -324,7 +324,93 @@
         }
       }
     },
-    "ModuleName": "03AC-03EB"
+    "ModuleName": "03AC-03EB",
+    "Extras": {
+      "03FE": {
+	"Translate": {
+          "%......00": {
+            "Value": "reserved",
+            "Channel": "01",
+            "SubName": "Unit"
+          },
+          "%......01": {
+            "Value": "liter",
+            "Channel": "01",
+            "SubName": "Unit"
+          },
+          "%......10": {
+            "Value": "m3",
+            "Channel": "01",
+            "SubName": "Unit"
+          },
+          "%......11": {
+            "Value": "kWh",
+            "Channel": "01",
+            "SubName": "Unit"
+	  },
+          "%....00..": {
+            "Value": "reserved",
+            "Channel": "02",
+            "SubName": "Unit"
+          },
+          "%....01..": {
+            "Value": "liter",
+            "Channel": "02",
+            "SubName": "Unit"
+          },
+          "%....10..": {
+            "Value": "m3",
+            "Channel": "02",
+            "SubName": "Unit"
+          },
+          "%....11..": {
+            "Value": "kWh",
+            "Channel": "02",
+            "SubName": "Unit"
+	  },
+          "%..00....": {
+            "Value": "reserved",
+            "Channel": "03",
+            "SubName": "Unit"
+          },
+          "%..01....": {
+            "Value": "liter",
+            "Channel": "03",
+            "SubName": "Unit"
+          },
+          "%..10....": {
+            "Value": "m3",
+            "Channel": "03",
+            "SubName": "Unit"
+          },
+          "%..11....": {
+            "Value": "kWh",
+            "Channel": "03",
+            "SubName": "Unit"
+	  },
+          "%00......": {
+            "Value": "reserved",
+            "Channel": "04",
+            "SubName": "Unit"
+          },
+          "%01......": {
+            "Value": "liter",
+            "Channel": "04",
+            "SubName": "Unit"
+          },
+          "%10......": {
+            "Value": "m3",
+            "Channel": "04",
+            "SubName": "Unit"
+          },
+          "%11......": {
+            "Value": "kWh",
+            "Channel": "04",
+            "SubName": "Unit"
+          }
+        }
+      }
+    }
   },
   "Type": "VMB7IN"
 }

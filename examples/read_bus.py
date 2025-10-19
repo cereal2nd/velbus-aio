@@ -11,11 +11,14 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 parser.add_argument(
     "--connect", help="Connection string", default="tls://192.168.1.9:27015"
 )
+parser.add_argument(
+    "--vlp", help="VLP file path", default=None
+)
 args = parser.parse_args()
 
 
-async def main(connect_str: str):
-    velbus = Velbus(connect_str)
+async def main(connect_str: str, vlp_file: str | None):
+    velbus = Velbus(dsn=connect_str, vlp_file=vlp_file)
     await velbus.connect()
     await velbus.start()
     for mod in (velbus.get_modules()).values():
@@ -32,4 +35,4 @@ logging.basicConfig(
     format="{asctime} {levelname:<9} {message}",
 )
 logging.getLogger("asyncio").setLevel(logging.DEBUG)
-asyncio.run(main(args.connect), debug=True)
+asyncio.run(main(args.connect, args.vlp), debug=True)

@@ -3,3 +3,5 @@ backoff>=1.10.0
 pyserial>=3.5.0
 pyserial-asyncio-fast>=0.11
 setuptools
+lxml
+bs4

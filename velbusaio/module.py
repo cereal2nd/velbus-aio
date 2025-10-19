@@ -165,6 +165,7 @@ class Module:
         self._is_loading = False
         self._channels = {}
         self.loaded = False
+        self._use_cache = True
         self._loaded_cache = {}
 
     def get_initial_timeout(self) -> int:
@@ -220,6 +221,8 @@ class Module:
                         del self._channels[i]
 
     async def _cache(self) -> None:
+        if not self._use_cache:
+            return
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
         async with async_open(cfile, "w") as fl:
             await fl.write(json.dumps(self.to_cache(), indent=4))
@@ -572,6 +575,15 @@ class Module:
         List all channels for this module
         """
         return self._channels
+    
+    async def load_from_vlp(self, vlp_data: dict) -> None:
+        self._name = vlp_data.get_name()
+        self._data["Channels"] = vlp_data.get_channels()
+        self._use_cache = False
+        self._is_loading = False
+        self.loaded = True
+        await self._load_default_channels()
+        await self._request_module_status()
 
     async def load(self, from_cache: bool = False) -> None:
         # start the loading
