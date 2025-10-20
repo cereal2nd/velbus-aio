@@ -276,11 +276,8 @@
       "07FB": {
         "ModuleName": "64:Save"
       }
-    }
+    },
+    "ModuleName": "07BC-07FB"
   },
   "Type": "VMBPSUMNGR-20"
-  "Memory": {
-    "ModuleName": "07BC-07FB"
-  }
-
 }

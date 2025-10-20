@@ -97,7 +97,7 @@
       "066A": { "ModuleName": "62" },
       "066B": { "ModuleName": "63:Save" }
     },
-    "ModuleName": "062C-32;064D-32"
+    "ModuleName": "062C-32;064D-32",
     "Channels": {
       "01": "0000-000F",
       "02": "0010-001F",
