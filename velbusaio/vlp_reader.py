@@ -27,8 +27,8 @@ class VlpFile:
                 print(f"  {chan_addr}: {chan}")
 
     async def read(self) -> None:
-        with open(self._file_path) as file:
-            xml_content = file.read()
+        async with async_open(self._file_path) as file:
+            xml_content = await file.read()
         _soup = BeautifulSoup(xml_content, "xml")
         for module in _soup.find_all("Module"):
             mod = vlpModule(

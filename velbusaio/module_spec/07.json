@@ -7,5 +7,10 @@
     }
   },
   "Info": "Dimmer module",
-  "Type": "VMB1DM"
+  "Type": "VMB1DM",
+  "Memory": {
+    "Channels": {
+      "01": "00F0-00FF"
+    }
+  }
 }

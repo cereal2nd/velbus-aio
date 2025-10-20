@@ -98,6 +98,12 @@
       "066B": { "ModuleName": "63:Save" }
     },
     "ModuleName": "062C-32;064D-32"
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0010-001F",
+      "03": "0020-002F",
+      "04": "0030-003F"
+    }
   },
   "Info": "4 channel led PWM dimmer module",
   "Type": "VMB4LEDPWM-20"

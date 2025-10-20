@@ -99,6 +99,13 @@
       "04EE": { "ModuleName": "64:Save" }
     },
     "ModuleName": "00E3-00EF;01E3-01EF;02E3-02EF;03E3-03EF;04E3-04EE"
+    "Channels": {
+      "01": "00F0-00FF",
+      "02": "01F0-01FF",
+      "03": "02F0-02FF",
+      "04": "03F0-03FF",
+      "05": "04F0-04FF"
+    }
   },
   "Type": "VMB4RYNO"
 }

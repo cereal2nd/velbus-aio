@@ -19,7 +19,7 @@
       "00FE": { "ModuleName": "14" },
       "00FF": { "ModuleName": "16:Save" }
     },
-    "ModuleName": "00F0-16"
+    "ModuleName": "00F0-00FF"
   },
   "Type": "VMB1TC"
 }

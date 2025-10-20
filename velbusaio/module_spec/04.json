@@ -279,4 +279,8 @@
     }
   },
   "Type": "VMBPSUMNGR-20"
+  "Memory": {
+    "ModuleName": "07BC-07FB"
+  }
+
 }

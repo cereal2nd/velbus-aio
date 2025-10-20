@@ -20,5 +20,11 @@
     }
   },
   "Info": "2-channel Blind Control Module",
-  "Type": "VMB2BL"
+  "Type": "VMB2BL",
+  "Memory": {
+    "Channels": {
+      "01": "0070-007F",
+      "02": "00F0-00FF"
+    }
+  }
 }
