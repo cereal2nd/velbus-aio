@@ -67,7 +67,13 @@
       "02FE": { "ModuleName": "62" },
       "02FF": { "ModuleName": "64:Save" }
     },
-    "ModuleName": "02C0-02FF"
+    "ModuleName": "02C0-02FF",
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0100-010F",
+      "03": "0200-020F",
+      "04": "0300-030F"
+    }
   },
   "Type": "VMB4RF"
 }

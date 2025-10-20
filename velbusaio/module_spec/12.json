@@ -61,7 +61,13 @@
       "01EE": { "ModuleName": "30" },
       "01EF": { "ModuleName": "32:Save" }
     },
-    "ModuleName": "00E0-00EF;01E0-01EF"
+    "ModuleName": "00E0-00EF;01E0-01EF",
+    "Channels": {
+      "01": "00F0-00FF",
+      "02": "01F0-01FF",
+      "03": "02F0-02FF",
+      "04": "03F0-03FF"
+    }
   },
   "Type": "VMB4DC"
 }

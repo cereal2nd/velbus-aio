@@ -113,7 +113,17 @@
       "03FE": { "ModuleName": "62" },
       "03FF": { "ModuleName": "64:Save" }
     },
-    "ModuleName": "03C0-03FF"
+    "ModuleName": "03C0-03FF",
+    "Channels": {
+      "01": "00F0-00FF",
+      "02": "01F0-01FF",
+      "03": "02F0-02FF",
+      "04": "03F0-03FF",
+      "05": "04F0-04FF",
+      "06": "05F0-05FF",
+      "07": "06F0-06FF",
+      "08": "07F0-07FF"
+    }
   },
   "Type": "VMB2PBN"
 }
