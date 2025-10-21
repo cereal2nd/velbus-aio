@@ -202,7 +202,10 @@
         "ModuleName": "64:Save"
       }
     },
-    "ModuleName": "00B0-00EF"
+    "ModuleName": "00B0-00EF",
+    "Channels": {
+      "01": "00F0-00FF"
+    }
   },
   "Type": "VMBDMIR"
 }
