@@ -206,7 +206,10 @@
         "ModuleName": "64:Save"
       }
     },
-    "ModuleName": "004C-008B"
+    "ModuleName": "004C-008B",
+    "Channels": {
+      "01": "0000-000F"
+    }
   },
   "Type": "VMB1BLS"
 }
