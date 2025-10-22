@@ -227,7 +227,15 @@
         "ModuleName": "64:Save"
       }
     },
-    "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8"
+    "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8",
+    "CHnanels": {
+      "01": "00F0-00FF",
+      "02": "01F0-01FF",
+      "03": "02F0-02FF",
+      "04": "03F0-03FF",
+      "05": "04F0-04FF",
+      "06": "00EA-00EF;01EA-01EF;02EA-02ED"
+    }
   },
   "Type": "VMB1RYS"
 }
