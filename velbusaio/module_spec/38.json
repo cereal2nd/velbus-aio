@@ -98,5 +98,12 @@
   "Info": "Edge-lit Motion detector with one touch button module",
   "TemperatureChannel": "09",
   "ThermostatAddr": "0",
-  "Type": "VMBELPIR"
+  "Type": "VMBELPIR",
+  "Memory": {
+    "ModuleName": "0350-035F",
+    "Channels": {
+      "01": "001C-002B",
+      "02": "0030-003F"
+    }
+  }
 }

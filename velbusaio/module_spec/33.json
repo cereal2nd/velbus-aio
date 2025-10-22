@@ -233,7 +233,11 @@
         "ModuleName": "64:Save"
       }
     },
-    "ModuleName": "00B0-00EF"
+    "ModuleName": "00B0-00EF",
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0010-001F"
+    }
   },
   "Type": "VMBVP1"
 }

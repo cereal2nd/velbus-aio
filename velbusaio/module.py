@@ -583,6 +583,9 @@ class Module:
         self._is_loading = False
         self.loaded = True
         await self._load_default_channels()
+        # TODO set all channels to _is_loaded = True
+        for chan in self._channels.values():
+            chan._is_loaded = True
         await self._request_module_status()
 
     async def load(self, from_cache: bool = False) -> None:

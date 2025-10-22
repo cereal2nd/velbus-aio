@@ -108,6 +108,7 @@ class vlpModule:
                 if name:
                     self._log.debug(f" => got name '{name}' for channel {addr}")
                     self._channels[addr]["Name"] = name
+                    self._channels[addr]["_is_loaded"] = True
 
         # extra
         self._load_extra_data()
