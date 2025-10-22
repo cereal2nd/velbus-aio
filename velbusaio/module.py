@@ -175,7 +175,7 @@ class Module:
         try:
             await asyncio.wait_for(self._got_status.wait(), 5)
         except Exception:
-            self._log.error("Timeout waiting for status messages for: {self}")
+            self._log.warning(f"Timeout waiting for status messages for: {self}")
 
     def get_initial_timeout(self) -> int:
         return SCAN_MODULEINFO_TIMEOUT_INITIAL

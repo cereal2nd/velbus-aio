@@ -20,12 +20,6 @@ class VlpFile:
     def get(self) -> dict:
         return self._modules
 
-    def print(self) -> None:
-        for addr, module in self._modules.items():
-            print(f"{module}")
-            for chan_addr, chan in module._channels.items():
-                print(f"  {chan_addr}: {chan}")
-
     async def read(self) -> None:
         async with async_open(self._file_path) as file:
             xml_content = await file.read()
@@ -59,7 +53,7 @@ class vlpModule:
             None,
         )
         self._log = logging.getLogger("velbus-vlpFile")
-        self._log.debug(
+        self._log.info(
             f"=> Created vlpModule address: {self._addresses} type: {self._type} ({self._type_id})"
         )
 

@@ -287,7 +287,13 @@
         "ModuleName": "64:Save"
       }
     },
-    "ModuleName": "03C0-03FF"
+    "ModuleName": "03C0-03FF",
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0014-0023",
+      "03": "0028-0037",
+      "04": "003C-004B"
+    }
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",

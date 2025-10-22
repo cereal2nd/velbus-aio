@@ -213,7 +213,10 @@ class Velbus:
                     build_year=int(mod_data.get_build()[0:2]),
                     build_week=int(mod_data.get_build()[2:4]),
                 )
-                await self._modules[decimal_addr].load_from_vlp(mod_data)
+                if mod_data.get_type() == 0x45 or mod_data.get_type() == 0x5A:
+                    await self._modules[decimal_addr].load()
+                else:
+                    await self._modules[decimal_addr].load_from_vlp(mod_data)
             for mod in self._modules.values():
                 await mod.wait_for_status_messages()
         else:
