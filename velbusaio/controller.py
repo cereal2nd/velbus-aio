@@ -214,7 +214,8 @@ class Velbus:
                     build_week=int(mod_data.get_build()[2:4]),
                 )
                 await self._modules[decimal_addr].load_from_vlp(mod_data)
-            # TODO verify that we received a module status message for each module in the vlp file
+            for mod in self._modules.values():
+                await mod.wait_for_status_messages()
         else:
             # scan the bus
             await self._handler.scan()

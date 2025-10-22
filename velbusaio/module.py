@@ -4,6 +4,7 @@ This represents a velbus module
 
 from __future__ import annotations
 
+import asyncio
 import importlib.resources
 import json
 import logging
@@ -163,10 +164,18 @@ class Module:
         self.build_week = build_week
         self._cache_dir = cache_dir
         self._is_loading = False
+        self._got_status = asyncio.Event()
+        self._got_status.clear()
         self._channels = {}
         self.loaded = False
         self._use_cache = True
         self._loaded_cache = {}
+
+    async def wait_for_status_messages(self) -> None:
+        try:
+            await asyncio.wait_for(self._got_status.wait(), 5)
+        except Exception:
+            self._log.error("Timeout waiting for status messages for: {self}")
 
     def get_initial_timeout(self) -> int:
         return SCAN_MODULEINFO_TIMEOUT_INITIAL
@@ -236,7 +245,7 @@ class Module:
         self.__dict__ = state
 
     def __repr__(self) -> str:
-        return f"<{self._name} type:{self._type} address:{self._address} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels}>"
+        return f"<{self._name} type:{self._type} address:{self._address} got_status:{self._got_status} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels}>"
 
     def __str__(self) -> str:
         return self.__repr__()
@@ -561,6 +570,8 @@ class Module:
             for offset, dim_value in enumerate(message.dim_values):
                 channel = message.channel + offset
                 await self._update_channel(channel, {"state": dim_value})
+        # notigy status
+        self._got_status.set()
 
     async def _update_channel(self, channel: int, updates: dict):
         try:
