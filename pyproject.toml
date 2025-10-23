@@ -33,6 +33,8 @@ dependencies = [
     "pyserial-asyncio_fast>=0.11",
     "backoff>=1.10.0",
     "aiofile",
+    "beautifulsoup4",
+    "lxml",
 ]
 
 [project.urls]
