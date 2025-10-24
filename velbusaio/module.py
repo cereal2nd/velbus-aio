@@ -750,14 +750,17 @@ class Module:
         self._log.info(f"Request module status {self._address}")
 
         mod_stat_req_msg = ModuleStatusRequestMessage(self._address)
-        counter_msg = None
-        for chan, chan_data in self._data["Channels"].items():
-            if int(chan) < 9 and chan_data["Type"] in ("Blind", "Dimmer", "Relay"):
-                mod_stat_req_msg.channels.append(int(chan))
-            if chan_data["Type"] == "ButtonCounter":
-                if counter_msg is None:
-                    counter_msg = CounterStatusRequestMessage(self._address)
-                counter_msg.channels.append(int(chan))
+        if keys_exists(self._data, "AllChannelStatus"):
+            mod_stat_req_msg.channels = 0xFF
+        else:
+            counter_msg = None
+            for chan, chan_data in self._data["Channels"].items():
+                if int(chan) < 9 and chan_data["Type"] in ("Blind", "Dimmer", "Relay"):
+                    mod_stat_req_msg.channels.append(int(chan))
+                if chan_data["Type"] == "ButtonCounter":
+                    if counter_msg is None:
+                        counter_msg = CounterStatusRequestMessage(self._address)
+                    counter_msg.channels.append(int(chan))
         await self._writer(mod_stat_req_msg)
         if counter_msg is not None:
             await self._writer(counter_msg)
