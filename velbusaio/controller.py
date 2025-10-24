@@ -189,9 +189,6 @@ class Velbus:
                 raise VelbusConnectionFailed from err
 
     async def start(self) -> None:
-        # make sure the cachedir exists
-        pathlib.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
-
         # if auth is required send the auth key
         parts = urlparse(self._destination)
         if parts.username:
@@ -216,10 +213,12 @@ class Velbus:
                 if mod_data.get_type() == 0x45 or mod_data.get_type() == 0x5A:
                     await self._modules[decimal_addr].load()
                 else:
-                    await self._modules[decimal_addr].load_from_vlp(mod_data)
-            for mod in self._modules.values():
-                await mod.wait_for_status_messages()
+                    module = self._modules[decimal_addr]
+                    await module.load_from_vlp(mod_data)
+                    await module.wait_for_status_messages()
         else:
+            # make sure the cachedir exists
+            pathlib.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
             # scan the bus
             await self._handler.scan()
 
