@@ -82,3 +82,9 @@ repos:
         types: [python]
         pass_filenames: false
         always_run: true
+      - id: validate-module-specs
+        name: Validate module spec JSON for editable channel memory locations
+        entry: python scripts/parse_specs.py
+        language: system
+        pass_filenames: false
+        files: ^velbusaio/module_spec/.*\.json$
