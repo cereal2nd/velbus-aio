@@ -86,22 +86,11 @@ def validate_spec(path: Path) -> list[str]:
             )
             continue
 
-        # channel keys in module spec might be stored in different formats:
-        # - decimal string (e.g. "1" or "10")
-        # - zero-padded decimal (e.g. "01")
-        # - two-digit uppercase hex (e.g. "0A")
-        possible_keys = {
-            chan_key,  # whatever the spec file used for Channels key
-            str(chan_num),  # decimal without padding
-            str(chan_num).zfill(2),  # zero-padded decimal
-            h2(chan_num),  # two-digit uppercase hex (existing code uses this)
-        }
-        # remove any None entries
-        possible_keys = {k for k in possible_keys if k is not None}
+        possible_key = str(chan_num).zfill(2)
 
-        if not any(k in mem_channels for k in possible_keys):
+        if possible_key not in mem_channels:
             errors.append(
-                f"{path}: channel {chan_num} (editable) but no memory location found in Memory->Channels for any of keys {sorted(possible_keys)}"
+                f"{path}: channel {chan_num} (editable) but no memory location found in Memory->Channels for key {possible_key}"
             )
 
     return errors
