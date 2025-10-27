@@ -200,8 +200,8 @@ class Velbus:
             await vlp.read()
             for mod_data in vlp.get():
                 # Convert hex address string to decimal integer
-                addr = mod_data.get_addr().split(",")[0]
-                decimal_addr = int(addr, 16)
+                addr = mod_data.get_addr().split(",")
+                decimal_addr = int(addr[0], 16)
                 await self.add_module(
                     decimal_addr,
                     mod_data.get_type(),
@@ -210,6 +210,12 @@ class Velbus:
                     build_year=int(mod_data.get_build()[0:2]),
                     build_week=int(mod_data.get_build()[2:4]),
                 )
+                # handle submodules
+                if len(addr) > 1:
+                    self.add_submodules(
+                        self._modules[decimal_addr], dict(enumerate(addr[1:]))
+                    )
+                # load module data, special for dali
                 if mod_data.get_type() == 0x45 or mod_data.get_type() == 0x5A:
                     await self._modules[decimal_addr].load()
                 else:
