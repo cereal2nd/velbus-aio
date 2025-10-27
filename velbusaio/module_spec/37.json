@@ -289,7 +289,7 @@
       "0F82": { "ModuleName": "62" },
       "0F83": { "ModuleName": "64:Save" }
     },
-    "ModuleName": "0F44-0F83",
+    "ModuleName": "0FA8-0FE7",
     "Channels": {
       "01": "001C-002B",
       "02": "0030-003F",
