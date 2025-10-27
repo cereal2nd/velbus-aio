@@ -83,5 +83,8 @@
     }
   },
   "TemperatureChannel": "10",
-  "ThermostatAddr": "0"
+  "ThermostatAddr": "0",
+  "Memory": {
+    "ModuleName": "03BC-03FB"
+  }
 }

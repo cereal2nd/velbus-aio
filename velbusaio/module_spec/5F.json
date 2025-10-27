@@ -62,5 +62,14 @@
   },
   "TemperatureChannel": "9",
   "Info": "Motion detector with four touch buttons module",
-  "Type": "VMBGP4PIR-20"
+  "Type": "VMBGP4PIR-20",
+  "Memory": {
+    "ModuleName": "06A8-06E7",
+    "Channels": {
+      "01": "001C-002B",
+      "02": "0030-003F",
+      "03": "0044-0053",
+      "04": "0058-0067"
+    }
+  }
 }
