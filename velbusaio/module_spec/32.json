@@ -13,58 +13,70 @@
   },
   "Channels": {
     "01": {
+      "Editable": "yes",
       "Name": "Alarm 1",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "02": {
+      "Editable": "yes",
       "Name": "Alarm 2",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "03": {
+      "Editable": "yes",
       "Name": "Alarm 3",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "04": {
+      "Editable": "yes",
       "Name": "Alarm 4",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "05": {
+      "Editable": "yes",
       "Name": "Alarm 5",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "06": {
+      "Editable": "yes",
       "Name": "Alarm 6",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "07": {
+      "Editable": "yes",
       "Name": "Alarm 7",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "08": {
+      "Editable": "yes",
       "Name": "Alarm 8",
       "Type": "Sensor",
       "Subdevice": "yes"
     },
     "09": {
+      "Editable": "yes",
       "Name": "Sensor 1",
       "Type": "SensorNumber"
     },
     "10": {
+      "Editable": "yes",
       "Name": "Sensor 2",
       "Type": "SensorNumber"
     },
     "11": {
+      "Editable": "yes",
       "Name": "Sensor 3",
       "Type": "SensorNumber"
     },
     "12": {
+      "Editable": "yes",
       "Name": "Sensor 4",
       "Type": "SensorNumber"
     },
@@ -354,11 +366,19 @@
       }
     },
     "ModuleName": "0000-003F",
-    "Unit": {
-      "09": "02E0-02E6",
-      "10": "0412-0418",
-      "11": "0544-054A",
-      "12": "0676-067C"
+    "Channels": {
+      "01": "0082-0091",
+      "02": "0092-00A1",
+      "03": "00A2-00B1",
+      "04": "00B2-00C1",
+      "05": "00C2-00D1",
+      "06": "00D2-00E1",
+      "07": "00E2-00F1",
+      "08": "00F2-0101",
+      "09": "027F-027D",
+      "10": "03B0-03BF",
+      "11": "04E2-04F1",
+      "12": "0614-0623"
     }
   },
   "Type": "VMB4AN"
