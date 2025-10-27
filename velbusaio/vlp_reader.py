@@ -37,6 +37,13 @@ class VlpFile:
             await mod.parse()
         self._modules.sort(key=lambda mod: mod.get_decimal_addr())
 
+    def dump(self) -> None:
+        for m in self._modules:
+            print(f"Module {m.get_decimal_addr()}: {m._name}, type {m._type_id}")
+            for key, value in m._channels.items():
+                name = value["Name"]
+                print(f"  {key} => {name}")
+
 
 class vlpModule:
 
