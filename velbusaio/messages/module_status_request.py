@@ -19,7 +19,7 @@ class ModuleStatusRequestMessage(Message):
 
     def __init__(self, address=None):
         Message.__init__(self)
-        self.channels = []
+        self.channels: list | str = []
         self.wait_after_send = 500
         self.set_defaults(address)
 
@@ -37,4 +37,6 @@ class ModuleStatusRequestMessage(Message):
         """
         :return: bytes
         """
-        return bytes([COMMAND_CODE, self.channels_to_byte(self.channels)])
+        if isinstance(self.channels, list):
+            return bytes([COMMAND_CODE, self.channels_to_byte(self.channels)])
+        return bytes([COMMAND_CODE, int(self.channels, 16)])

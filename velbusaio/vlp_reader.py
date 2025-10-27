@@ -35,6 +35,7 @@ class VlpFile:
             )
             self._modules.append(mod)
             await mod.parse()
+        self._modules.sort(key=lambda mod: mod.get_decimal_addr())
 
 
 class vlpModule:
@@ -84,6 +85,12 @@ class vlpModule:
 
     def __str__(self):
         return f"vlpModule(name={self._name}, addresses={self._addresses}, build={self._build}, serial={self._serial}, type={self._type})"
+
+    def get_decimal_addr(
+        self,
+    ) -> int:  # lgor: get the numeric value of primary module address
+        addr = self._addresses.split(",")[0]
+        return int(addr, 16)
 
     async def parse(self) -> None:
         await self._load_module_spec()

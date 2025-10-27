@@ -173,7 +173,7 @@ class Module:
 
     async def wait_for_status_messages(self) -> None:
         try:
-            await asyncio.wait_for(self._got_status.wait(), 5)
+            await asyncio.wait_for(self._got_status.wait(), 2)
         except Exception:
             self._log.warning(f"Timeout waiting for status messages for: {self}")
 
@@ -750,10 +750,10 @@ class Module:
         self._log.info(f"Request module status {self._address}")
 
         mod_stat_req_msg = ModuleStatusRequestMessage(self._address)
+        counter_msg = None
         if keys_exists(self._data, "AllChannelStatus"):
-            mod_stat_req_msg.channels = 0xFF
+            mod_stat_req_msg.channels = self._data["AllChannelStatus"]
         else:
-            counter_msg = None
             for chan, chan_data in self._data["Channels"].items():
                 if int(chan) < 9 and chan_data["Type"] in ("Blind", "Dimmer", "Relay"):
                     mod_stat_req_msg.channels.append(int(chan))
