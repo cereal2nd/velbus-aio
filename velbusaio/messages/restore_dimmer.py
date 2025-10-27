@@ -20,6 +20,7 @@ COMMAND_CODE = 0x11
         "VMB1LED",
         "VMB4DC",
         "VMB8DC-20",
+        "VMB2DC-20",
         "VMB4LEDPWM-20",
     ],
 )

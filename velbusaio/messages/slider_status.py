@@ -20,6 +20,7 @@ COMMAND_CODE = 0x0F
         "VMBDMI-R",
         "VMB1LED",
         "VMB8DC-20",
+        "VMB2DC-20",
         "VMB4LEDPWM-20",
     ],
 )

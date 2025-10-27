@@ -83,6 +83,7 @@ class ChannelNamePart2Message(Message):
         "VMBEL4PIR-20",
         "VMBGP4PIR-20",
         "VMB8DC-20",
+        "VMB2DC-20",
         "VMB8IN-20",
         "VMB4LEDPWM-20",
         "VMBPSUMNGR-20",

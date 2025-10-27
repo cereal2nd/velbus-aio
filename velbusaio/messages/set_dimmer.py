@@ -56,7 +56,15 @@ class SetDimmerMessage(Message):
 
 @register(
     COMMAND_CODE,
-    ["VMBDALI", "VMBDALI-20", "VMBDMI", "VMBDMI-R", "VMB8DC-20", "VMB4LEDPWM-20"],
+    [
+        "VMBDALI",
+        "VMBDALI-20",
+        "VMBDMI",
+        "VMBDMI-R",
+        "VMB8DC-20",
+        "VMB4LEDPWM-20",
+        "VMB2DC-20",
+    ],
 )
 class SetDimmerMessage2(SetDimmerMessage):
     """This with this message the channel numbering is an integer
