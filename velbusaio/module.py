@@ -245,7 +245,7 @@ class Module:
         self.__dict__ = state
 
     def __repr__(self) -> str:
-        return f"<{self._name} type:{self._type} address:{self._address} got_status:{self._got_status} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels}>"
+        return f"<{self._name} type:{self._type} address:{self._address} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels}>"
 
     def __str__(self) -> str:
         return self.__repr__()
