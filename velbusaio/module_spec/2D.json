@@ -45,42 +45,10 @@
       "Name": "Absence output",
       "Type": "Sensor"
     },
-    "10": {
+    "09": {
       "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature"
-    },
-    "11": {
-      "Name": "Heater",
-      "Type": "ThermostatChannel"
-    },
-    "12": {
-      "Name": "Boost",
-      "Type": "ThermostatChannel"
-    },
-    "13": {
-      "Name": "Pump",
-      "Type": "ThermostatChannel"
-    },
-    "14": {
-      "Name": "Cooler",
-      "Type": "ThermostatChannel"
-    },
-    "15": {
-      "Name": "Alarm 1",
-      "Type": "ThermostatChannel"
-    },
-    "16": {
-      "Name": "Alarm 2",
-      "Type": "ThermostatChannel"
-    },
-    "17": {
-      "Name": "Alarm 3",
-      "Type": "ThermostatChannel"
-    },
-    "18": {
-      "Name": "Alarm 4",
-      "Type": "ThermostatChannel"
     },
     "96": {
       "Name": "SelectedProgram",
@@ -292,7 +260,8 @@
       "01": "0000-000F",
       "02": "0014-0023",
       "03": "0028-0037",
-      "04": "003C-004B"
+      "04": "003C-004B",
+      "09": "00E1-00F0"
     }
   },
   "TemperatureChannel": "10",
