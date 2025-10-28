@@ -70,8 +70,6 @@ def validate_spec(path: Path) -> list[str]:
             continue
 
         editable = chan_data.get("Editable", "") == "yes"
-        if not editable:
-            continue
 
         if memory is None:
             errors.append(
@@ -91,6 +89,25 @@ def validate_spec(path: Path) -> list[str]:
         if possible_key not in mem_channels:
             errors.append(
                 f"{path}: channel {chan_num} (editable) but no memory location found in Memory->Channels for key {possible_key}"
+            )
+
+        ctype = chan_data.get("Type", "")
+        print(chan_data)
+        if (
+            ctype
+            in [
+                "Blind",
+                "Button",
+                "ButtonCounter",
+                "Sensor",
+                "Dimmer",
+                "Temperature",
+                "Relay",
+            ]
+            and not editable
+        ):
+            errors.append(
+                f"{path}: channel {chan_num} of type {ctype} but not marked as editable"
             )
 
     return errors
