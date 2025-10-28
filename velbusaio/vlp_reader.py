@@ -114,7 +114,7 @@ class vlpModule:
                 self._log.debug(f"  => channel {addr} is editable, getting name")
                 name = self._get_channel_name(int(addr))
                 if name:
-                    self._log.debug(f" => got name '{name}' for channel {addr}")
+                    self._log.debug(f"  => got name '{name}' for channel {addr}")
                     self._channels[addr]["Name"] = name
                     self._channels[addr]["_is_loaded"] = True
 
@@ -210,7 +210,13 @@ class vlpModule:
                 "FF", ""
             )
         )
-        return byte_data.decode("ascii")
+        try:
+            name = byte_data.decode("ascii")
+        except UnicodeDecodeError as e:
+            self._log.error(f"  => UnicodeDecodeError: {e}")
+            name = byte_data
+        finally:
+            return name
 
     async def _load_module_spec(self) -> None:
         self._log.debug(f" => Load module spec for {self._type_id}")
