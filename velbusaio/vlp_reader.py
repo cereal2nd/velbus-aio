@@ -201,11 +201,12 @@ class vlpModule:
         if "Channels" not in self._spec["Memory"]:
             self._log.debug("  => no Channels Memory locations found")
             return None
-        if h2(chan) not in self._spec["Memory"]["Channels"]:
+        dchan = format(chan, "02d")
+        if dchan not in self._spec["Memory"]["Channels"]:
             self._log.debug(f"  => no chan {chan} Memory locations found")
             return None
         byte_data = bytes.fromhex(
-            self._read_from_memory(self._spec["Memory"]["Channels"][h2(chan)]).replace(
+            self._read_from_memory(self._spec["Memory"]["Channels"][dchan]).replace(
                 "FF", ""
             )
         )
