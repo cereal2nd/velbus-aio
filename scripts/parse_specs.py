@@ -86,20 +86,18 @@ def validate_spec(path: Path) -> list[str]:
 
         possible_key = str(chan_num).zfill(2)
 
-        if possible_key not in mem_channels:
+        if possible_key not in mem_channels and editable:
             errors.append(
                 f"{path}: channel {chan_num} (editable) but no memory location found in Memory->Channels for key {possible_key}"
             )
 
         ctype = chan_data.get("Type", "")
-        print(chan_data)
         if (
             ctype
             in [
                 "Blind",
                 "Button",
                 "ButtonCounter",
-                "Sensor",
                 "Dimmer",
                 "Temperature",
                 "Relay",

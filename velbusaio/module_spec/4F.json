@@ -7,38 +7,47 @@
   },
   "Channels": {
     "01": {
+      "Editable": "yes",
       "Name": "Push button 1",
       "Type": "Button"
     },
     "02": {
+      "Editable": "yes",
       "Name": "Virtual button 2",
       "Type": "Button"
     },
     "03": {
+      "Editable": "yes",
       "Name": "Virtual button 3",
       "Type": "Button"
     },
     "04": {
+      "Editable": "yes",
       "Name": "Virtual button 4",
       "Type": "Button"
     },
     "05": {
+      "Editable": "yes",
       "Name": "Virtual button 5",
       "Type": "Button"
     },
     "06": {
+      "Editable": "yes",
       "Name": "Virtual button 6",
       "Type": "Button"
     },
     "07": {
+      "Editable": "yes",
       "Name": "Virtual button 7",
       "Type": "Button"
     },
     "08": {
+      "Editable": "yes",
       "Name": "Virtual button 8",
       "Type": "Button"
     },
     "09": {
+      "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature"
     },
@@ -75,6 +84,7 @@
       "Type": "ThermostatChannel"
     },
     "18": {
+      "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
     },
@@ -96,7 +106,9 @@
       "05": "006C-007B",
       "06": "0080-008F",
       "07": "0094-00A3",
-      "08": "00A8-00B7"
+      "08": "00A8-00B7",
+      "09": "0398-03A7",
+      "18": "03CC-03DB"
     }
   }
 }

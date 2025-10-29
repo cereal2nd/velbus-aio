@@ -9,10 +9,12 @@
       "Type": "Sensor"
     },
     "03": {
+      "Editable": "yes",
       "Name": "Bell 1",
       "Type": "Button"
     },
     "04": {
+      "Editable": "yes",
       "Name": "Bell 2",
       "Type": "Button"
     },
@@ -25,10 +27,12 @@
       "Type": "Sensor"
     },
     "07": {
+      "Editable": "yes",
       "Name": "Virtual button 1",
       "Type": "Button"
     },
     "08": {
+      "Editable": "yes",
       "Name": "Virtual button 2",
       "Type": "Button"
     },

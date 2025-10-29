@@ -7,134 +7,167 @@
   },
   "Channels": {
     "01": {
+      "Editable": "yes",
       "Name": "Push button 1",
       "Type": "Button"
     },
     "02": {
+      "Editable": "yes",
       "Name": "Push button 2",
       "Type": "Button"
     },
     "03": {
+      "Editable": "yes",
       "Name": "Push button 3",
       "Type": "Button"
     },
     "04": {
+      "Editable": "yes",
       "Name": "Push button 4",
       "Type": "Button"
     },
     "05": {
+      "Editable": "yes",
       "Name": "Push button 5",
       "Type": "Button"
     },
     "06": {
+      "Editable": "yes",
       "Name": "Push button 6",
       "Type": "Button"
     },
     "07": {
+      "Editable": "yes",
       "Name": "Push button 7",
       "Type": "Button"
     },
     "08": {
+      "Editable": "yes",
       "Name": "Push button 8",
       "Type": "Button"
     },
     "09": {
+      "Editable": "yes",
       "Name": "Push button 9",
       "Type": "Button"
     },
     "10": {
+      "Editable": "yes",
       "Name": "Push button 10",
       "Type": "Button"
     },
     "11": {
+      "Editable": "yes",
       "Name": "Push button 11",
       "Type": "Button"
     },
     "12": {
+      "Editable": "yes",
       "Name": "Push button 12",
       "Type": "Button"
     },
     "13": {
+      "Editable": "yes",
       "Name": "Push button 13",
       "Type": "Button"
     },
     "14": {
+      "Editable": "yes",
       "Name": "Push button 14",
       "Type": "Button"
     },
     "15": {
+      "Editable": "yes",
       "Name": "Push button 15",
       "Type": "Button"
     },
     "16": {
+      "Editable": "yes",
       "Name": "Push button 16",
       "Type": "Button"
     },
     "17": {
+      "Editable": "yes",
       "Name": "Push button 17",
       "Type": "Button"
     },
     "18": {
+      "Editable": "yes",
       "Name": "Push button 18",
       "Type": "Button"
     },
     "19": {
+      "Editable": "yes",
       "Name": "Push button 19",
       "Type": "Button"
     },
     "20": {
+      "Editable": "yes",
       "Name": "Push button 10",
       "Type": "Button"
     },
     "21": {
+      "Editable": "yes",
       "Name": "Push button 21",
       "Type": "Button"
     },
     "22": {
+      "Editable": "yes",
       "Name": "Push button 22",
       "Type": "Button"
     },
     "23": {
+      "Editable": "yes",
       "Name": "Push button 23",
       "Type": "Button"
     },
     "24": {
+      "Editable": "yes",
       "Name": "Push button 24",
       "Type": "Button"
     },
     "25": {
+      "Editable": "yes",
       "Name": "Push button 25",
       "Type": "Button"
     },
     "26": {
+      "Editable": "yes",
       "Name": "Push button 26",
       "Type": "Button"
     },
     "27": {
+      "Editable": "yes",
       "Name": "Push button 27",
       "Type": "Button"
     },
     "28": {
+      "Editable": "yes",
       "Name": "Push button 28",
       "Type": "Button"
     },
     "29": {
+      "Editable": "yes",
       "Name": "Push button 29",
       "Type": "Button"
     },
     "30": {
+      "Editable": "yes",
       "Name": "Push button 30",
       "Type": "Button"
     },
     "31": {
+      "Editable": "yes",
       "Name": "Push button 31",
       "Type": "Button"
     },
     "32": {
+      "Editable": "yes",
       "Name": "Push button 32",
       "Type": "Button"
     },
     "33": {
+      "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature"
     },
@@ -171,6 +204,7 @@
       "Type": "ThermostatChannel"
     },
     "42": {
+      "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
     },
@@ -411,7 +445,9 @@
       "29": "024C-025B",
       "30": "0260-026F",
       "31": "0274-0283",
-      "32": "0288-0297"
+      "32": "0288-0297",
+      "33": "05E4-05F3",
+      "42": "0618-0627"
     }
   },
   "TemperatureChannel": "33",
