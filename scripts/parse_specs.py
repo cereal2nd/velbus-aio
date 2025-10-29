@@ -92,21 +92,23 @@ def validate_spec(path: Path) -> list[str]:
             )
 
         ctype = chan_data.get("Type", "")
-        if (
-            ctype
-            in [
-                "Blind",
-                "Button",
-                "ButtonCounter",
-                "Dimmer",
-                "Temperature",
-                "Relay",
-            ]
-            and not editable
-        ):
-            errors.append(
-                f"{path}: channel {chan_num} of type {ctype} but not marked as editable"
-            )
+        if ctype in [
+            "Blind",
+            "Button",
+            "ButtonCounter",
+            "Dimmer",
+            "Temperature",
+            "Relay",
+        ]:
+            if chan_data.get("Editable", "") == "":
+                errors.append(
+                    f"{path}: channel {chan_num} of type {ctype} but editable field is missing"
+                )
+            if chan_data.get("Editable", "") == "yes":
+                if mem_channels is None or possible_key not in mem_channels:
+                    errors.append(
+                        f"{path}: channel {chan_num} of type {ctype} is editable but no memory location found in Memory->Channels for key {possible_key}"
+                    )
 
     return errors
 

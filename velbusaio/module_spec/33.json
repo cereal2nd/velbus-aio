@@ -9,12 +9,12 @@
       "Type": "Sensor"
     },
     "03": {
-      "Editable": "yes",
+      "Editable": "no",
       "Name": "Bell 1",
       "Type": "Button"
     },
     "04": {
-      "Editable": "yes",
+      "Editable": "no",
       "Name": "Bell 2",
       "Type": "Button"
     },
@@ -240,7 +240,9 @@
     "ModuleName": "00B0-00EF",
     "Channels": {
       "01": "0000-000F",
-      "02": "0010-001F"
+      "02": "0010-001F",
+      "07": "0000-000F",
+      "08": "0010-001F"
     }
   },
   "Type": "VMBVP1"
