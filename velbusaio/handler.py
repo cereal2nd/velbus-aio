@@ -61,6 +61,11 @@ class PacketHandler:
             ) as fspath:
                 async with async_open(fspath) as protocol_file:
                     self.broadcast = json.loads(await protocol_file.read())
+            with importlib.resources.path(
+                __name__, "module_spec/ignore.json"
+            ) as fspath:
+                async with async_open(fspath) as protocol_file:
+                    self.ignore = json.loads(await protocol_file.read())
         else:
             async with async_open(
                 str(
@@ -70,6 +75,14 @@ class PacketHandler:
                 )
             ) as protocol_file:
                 self.broadcast = json.loads(await protocol_file.read())
+            async with async_open(
+                str(
+                    importlib.resources.files(__name__.split(".")[0]).joinpath(
+                        "module_spec/ignore.json"
+                    )
+                )
+            ) as protocol_file:
+                self.ignore = json.loads(await protocol_file.read())
 
     def empty_cache(self) -> bool:
         if (
@@ -242,6 +255,14 @@ class PacketHandler:
             self._log.debug(
                 "Received broadcast message {} from {}, ignoring".format(
                     self.broadcast[str(command_value).upper()], address
+                )
+            )
+
+        # ignore messages
+        elif command_value in self.ignore:
+            self._log.debug(
+                "Received ignored message {} from {}, ignoring".format(
+                    self.ignore[str(command_value).upper()], address
                 )
             )
 
