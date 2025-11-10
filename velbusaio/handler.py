@@ -189,6 +189,7 @@ class PacketHandler:
                     self._log.info(
                         f"Scan module {address} ({address:#02x}, {module.get_type_name()}) completed in {module_scan_time:.2f}, module loaded={await module.is_loaded()}"
                     )
+                    await module.wait_for_status_messages()
                 except asyncio.TimeoutError:
                     self._log.error(
                         f"Module {address} ({address:#02x}) did not respond to info requests after successful type request"
