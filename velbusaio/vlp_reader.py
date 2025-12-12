@@ -215,8 +215,7 @@ class vlpModule:
         except UnicodeDecodeError as e:
             self._log.error(f"  => UnicodeDecodeError: {e}")
             name = byte_data
-        finally:
-            return name
+        return name
 
     async def _load_module_spec(self) -> None:
         self._log.debug(f" => Load module spec for {self._type_id}")
