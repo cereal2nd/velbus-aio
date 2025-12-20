@@ -93,6 +93,7 @@ from velbusaio.messages.module_status import (
     ModuleStatusPirMessage,
 )
 from velbusaio.messages.module_status_request import ModuleStatusRequestMessage
+from velbusaio.messages.module_type_request import ModuleTypeRequestMessage
 from velbusaio.messages.push_button_status import PushButtonStatusMessage
 from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
@@ -613,6 +614,10 @@ class Module:
             self._name = cache["name"]
         else:
             await self.__load_memory()
+
+        # Submit ModuleType request, to trigger configuration of sub addresses
+        await self._writer(ModuleTypeRequestMessage(self._address))
+
         # load the module status
         # await self._request_module_status()
         # load the channel names
