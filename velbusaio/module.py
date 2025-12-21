@@ -615,7 +615,7 @@ class Module:
         else:
             await self.__load_memory()
 
-        # Submit ModuleType request, to trigger configuration of sub addresses
+        # Submit ModuleType request to trigger discovery of sub addresses
         await self._writer(ModuleTypeRequestMessage(self._address))
 
         # load the module status
