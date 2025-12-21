@@ -620,9 +620,9 @@ class Module:
             for num, chan in cache["channels"].items():
                 self._channels[int(num)]._name = chan["name"]
                 if "subdevice" in chan:
-                    self._channels[int(num)]._sub_device = chan["subdevice"]
+                    self._channels[int(num)]._subDevice = chan["subdevice"]
                 else:
-                    self._channels[int(num)]._sub_device = False
+                    self._channels[int(num)]._subDevice = False
                 if "Unit" in chan:
                     self._channels[int(num)]._Unit = chan["Unit"]
                 self._channels[int(num)]._is_loaded = True
