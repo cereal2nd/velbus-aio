@@ -93,6 +93,7 @@ from velbusaio.messages.module_status import (
     ModuleStatusPirMessage,
 )
 from velbusaio.messages.module_status_request import ModuleStatusRequestMessage
+from velbusaio.messages.module_type_request import ModuleTypeRequestMessage
 from velbusaio.messages.push_button_status import PushButtonStatusMessage
 from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
@@ -251,9 +252,11 @@ class Module:
         return self.__repr__()
 
     def to_cache(self) -> dict:
-        d = {"name": self._name, "channels": {}}
+        d = {"name": self._name, "channels": {}, "sub_addresses": {}}
         for num, chan in self._channels.items():
             d["channels"][num] = chan.to_cache()
+        for num, address in self._sub_address.items():
+            d["sub_addresses"][num] = address
         return d
 
     def get_address(self) -> int:
@@ -613,6 +616,17 @@ class Module:
             self._name = cache["name"]
         else:
             await self.__load_memory()
+
+        # load the sub addresses from cache if it's available
+        if (self._use_cache or from_cache) and "sub_addresses" in cache:
+            for num, addr in cache["sub_addresses"].items():
+                self._sub_address[int(num)] = int(addr)
+        else:
+            # Submit ModuleType request to trigger discovery of sub addresses.
+            # Do not cache immediately here: sub addresses are populated asynchronously
+            # when the response is handled; caching now could store an empty mapping.
+            await self._writer(ModuleTypeRequestMessage(self._address))
+
         # load the module status
         # await self._request_module_status()
         # load the channel names
