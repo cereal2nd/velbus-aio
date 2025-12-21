@@ -622,10 +622,10 @@ class Module:
             for num, addr in cache["sub_addresses"].items():
                 self._sub_address[int(num)] = int(addr)
         else:
-            # Submit ModuleType request to trigger discovery of sub addresses
+            # Submit ModuleType request to trigger discovery of sub addresses.
+            # Do not cache immediately here: sub addresses are populated asynchronously
+            # when the response is handled; caching now could store an empty mapping.
             await self._writer(ModuleTypeRequestMessage(self._address))
-            if from_cache:
-                await self._cache()
 
         # load the module status
         # await self._request_module_status()
