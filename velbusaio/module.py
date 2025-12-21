@@ -252,9 +252,11 @@ class Module:
         return self.__repr__()
 
     def to_cache(self) -> dict:
-        d = {"name": self._name, "channels": {}}
+        d = {"name": self._name, "channels": {}, "sub_addresses": {}}
         for num, chan in self._channels.items():
             d["channels"][num] = chan.to_cache()
+        for num, address in self._sub_address.items():
+            d["sub_addresses"][num] = address
         return d
 
     def get_address(self) -> int:
@@ -615,8 +617,15 @@ class Module:
         else:
             await self.__load_memory()
 
-        # Submit ModuleType request to trigger discovery of sub addresses
-        await self._writer(ModuleTypeRequestMessage(self._address))
+        # load the sub addresses from cache if it's available
+        if (self._use_cache or from_cache) and "sub_addresses" in cache:
+            for num, addr in cache["sub_addresses"].items():
+                self._sub_address[int(num)] = int(addr)
+        else:
+            # Submit ModuleType request to trigger discovery of sub addresses
+            await self._writer(ModuleTypeRequestMessage(self._address))
+            if from_cache:
+                await self._cache()
 
         # load the module status
         # await self._request_module_status()
