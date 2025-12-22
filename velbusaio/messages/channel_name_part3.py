@@ -87,6 +87,8 @@ class ChannelNamePart3Message(Message):
         "VMB8IN-20",
         "VMB4LEDPWM-20",
         "VMBPSUMNGR-20",
+        "VMB4RYLD-20",
+        "VMB4RYNO-20",
     ],
 )
 class ChannelNamePart3Message2(ChannelNamePart3Message):

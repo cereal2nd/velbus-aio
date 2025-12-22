@@ -87,6 +87,8 @@ class ChannelNamePart1Message(Message):
         "VMB2DC-20",
         "VMB8IN-20",
         "VMBPSUMNGR-20",
+        "VMB4RYLD-20",
+        "VMB4RYNO-20",
     ],
 )
 class ChannelNamePart1Message2(ChannelNamePart1Message):
