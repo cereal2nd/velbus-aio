@@ -118,3 +118,70 @@ class RelayStatusMessage2(RelayStatusMessage):
             return True
         else:
             return False
+
+
+@register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20"])
+class RelayStatusMessage3(Message):
+    """
+    send by: VMB4RYLD
+    received by:
+    """
+
+    def __init__(self, address=None):
+        Message.__init__(self)
+        self.channels = []
+        self.disable_inhibit_forced = 0
+        self.status = 0
+        self.led_status = 0
+        self.delay_time = 0
+        self.set_defaults(address)
+
+    def populate(self, priority, address, rtr, data):
+        """
+        :return: None
+        """
+        self.needs_low_priority(priority)
+        self.needs_no_rtr(rtr)
+        self.needs_data(data, 7)
+        self.set_attributes(priority, address, rtr)
+        self.channel = self.byte_to_channels(data[0])
+        self.disable_inhibit_forced = data[1]
+        self.status = data[2]
+        self.led_status = data[3]
+        (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[4:])
+
+    def is_normal(self):
+        """
+        :return: bool
+        """
+        return self.disable_inhibit_forced == CHANNEL_NORMAL
+
+    def is_inhibited(self):
+        """
+        :return: bool
+        """
+        return self.disable_inhibit_forced == CHANNEL_INHIBITED
+
+    def is_forced_on(self):
+        """
+        :return: bool
+        """
+        return self.disable_inhibit_forced == CHANNEL_FORCED_ON
+
+    def is_disabled(self):
+        """
+        :return: bool
+        """
+        return self.disable_inhibit_forced == CHANNEL_DISABLED
+
+    def is_on(self):
+        """
+        :return: bool
+        """
+        return self.status == RELAY_ON
+
+    def has_interval_timer_on(self):
+        """
+        :return: bool
+        """
+        return self.status == INTERVAL_TIMER_ON
