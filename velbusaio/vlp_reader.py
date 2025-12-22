@@ -219,6 +219,25 @@ class vlpModule:
 
     async def _load_module_spec(self) -> None:
         self._log.debug(f" => Load module spec for {self._type_id}")
+
+        # remap VMBELx modules to unified memorymap based on build number
+        # remap VMBELx TO VMBELx-20
+        memmap_id = self._type_id
+        if memmap_id == 0x34 and self._build >= "2524":  # VMBEL1
+            memmap_id = 0x4F
+        elif memmap_id == 0x35 and self._build >= "2524":  # VMBEL2
+            memmap_id = 0x50
+        elif memmap_id == 0x36 and self._build >= "2524":  # VMBEL4
+            memmap_id = 0x51
+        elif memmap_id == 0x37 and self._build >= "2438":  # VMBELO
+            memmap_id = 0x52
+        elif memmap_id == 0x38 and self._build >= "2524":  # VMBELPIR
+            memmap_id = 0x5C
+        if memmap_id != self._type_id:
+            self._log.debug(
+                f" => Load module spec for {self._type_id}, {self._build} => {memmap_id}"
+            )
+
         if sys.version_info >= (3, 13):
             with importlib.resources.path(
                 __name__, f"module_spec/{h2(self._type_id)}.json"
