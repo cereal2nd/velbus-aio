@@ -8,6 +8,7 @@ import pathlib
 import re
 import ssl
 import time
+import typing as t
 from urllib.parse import urlparse
 
 import serial
@@ -57,10 +58,11 @@ class Velbus:
 
         self._protocol = VelbusProtocol(
             message_received_callback=self._on_message_received,
-            connection_lost_callback=self._on_connection_lost,
+            connection_state_callback=self._on_connection_state,
         )
         self._closing = False
         self._auto_reconnect = True
+        self._is_connected = None
 
         self._destination = dsn
         self._handler = PacketHandler(self, one_address)
@@ -69,6 +71,38 @@ class Velbus:
         self._send_queue: asyncio.Queue = asyncio.Queue()
         self._vlp_file = vlp_file
         self._cache_dir: str = cache_dir
+        self._is_connected: bool = False
+        self._on_connect_callbacks: list[t.Callable[[], None]] = []
+        self._on_disconnect_callbacks: list[t.Callable[[], None]] = []
+
+    @property
+    def connected(self) -> bool:
+        """Return connection state."""
+        return self._is_connected
+
+    def _on_connection_state(self, is_connected: bool) -> None:
+        """Respond to Protocol connection state changes."""
+        self._is_connected = is_connected
+        if is_connected:
+            self._log.info("Connected to transport")
+            for callback in self._on_connect_callbacks:
+                callback()
+        else:
+            self._log.info("Disconnected from transport")
+            for callback in self._on_disconnect_callbacks:
+                callback()
+
+    def _add_on_connect_callback(self, callback: t.Callable[[], None]) -> None:
+        self._on_connect_callbacks.append(callback)
+
+    def _add_on_disconnect_callback(self, callback: t.Callable[[], None]) -> None:
+        self._on_disconnect_callbacks.append(callback)
+
+    def _remove_on_connect_callback(self, callback: t.Callable[[], None]) -> None:
+        self._on_connect_callbacks.remove(callback)
+
+    def _remove_on_disconnect_callback(self, callback: t.Callable[[], None]) -> None:
+        self._on_disconnect_callbacks.remove(callback)
 
     def get_cache_dir(self) -> str:
         return self._cache_dir
@@ -102,7 +136,7 @@ class Velbus:
             memorymap=memorymap,
             cache_dir=self._cache_dir,
         )
-        await module.initialize(self.send)
+        await module.initialize(self.send, self)
         self._modules[addr] = module
         self._log.info(f"Found module {addr}: {module}")
 

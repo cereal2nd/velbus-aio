@@ -10,6 +10,25 @@ class MockWriter:
         pass
 
 
+class MockController:
+    """Mock controller for testing."""
+
+    def connected(self):
+        return True
+
+    def _add_on_connext_callback(self, callback):
+        pass
+
+    def _remove_on_connect_callback(self, callback):
+        pass
+
+    def _add_on_disconnect_callback(self, callback):
+        pass
+
+    def _remove_on_disconnect_callback(self, callback):
+        pass
+
+
 @pytest.mark.asyncio
 async def test_vmbdali_loads_and_has_channels():
     module_address = 0x12
@@ -19,7 +38,7 @@ async def test_vmbdali_loads_and_has_channels():
         dali_type,
     )
     writer = MockWriter()
-    await module.initialize(writer)
+    await module.initialize(writer, MockController())
 
     await module.load()
 

@@ -16,7 +16,7 @@ from velbusaio.raw_message import create as create_message_info
 
 def _on_write_backoff(details):
     logging.debug(
-        f"Transport is not open, waiting {details.wait} seconds after {details.tries}"
+        f"Transport is not open, waiting {details['wait']} seconds after {details['tries']}"
     )
 
 
@@ -29,12 +29,14 @@ class VelbusProtocol(asyncio.BufferedProtocol):
     def __init__(
         self,
         message_received_callback: t.Callable[[RawMessage], t.Awaitable[None]],
-        connection_lost_callback=None,
+        connection_state_callback: t.Callable[[bool], None] | None = None,
     ) -> None:
         super().__init__()
         self._log = logging.getLogger("velbus-protocol")
         self._message_received_callback = message_received_callback
-        self._connection_lost_callback = connection_lost_callback
+        self._connection_state_callbacks = (
+            [connection_state_callback] if connection_state_callback else []
+        )
 
         # everything for reading from Velbus
         self._buffer = bytearray(MAXIMUM_MESSAGE_SIZE)
@@ -53,12 +55,48 @@ class VelbusProtocol(asyncio.BufferedProtocol):
 
         self._closing = False
 
+    def add_connection_state_callback(self, callback: t.Callable[[bool], None]) -> None:
+        """Register a callback to be called when connection state changes.
+
+        Args:
+            callback: A callable that takes a boolean parameter (True for connected, False for disconnected).
+        """
+        if callback not in self._connection_state_callbacks:
+            self._connection_state_callbacks.append(callback)
+
+    def remove_connection_state_callback(
+        self, callback: t.Callable[[bool], None]
+    ) -> None:
+        """Remove a previously registered connection state callback.
+
+        Args:
+            callback: The callback to remove.
+        """
+        if callback in self._connection_state_callbacks:
+            self._connection_state_callbacks.remove(callback)
+
+    def _notify_connection_state_callbacks(self, connected: bool) -> None:
+        """Notify all registered callbacks of connection state change.
+
+        Args:
+            connected: True if connected, False if disconnected.
+        """
+        for callback in self._connection_state_callbacks:
+            try:
+                callback(connected)
+            except Exception as exc:
+                self._log.error(f"Error calling connection state callback: {exc!r}")
+
     def connection_made(self, transport: transports.BaseTransport) -> None:
         self.transport = transport
         self._log.info("Connection established to Velbus")
+        self._last_activity_time = time.time()
 
         self._restart_writer = True
         self.restart_writing()
+
+        # Notify callbacks that connection is established
+        self._notify_connection_state_callbacks(True)
 
     async def pause_writing(self) -> None:
         """Pause writing."""
@@ -93,8 +131,9 @@ class VelbusProtocol(asyncio.BufferedProtocol):
 
         self.transport = None
         asyncio.ensure_future(self.pause_writing())
-        if self._connection_lost_callback:
-            self._connection_lost_callback(exc)
+
+        # Notify callbacks that connection is lost
+        self._notify_connection_state_callbacks(False)
 
     # Everything read-related
 
@@ -105,6 +144,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         """Receive data from the Streaming protocol.
         Called when asyncio.Protocol detects received data from serial port.
         """
+        self._last_activity_time = time.time()
         self._serial_buf += data
         self._log.debug(
             "Received {nbytes} bytes from Velbus: {data_hex}".format(
@@ -133,6 +173,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         """Receive data from the Buffered Streaming protocol.
         Called when asyncio.BufferedProtocol detects received data from network.
         """
+        self._last_activity_time = time.time()
         self._buffer_pos += nbytes
         # self._log.debug(
         #    "Received {nbytes} bytes from Velbus: {data_hex}".format(
@@ -234,6 +275,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         self._log.debug(f"TX: {msg}")
         if not self.transport.is_closing():
             self.transport.write(msg.to_bytes())
+            self._last_activity_time = time.time()
             return True
         else:
             return False

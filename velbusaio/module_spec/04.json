@@ -79,6 +79,26 @@
       "Editable": "yes",
       "Name": "Alarm 16",
       "Type": "Button"
+    },
+    "92": {
+      "Editable": "no",
+      "Name": "PSU Amperage",
+      "Type": "SensorNumber"
+    },
+    "93": {
+      "Editable": "no",
+      "Name": "PSU Voltage",
+      "Type": "SensorNumber"
+    },
+    "94": {
+      "Editable": "no",
+      "Name": "PSU Wattage",
+      "Type": "SensorNumber"
+    },
+    "95": {
+      "Editable": "no",
+      "Name": "PSU Load",
+      "Type": "SensorNumber"
     }
   },
   "Info": "PSU Manager",

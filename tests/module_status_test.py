@@ -58,7 +58,7 @@ async def test_module_status_selected_program(module_type):
         cache_dir=get_cache_dir(),
     )
     velbus = Velbus("")  # Dummy connection
-    await m.initialize(velbus.send)
+    await m.initialize(velbus.send, velbus)
 
     # load the module with dummy channels
     for chan in range(1, 9):

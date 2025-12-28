@@ -7,7 +7,8 @@ from __future__ import annotations
 import asyncio
 import math
 import string
-from typing import TYPE_CHECKING, Any, Awaitable, Callable
+from collections.abc import Awaitable
+from typing import TYPE_CHECKING, Any, Callable
 
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
@@ -218,6 +219,24 @@ class Channel:
     async def press(self) -> None:
         raise NotImplementedError()
 
+    def get_sensor_type(self) -> str | None:
+        return None
+
+    def on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self.module.on_connect(meth)
+
+    def remove_on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self._module.remove_on_connect(meth)
+
+    def on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self._module.on_disconnect(meth)
+
+    def remove_on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self._module.remove_on_disconnect(meth)
+
+    def is_connected(self) -> bool:
+        return self._module.is_connected()
+
 
 class Blind(Channel):
     """
@@ -392,6 +411,11 @@ class ButtonCounter(Button):
             return True
         return False
 
+    def get_sensor_type(self) -> str | None:
+        if self._counter:
+            return "counter"
+        return None
+
     def get_state(self) -> int:
         if self._energy:
             return self._energy
@@ -545,8 +569,11 @@ class Temperature(Channel):
     def get_unit(self) -> str:
         return TEMP_CELSIUS
 
-    def get_state(self) -> int:
-        return round(self._cur, 2)
+    def get_state(self) -> float:
+        return round(float(self._cur), 2)
+
+    def get_sensor_type(self):
+        return "temperature"
 
     def is_temperature(self) -> bool:
         return True
@@ -662,6 +689,7 @@ class SensorNumber(Channel):
 
     _cur = 0
     _unit = None
+    _sensor_type = None
 
     def get_categories(self) -> list[str]:
         return ["sensor"]
@@ -674,6 +702,9 @@ class SensorNumber(Channel):
 
     def get_state(self) -> float:
         return round(self._cur, 2)
+
+    def get_sensor_type(self) -> str | None:
+        return self._sensor_type
 
 
 class LightSensor(Channel):

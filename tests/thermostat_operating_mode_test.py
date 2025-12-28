@@ -40,7 +40,7 @@ async def test_thermostat_operating_mode(mode, sleep_timer):
         cache_dir=get_cache_dir(),
     )
     velbus = Velbus("")  # Dummy connection
-    await m.initialize(velbus.send)
+    await m.initialize(velbus.send, velbus)
     m._log = logging.getLogger("velbus-module")
     chan = m._translate_channel_name(m._data["TemperatureChannel"])
     m._channels[chan] = Temperature(m, chan, None, False, False, velbus.send, None)

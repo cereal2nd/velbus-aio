@@ -12,6 +12,25 @@ class MockWriter:
         pass
 
 
+class MockController:
+    """Mock controller for testing."""
+
+    def connected(self):
+        return True
+
+    def _add_on_connext_callback(self, callback):
+        pass
+
+    def _remove_on_connect_callback(self, callback):
+        pass
+
+    def _add_on_disconnect_callback(self, callback):
+        pass
+
+    def _remove_on_disconnect_callback(self, callback):
+        pass
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     "name",
@@ -31,7 +50,7 @@ async def test_module_name(name):
         memory[0xF0 + i] = ord(c)
 
     m = Module(module_address, module_type)
-    await m.initialize(MockWriter())
+    await m.initialize(MockWriter(), MockController())
     m._log = logging.getLogger("velbus-module")
 
     for addr, data in memory.items():

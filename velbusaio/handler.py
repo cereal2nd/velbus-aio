@@ -25,11 +25,11 @@ from velbusaio.const import (
 )
 from velbusaio.messages.module_subtype import ModuleSubTypeMessage
 from velbusaio.messages.module_type import ModuleType2Message, ModuleTypeMessage
-from velbusaio.module import Module
 from velbusaio.raw_message import RawMessage
 
 if TYPE_CHECKING:
     from velbusaio.controller import Velbus
+    from velbusaio.module import Module
 
 
 class PacketHandler:

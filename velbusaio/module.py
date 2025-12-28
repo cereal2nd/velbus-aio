@@ -12,9 +12,13 @@ import os
 import pathlib
 import struct
 import sys
-from typing import Awaitable, Callable
+from collections.abc import Awaitable
+from typing import TYPE_CHECKING, Callable
 
 from aiofile import async_open
+
+if TYPE_CHECKING:
+    from velbusaio.controller import Controller
 
 from velbusaio.channels import (
     Blind,
@@ -181,7 +185,9 @@ class Module:
     def get_initial_timeout(self) -> int:
         return SCAN_MODULEINFO_TIMEOUT_INITIAL
 
-    async def initialize(self, writer: Callable[[Message], Awaitable[None]]) -> None:
+    async def initialize(
+        self, writer: Callable[[Message], Awaitable[None]], controller: Controller
+    ) -> None:
         self._log = logging.getLogger("velbus-module")
         # load the protocol data
         try:
@@ -300,6 +306,22 @@ class Module:
                     _channel_offset = 8 * _sub_addr_key
                     break
         return _channel_offset
+
+    def on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self.controller._add_on_connext_callback(meth)
+
+    def remove_on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self.controller._remove_on_connect_callback(meth)
+
+    def on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self.controller._add_on_disconnect_callback(meth)
+
+    def remove_on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        self.controller._remove_on_disconnect_callback(meth)
+
+    @property
+    def is_connected(self) -> bool:
+        return self.controller.connected()
 
     async def on_message(self, message: Message) -> None:
         """
