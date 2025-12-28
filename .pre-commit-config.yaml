@@ -75,7 +75,6 @@ repos:
   - repo: local
     hooks:
       - id: pytest
-        stages: [manual]
         name: pytest
         entry: pytest tests
         language: system
