@@ -6,7 +6,7 @@
 [![Downloads](https://pepy.tech/badge/velbus-aio)](https://pepy.tech/project/velbus-aio)
 [![Downloads](https://pepy.tech/badge/velbus-aio/month)](https://pepy.tech/project/velbus-aio)
 [![Downloads](https://pepy.tech/badge/velbus-aio/week)](https://pepy.tech/project/velbus-aio)
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 > This project requires financial support, but it is free for you to use. You can join those helping to keep the lights on at:
 >
