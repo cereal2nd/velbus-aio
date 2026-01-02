@@ -5,7 +5,7 @@ This document should get you up and running with your development environment.
 
 ## Development environment
 
-1. Clone the repo with its submodules: `git clone --recurse-submodules https://github.com/Cereal2nd/velbus-aio`
+1. Clone the repo with its submodules: `git clone https://github.com/Cereal2nd/velbus-aio`
 2. (optional) To keep dependencies from different projects from conflicting,
    it's usually better to install every project in its own Virtual Environment.
    Start by creating a new virtualenv: `python3 -m venv venv`
