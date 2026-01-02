@@ -145,6 +145,9 @@ class Velbus:
         """Get a module on an address."""
         if addr in self._modules:
             return self._modules[addr]
+        for module in self._modules.values():
+            if addr in module.get_addresses():
+                return module
         return None
 
     def get_channels(self, addr: int) -> None | dict:
