@@ -87,6 +87,7 @@ class Velbus:
                 await chan.status_update()
 
     def get_cache_dir(self) -> str:
+        """Return the cache directory."""
         return self._cache_dir
 
     async def _on_message_received(self, msg: RawMessage) -> None:
@@ -206,6 +207,7 @@ class Velbus:
                 raise VelbusConnectionFailed from err
 
     async def start(self) -> None:
+        """Start the controller."""
         # if auth is required send the auth key
         parts = urlparse(self._destination)
         if parts.username:
@@ -246,10 +248,11 @@ class Velbus:
             await self._handler.scan()
 
     async def scan(self) -> None:
-        """Service endpoint to restart the scan"""
+        """Service endpoint to restart the scan."""
         await self._handler.scan(True)
 
     async def sendTypeRequestMessage(self, address: int) -> None:
+        """Send a module type request message."""
         msg = ModuleTypeRequestMessage(address)
         await self.send(msg)
 
@@ -267,30 +270,39 @@ class Velbus:
     def get_all_sensor(
         self,
     ) -> list[ButtonCounter | Temperature | LightSensor | SensorNumber]:
+        """Get all sensors."""
         return self._get_all("sensor")
 
     def get_all_switch(self) -> list[Relay]:
+        """Get all switches."""
         return self._get_all("switch")
 
     def get_all_binary_sensor(self) -> list[Button]:
+        """Get all binary sensors."""
         return self._get_all("binary_sensor")
 
     def get_all_button(self) -> list[Button | ButtonCounter]:
+        """Get all buttons."""
         return self._get_all("button")
 
     def get_all_climate(self) -> list[Temperature]:
+        """Get all climate devices."""
         return self._get_all("climate")
 
     def get_all_cover(self) -> list[Blind]:
+        """Get all covers."""
         return self._get_all("cover")
 
     def get_all_select(self) -> list[SelectedProgram]:
+        """Get all select devices."""
         return self._get_all("select")
 
     def get_all_light(self) -> list[Dimmer]:
+        """Get all light devices."""
         return self._get_all("light")
 
     def get_all_led(self) -> list[Button]:
+        """Get all LED devices."""
         return self._get_all("led")
 
     def _get_all(
@@ -311,14 +323,13 @@ class Velbus:
         | SelectedProgram
     ]:
         """Get all channels."""
-        lst = []
-        for addr, mod in (self.get_modules()).items():
-            if addr in self._submodules:
-                continue
-            for chan in (mod.get_channels()).values():
-                if class_name in chan.get_categories():
-                    lst.append(chan)
-        return lst
+        return [
+            chan
+            for addr, mod in (self.get_modules()).items()
+            if addr not in self._submodules
+            for chan in (mod.get_channels()).values()
+            if class_name in chan.get_categories()
+        ]
 
     async def sync_clock(self) -> None:
         """Will send all the needed messages to sync the clock."""

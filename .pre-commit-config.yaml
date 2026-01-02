@@ -39,11 +39,11 @@ repos:
           - --configfile=pyproject.toml
         additional_dependencies: ["bandit[toml]"]
         files: ^.*/.+\.py$
-  - repo: https://github.com/PyCQA/isort
-    rev: 7.0.0
-    hooks:
-      - id: isort
-        args: ["--profile", "black"]
+  #- repo: https://github.com/PyCQA/isort
+  #  rev: 7.0.0
+  #  hooks:
+  #    - id: isort
+  #      args: ["--profile", "black"]
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:

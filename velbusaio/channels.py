@@ -1,11 +1,14 @@
-"""author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Velbusaio channel classes.
+
+author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Awaitable
 import math
 import string
-from collections.abc import Awaitable
 from typing import TYPE_CHECKING, Any, Callable
 
 from velbusaio.command_registry import commandRegistry
@@ -43,6 +46,7 @@ class Channel:
         writer: Callable[[Message], Awaitable[None]],
         address: int,
     ):
+        """Initialize the channel."""
         self._num = num
         self._module = module
         self._name = name
@@ -143,7 +147,7 @@ class Channel:
         return {
             k: d[k]
             for k in d
-            if k != "_writer" and k != "_on_status_update" and k != "_name_parts"
+            if k not in {"_writer", "_on_status_update", "_name_parts"}
         }
 
     def to_cache(self) -> dict:
@@ -244,7 +248,7 @@ class Channel:
 
 
 class Blind(Channel):
-    """A blind channel"""
+    """A blind channel."""
 
     _state = None
     # State reports the direction of *movement*: moving up, moving down or stopped
@@ -252,21 +256,27 @@ class Blind(Channel):
     # Position reporting is not supported by VMBxBL modules (only in BLE/BLS)
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         return ["cover"]
 
     def get_position(self) -> int | None:
+        """Return the blind position."""
         return self._position
 
     def get_state(self) -> str:
+        """Return the blind state."""
         return self._state
 
     def is_opening(self) -> bool:
+        """Return if the blind is opening."""
         return self._state == 0x01
 
     def is_closing(self) -> bool:
+        """Return if the blind is closing."""
         return self._state == 0x02
 
     def is_stopped(self) -> bool:
+        """Return if the blind is stopped."""
         return self._state == 0x00
 
     def is_closed(self) -> bool | None:
@@ -283,29 +293,34 @@ class Blind(Channel):
         return self._position == 0
 
     def support_position(self) -> bool:
+        """Return if position reporting is supported."""
         # position will be populated after the first BlindStatusNgMessage (during module load)
         # For VMBxBL modules, position will remain None and not be overwritten
         return self._position is not None
 
     async def open(self) -> None:
+        """Open the blind."""
         cls = commandRegistry.get_command(0x05, self._module.get_type())
         msg = cls(self._address)
         msg.channel = self._num
         await self._writer(msg)
 
     async def close(self) -> None:
+        """Close the blind."""
         cls = commandRegistry.get_command(0x06, self._module.get_type())
         msg = cls(self._address)
         msg.channel = self._num
         await self._writer(msg)
 
     async def stop(self) -> None:
+        """Stop the blind."""
         cls = commandRegistry.get_command(0x04, self._module.get_type())
         msg = cls(self._address)
         msg.channel = self._num
         await self._writer(msg)
 
     async def set_position(self, position: int) -> None:
+        """Set the blind to a specific position."""
         # may not be supported by the module
         if position == 100:
             # at least VMB1BLS ignores command 0x1C with position 0x64
@@ -319,7 +334,7 @@ class Blind(Channel):
 
 
 class Button(Channel):
-    """A Button channel"""
+    """A Button channel."""
 
     _enabled = True
     _closed = False
@@ -327,22 +342,23 @@ class Button(Channel):
     _long = False
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         if self._enabled:
             return ["binary_sensor", "led", "button"]
         return []
 
     def is_closed(self) -> bool:
-        """Return if this button is on"""
+        """Return if this button is on."""
         return self._closed
 
     def is_on(self) -> bool:
-        """Return if this relay is on"""
+        """Return if this relay is on."""
         if self._led_state == "on":
             return True
         return False
 
     async def set_led_state(self, state: str) -> None:
-        """Set led"""
+        """Set led."""
         if state == "on":
             code = 0xF6
         elif state == "slow":
@@ -363,7 +379,7 @@ class Button(Channel):
         await self.update({"led_state": state})
 
     async def press(self) -> None:
-        """Press the button"""
+        """Press the button."""
         _mod_add = self.get_module_address("Button")
         _chn_num = self._num - self._module.calc_channel_offset(_mod_add)
         # send the just pressed
@@ -380,7 +396,8 @@ class Button(Channel):
 
 
 class ButtonCounter(Button):
-    """A ButtonCounter channel
+    """A ButtonCounter channel.
+
     This channel can act as a button and as a counter
     => standard     this is the calculated value
     => is_counter   this is the numeric value
@@ -394,21 +411,25 @@ class ButtonCounter(Button):
     _energy = None
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         if self._counter:
             return ["sensor"]
         return ["binary_sensor", "button"]
 
     def is_counter_channel(self) -> bool:
+        """Return if this channel is a counter channel."""
         if self._counter:
             return True
         return False
 
     def get_sensor_type(self) -> str | None:
+        """Return the sensor type."""
         if self._counter:
             return "counter"
         return None
 
     def get_state(self) -> int:
+        """Return the current state of the counter."""
         if self._energy:
             return self._energy
         # if we don't know the delay
@@ -418,7 +439,7 @@ class ButtonCounter(Button):
         val = 0
         if not self._delay or not self._Unit or self._delay == 0xFFFF:
             return round(0, 2)
-        if self._Unit == VOLUME_LITERS_HOUR or self._Unit == VOLUME_CUBIC_METER_HOUR:
+        if self._Unit in {VOLUME_LITERS_HOUR, VOLUME_CUBIC_METER_HOUR}:
             val = (1000 * 3600) / (self._delay * self._pulses)
         elif self._Unit == ENERGY_KILO_WATT_HOUR:
             val = (1000 * 1000 * 3600) / (self._delay * self._pulses)
@@ -427,6 +448,7 @@ class ButtonCounter(Button):
         return round(val, 2)
 
     def get_unit(self) -> str | None:
+        """Return the unit of the counter."""
         if self._Unit == VOLUME_LITERS_HOUR:
             return "L"
         if self._Unit == VOLUME_CUBIC_METER_HOUR:
@@ -436,39 +458,45 @@ class ButtonCounter(Button):
         return None
 
     def get_counter_state(self) -> int:
+        """Return the current state of the counter."""
         if self._power:
             return self._power
         return round((self._counter / self._pulses), 2)
 
     def get_counter_unit(self) -> str:
+        """Return the unit of the counter."""
         return self._Unit
 
     def is_water(self) -> bool:
+        """Return if this channel is a water channel."""
         if self._counter and self._Unit == VOLUME_LITERS_HOUR:
             return True
         return False
 
 
 class Sensor(Button):
-    """A Sensor channel
+    """A Sensor channel.
+
     This is a bit weird, but this happens because of code sharing with openhab
     A sensor in this case is actually a Button
     """
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         if self._enabled:
             return ["binary_sensor", "led"]
         return []
 
 
 class ThermostatChannel(Button):
-    """A Thermostat channel
+    """A Thermostat channel.
+
     These are the booster/heater/alarms
     """
 
 
 class Dimmer(Channel):
-    """A Dimmer channel"""
+    """A Dimmer channel."""
 
     _state: int = 0
 
@@ -483,6 +511,7 @@ class Dimmer(Channel):
         address: int,
         slider_scale: int = 100,
     ):
+        """Initialize the dimmer channel."""
         super().__init__(module, num, name, nameEditable, subDevice, writer, address)
 
         self.slider_scale = slider_scale
@@ -490,20 +519,21 @@ class Dimmer(Channel):
         # VMBDALI has dim values 0(off), 1-253(dimmed), 254(full on), 255(previous value)
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         return ["light"]
 
     def is_on(self) -> bool:
-        """Check if a dimmer is turned on"""
+        """Check if a dimmer is turned on."""
         if self._state == 0:
             return False
         return True
 
     def get_dimmer_state(self) -> int:
-        """Return the dimmer state"""
+        """Return the dimmer state."""
         return int(self._state * 100 / self.slider_scale)
 
     async def set_dimmer_state(self, slider: int, transitiontime: int = 0) -> None:
-        """Set dimmer to slider"""
+        """Set dimmer to slider."""
         cls = commandRegistry.get_command(0x07, self._module.get_type())
         msg = cls(self._address)
         msg.dimmer_state = int(slider * self.slider_scale / 100)
@@ -512,7 +542,7 @@ class Dimmer(Channel):
         await self._writer(msg)
 
     async def restore_dimmer_state(self, transitiontime: int = 0) -> None:
-        """Restore dimmer to last known state"""
+        """Restore dimmer to last known state."""
         cls = commandRegistry.get_command(0x11, self._module.get_type())
         msg = cls(self._address)
         msg.dimmer_transitiontime = int(transitiontime)
@@ -521,7 +551,7 @@ class Dimmer(Channel):
 
 
 class Temperature(Channel):
-    """A Temperature sensor channel"""
+    """A Temperature sensor channel."""
 
     _cur = 0
     _cur_precision = None
@@ -535,54 +565,68 @@ class Temperature(Channel):
     _sleep_timer = 0
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         if self._thermostat:
             return ["sensor", "climate"]
         return ["sensor"]
 
     def get_class(self) -> str:
+        """Return the device class for this channel."""
         return DEVICE_CLASS_TEMPERATURE
 
     def get_unit(self) -> str:
+        """Return the unit of measurement for this channel."""
         return TEMP_CELSIUS
 
     def get_state(self) -> float:
+        """Return the current state of the temperature sensor."""
         return round(float(self._cur), 2)
 
     def get_sensor_type(self):
+        """Return the sensor type."""
         return "temperature"
 
     def is_temperature(self) -> bool:
+        """Return if this channel is a temperature sensor."""
         return True
 
     def get_max(self) -> int | None:
+        """Return the maximum temperature recorded."""
         if self._max is None:
             return None
         return round(self._max, 2)
 
     def get_min(self) -> int | None:
+        """Return the minimum temperature recorded."""
         if self._min is None:
             return None
         return round(self._min, 2)
 
     def get_climate_target(self) -> int:
+        """Return the target temperature."""
         return round(self._target, 2)
 
     def get_climate_preset(self) -> str:
+        """Return the climate preset."""
         return self._cmode
 
     def get_climate_mode(self) -> str:
+        """Return the climate mode."""
         return self._cstatus
 
     def get_cool_mode(self) -> str:
+        """Return the cool mode."""
         return self._cool_mode
 
     async def set_temp(self, temp: float) -> None:
+        """Set the target temperature."""
         cls = commandRegistry.get_command(0xE4, self._module.get_type())
         msg = cls(self._address)
         msg.temp = temp * 2  # TODO: int()
         await self._writer(msg)
 
     async def _switch_mode(self) -> None:
+        """Switch the climate mode."""
         if self._cmode == "safe":
             code = 0xDE
         elif self._cmode == "comfort":
@@ -605,14 +649,17 @@ class Temperature(Channel):
         await self._writer(msg)
 
     async def set_preset(self, preset: str) -> None:
+        """Set the climate preset."""
         self._cmode = preset
         await self._switch_mode()
 
     async def set_climate_mode(self, mode: str) -> None:
+        """Set the climate mode."""
         self._cstatus = mode
         await self._switch_mode()
 
     async def set_mode(self, mode: str) -> None:
+        """Set the heat/cool mode."""
         # TODO: change function name, proposal = set_heat_cool_mode
         if mode == "heat":
             code = 0xE0
@@ -624,6 +671,7 @@ class Temperature(Channel):
         await self._writer(msg)
 
     async def maybe_update_temperature(self, new_temp: float, precision: float) -> None:
+        """Update the temperature only if the new value is different enough."""
         # Based on experiments, Velbus modules seem to truncate (i.e. round down)
         current_temp_rounded_to_precision = (
             math.floor(self._cur / precision) * precision
@@ -659,48 +707,57 @@ class Temperature(Channel):
 
 
 class SensorNumber(Channel):
-    """A Numeric Sensor channel"""
+    """A Numeric Sensor channel."""
 
     _cur = 0
     _unit = None
     _sensor_type = None
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         return ["sensor"]
 
     def get_class(self) -> None:
-        return None
+        """Return the device class for this channel."""
+        return
 
     def get_unit(self) -> None:
+        """Return the unit of measurement for this channel."""
         return self._unit
 
     def get_state(self) -> float:
+        """Return the current state of the temperature sensor."""
         return round(self._cur, 2)
 
     def get_sensor_type(self) -> str | None:
+        """Return the sensor type."""
         return self._sensor_type
 
 
 class LightSensor(Channel):
-    """A light sensor channel"""
+    """A light sensor channel."""
 
     _cur = 0
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         return ["sensor"]
 
     def get_class(self) -> str:
+        """Return the device class for this channel."""
         return DEVICE_CLASS_ILLUMINANCE
 
     def get_unit(self) -> None:
-        return None
+        """Return the unit of measurement for this channel."""
+        return
 
     def get_state(self) -> float:
+        """Return the current state of the light sensor."""
         return round(self._cur, 2)
 
 
 class Relay(Channel):
-    """A Relay channel"""
+    """A Relay channel."""
 
     _on = None
     _enabled = True
@@ -709,32 +766,36 @@ class Relay(Channel):
     _disabled = False
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         if self._enabled:
             return ["switch"]
         return []
 
     def is_on(self) -> bool:
-        """Return if this relay is on"""
+        """Return if this relay is on."""
         return self._on
 
     def is_inhibit(self) -> bool:
+        """Return if this relay is inhibited."""
         return self._inhibit
 
     def is_forced_on(self) -> bool:
+        """Return if this relay is forced on."""
         return self._forced_on
 
     def is_disabled(self) -> bool:
+        """Return if this relay is disabled."""
         return self._disabled
 
     async def turn_on(self) -> None:
-        """Send the turn on message"""
+        """Send the turn on message."""
         cls = commandRegistry.get_command(0x02, self._module.get_type())
         msg = cls(self._address)
         msg.relay_channels = [self._num]
         await self._writer(msg)
 
     async def turn_off(self) -> None:
-        """Send the turn off message"""
+        """Send the turn off message."""
         cls = commandRegistry.get_command(0x01, self._module.get_type())
         msg = cls(self._address)
         msg.relay_channels = [self._num]
@@ -742,9 +803,10 @@ class Relay(Channel):
 
 
 class EdgeLit(Channel):
-    """An EdgeLit channel"""
+    """An EdgeLit channel."""
 
     async def reset_color(self, left=True, top=True, right=True, bottom=True):
+        """Send the edgelit color message."""
         msg = SetEdgeColorMessage(self._address)
         msg.apply_background_color = True
         msg.color_idx = 0
@@ -765,7 +827,7 @@ class EdgeLit(Channel):
         blinking=False,
         priority=CustomColorPriority.LOW_PRIORITY,
     ) -> None:
-        """Send the turn off message"""
+        """Send the set color message."""
 
         msg = SetEdgeColorMessage(self._address)
         msg.apply_background_color = True
@@ -781,9 +843,10 @@ class EdgeLit(Channel):
 
 
 class Memo(Channel):
-    """A Memo text"""
+    """A Memo text."""
 
     async def set(self, txt: str) -> None:
+        """Set the memo text."""
         cls = commandRegistry.get_command(0xAC, self._module.get_type())
         msg = cls(self._address)
         msgcntr = 0
@@ -798,23 +861,28 @@ class Memo(Channel):
 
 
 class SelectedProgram(Channel):
-    """A selected program channel"""
+    """A selected program channel."""
 
     _selected_program_str = None
 
     def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
         return ["select"]
 
     def get_class(self) -> None:
-        return None
+        """Return the device class for this channel."""
+        return
 
     def get_options(self) -> list:
+        """Return the available program options for this channel."""
         return list(PROGRAM_SELECTION.values())
 
     def get_selected_program(self) -> str:
+        """Return the currently selected program."""
         return self._selected_program_str
 
     async def set_selected_program(self, program_str: str) -> None:
+        """Set the currently selected program."""
         self._selected_program_str = program_str
         command_code = 0xB3
         cls = commandRegistry.get_command(command_code, self._module.get_type())
