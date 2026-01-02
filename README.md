@@ -1,7 +1,16 @@
-![CI](https://github.com/Cereal2nd/velbus-aio/actions/workflows/main.yml/badge.svg)
-[![PyPI version](https://badge.fury.io/py/velbus-aio.svg)](https://badge.fury.io/py/velbus-aio)
-[![Supported Python versions](https://img.shields.io/pypi/pyversions/velbus-aio.svg)](https://github.com/Cereal2nd/velbus-aio)
+[![main.yml](https://github.com/Cereal2nd/velbus-aio/workflows/main.yml/badge.svg)](https://github.com/Cereal2nd/velbus-aio/actions?query=workflow:"main.yml")
 [![License](https://img.shields.io/github/license/Cereal2nd/velbus-aio)](https://github.com/cereal2nd/velbus-aio/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/Cereal2nd/velbus-aio?include_prereleases=&sort=semver&color=blue)](https://github.com/Cereal2nd/velbus-aio/releases/)
+[![PyPI version](https://badge.fury.io/py/velbus-aio.svg)](https://badge.fury.io/py/velbus-aio)
+
+[![Supported Python versions](https://img.shields.io/pypi/pyversions/velbus-aio.svg)](https://github.com/Cereal2nd/velbus-aio)
+[![Go to Python website](https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2FCereal2nd%2Fvelbus-aio%2Frefs%2Fheads%2Fmaster%2Fpyproject.toml&query=project.requires-python&label=python&logo=python&logoColor=white)](https://python.org)
+
+[![Contributors](https://img.shields.io/github/contributors/Cereal2nd/velbus-aio)](https://github.com/cereal2nd/velbus-aio/graphs/contributors)
+[![issues - velbus-aio](https://img.shields.io/github/issues/Cereal2nd/velbus-aio)](https://github.com/Cereal2nd/velbus-aio/issues)
+[![issues closed - velbus-aio](https://img.shields.io/github/issues-closed-raw/Cereal2nd/velbus-aio)](https://github.com/cereal2nd/velbus-aio/issues?q=is%3Aissue%20state%3Aclosed)
+[![Forks](https://img.shields.io/github/forks/Cereal2nd/velbus-aio?style=social)](https://github.com/cereal2nd/velbus-aio/forks)
+
 [![Downloads](https://pepy.tech/badge/velbus-aio)](https://pepy.tech/project/velbus-aio)
 [![Downloads](https://pepy.tech/badge/velbus-aio/month)](https://pepy.tech/project/velbus-aio)
 [![Downloads](https://pepy.tech/badge/velbus-aio/week)](https://pepy.tech/project/velbus-aio)
