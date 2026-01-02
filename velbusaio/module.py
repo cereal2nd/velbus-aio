@@ -185,6 +185,7 @@ class Module:
     async def initialize(
         self, writer: Callable[[Message], Awaitable[None]], controller: Controller
     ) -> None:
+        self._controller = controller
         self._log = logging.getLogger("velbus-module")
         # load the protocol data
         try:
@@ -301,21 +302,21 @@ class Module:
         return _channel_offset
 
     def on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self.controller._add_on_connext_callback(meth)
+        self._controller._add_on_connext_callback(meth)
 
     def remove_on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self.controller._remove_on_connect_callback(meth)
+        self._controller._remove_on_connect_callback(meth)
 
     def on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self.controller._add_on_disconnect_callback(meth)
+        self._controller._add_on_disconnect_callback(meth)
 
     def remove_on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self.controller._remove_on_disconnect_callback(meth)
+        self._controller._remove_on_disconnect_callback(meth)
 
     @property
     def is_connected(self) -> bool:
         """Return if the module is connected."""
-        return self.controller.connected()
+        return self._controller.connected
 
     async def on_message(self, message: Message) -> None:
         """Process received message"""

@@ -244,7 +244,7 @@ class Channel:
 
     def is_connected(self) -> bool:
         """Return if the module is connected."""
-        return self._module.is_connected()
+        return self._module.is_connected
 
 
 class Blind(Channel):
