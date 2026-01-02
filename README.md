@@ -1,4 +1,4 @@
-[![main.yml](https://github.com/Cereal2nd/velbus-aio/workflows/main.yml/badge.svg)](https://github.com/Cereal2nd/velbus-aio/actions?query=workflow:"main.yml")
+[![main.yml](https://github.com/Cereal2nd/velbus-aio/actions/workflows/main.yml/badge.svg)](https://github.com/Cereal2nd/velbus-aio/actions?query=workflow:"main.yml")
 [![License](https://img.shields.io/github/license/Cereal2nd/velbus-aio)](https://github.com/cereal2nd/velbus-aio/blob/master/LICENSE)
 [![GitHub release](https://img.shields.io/github/release/Cereal2nd/velbus-aio?include_prereleases=&sort=semver&color=blue)](https://github.com/Cereal2nd/velbus-aio/releases/)
 [![PyPI version](https://badge.fury.io/py/velbus-aio.svg)](https://badge.fury.io/py/velbus-aio)
