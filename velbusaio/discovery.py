@@ -1,17 +1,24 @@
+"""Velbus discovery protocol implementation."""
+
 from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import socket
 
 Address = tuple[str, int]
 
 
 class VelbusDiscoveryProtocol(asyncio.DatagramProtocol):
+    """Velbus discovery protocol implementation."""
+
     def __init__(self, target: Address):
+        """Initialize the protocol."""
         self.target = target
 
     def connection_made(self, transport: asyncio.transports.DatagramTransport) -> None:
+        """Called when the connection is made."""
         self.transport = transport
         sock = transport.get_extra_info("socket")
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -20,10 +27,11 @@ class VelbusDiscoveryProtocol(asyncio.DatagramProtocol):
         self.transport.sendto(string.encode(), self.target)
 
     def datagram_received(self, data: bytes | str, addr: Address) -> None:
+        """Called when a datagram is received."""
         # data received: b'{"message": "Velbus Navigation Guidance", "hostname": "Velbus", "model": "signum18", "id": "7b95834e", "velbus_port": 27015, "velbus_auth": false}' ('192.168.1.9', 32767)
         try:
             json_data = json.loads(data)
-        except Exception:
+        except json.JSONDecodeError:
             return
         if all(
             key in json_data
@@ -44,4 +52,4 @@ class VelbusDiscoveryProtocol(asyncio.DatagramProtocol):
                 "port": json_data["velbus_port"],
                 "auth": json_data["velbus_auth"],
             }
-            print("data received:", res)
+            logging.log.info("data received:", res)

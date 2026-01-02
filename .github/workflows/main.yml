@@ -18,7 +18,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: pre-commit/action@v3.0.1
       - name: Install requirements
         run: pip install -r requirements.txt
       - name: Install pytest
@@ -27,6 +26,7 @@ jobs:
           pip install pytest-asyncio
       - name: Install package
         run: pip install .
+      - uses: pre-commit/action@v3.0.1
       - name: Run testcases
         run: pytest
       - name: Build binary wheel and a source tarball

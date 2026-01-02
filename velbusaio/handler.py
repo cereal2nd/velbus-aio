@@ -1,4 +1,5 @@
-"""Velbus packet handler
+"""Velbus packet handler.
+
 :Author maikel punie <maikel.punie@gmail.com>
 """
 
@@ -8,7 +9,6 @@ import asyncio
 import importlib.resources
 import json
 import logging
-import os
 import pathlib
 import sys
 import time
@@ -32,13 +32,14 @@ if TYPE_CHECKING:
 
 
 class PacketHandler:
-    """The PacketHandler class"""
+    """The PacketHandler class."""
 
     def __init__(
         self,
         velbus: Velbus,
         one_address: int | None = None,
     ) -> None:
+        """Initialize the PacketHandler class."""
         self._log = logging.getLogger("velbus-handler")
         self._log.setLevel(logging.DEBUG)
         self._velbus = velbus
@@ -52,6 +53,7 @@ class PacketHandler:
         self.__scan_found_addresses: dict[int, ModuleTypeMessage | None] | None = None
 
     async def read_protocol_data(self):
+        """Read the protocol data from the json files."""
         if sys.version_info >= (3, 13):
             with importlib.resources.path(
                 __name__, "module_spec/broadcast.json"
@@ -82,20 +84,14 @@ class PacketHandler:
                 self.ignore = json.loads(await protocol_file.read())
 
     def empty_cache(self) -> bool:
-        if (
-            len(
-                [
-                    name
-                    for name in os.listdir(f"{self._velbus.get_cache_dir()}")
-                    if os.path.isfile(f"{self._velbus.get_cache_dir()}/{name}")
-                ]
-            )
-            == 0
-        ):
+        """Check if the cache is empty."""
+        cache_dir = pathlib.Path(self._velbus.get_cache_dir())
+        if len([name for name in cache_dir.iterdir() if name.is_file()]) == 0:
             return True
         return False
 
     async def scan(self, reload_cache: bool = False) -> None:
+        """Scan the Velbus bus for connected modules."""
         start_address = 1
         max_address = 254 + 1
         if self._one_address is not None:
@@ -121,11 +117,11 @@ class PacketHandler:
             self.__scan_found_addresses = {}
             for address in range(start_address, max_address):
                 cfile = pathlib.Path(f"{self._velbus.get_cache_dir()}/{address}.json")
-                if reload_cache and os.path.isfile(cfile):
+                if reload_cache and cfile.is_file():
                     self._log.info(
                         f"Reloading cache for address {address} ({address:#02x})"
                     )
-                    os.remove(cfile)
+                    cfile.unlink()
 
                 self.__scan_found_addresses[address] = None
                 async with self._scanLock:
@@ -199,7 +195,7 @@ class PacketHandler:
             self._log.info(f"Module scan completed in {total_time:.2f} seconds")
 
     async def __handle_module_type_response_async(self, rawmsg: RawMessage) -> None:
-        """Handle a received module type response packet"""
+        """Handle a received module type response packet."""
         address = rawmsg.address
 
         if self.__scan_found_addresses is None:
@@ -216,7 +212,7 @@ class PacketHandler:
         self.__scan_found_addresses[address] = tmsg
 
     async def handle(self, rawmsg: RawMessage) -> None:
-        """Handle a received packet"""
+        """Handle a received packet."""
         if rawmsg.address < 1 or rawmsg.address > 254:
             return
         if rawmsg.command is None:
@@ -290,7 +286,7 @@ class PacketHandler:
     async def _handle_module_type(
         self, msg: ModuleTypeMessage | ModuleType2Message
     ) -> None:
-        """Load the module data"""
+        """Load the module data."""
         if msg is not None:
             module = self._velbus.get_module(msg.address)
             if module is None:
@@ -315,6 +311,7 @@ class PacketHandler:
         #    self._log.debug("*** handle_module_type called without response message")
 
     def _handle_module_subtype(self, msg: ModuleSubTypeMessage) -> None:
+        """Handle a received module subtype packet."""
         module = self._velbus.get_module(msg.address)
         if module is not None:
             addrList = {

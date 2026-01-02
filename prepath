@@ -1,0 +1,17 @@
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index d6b1ad9..ee6f02a 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -1,4 +1,12 @@
+ repos:
++  - repo: https://github.com/astral-sh/ruff-pre-commit
++    rev: v0.13.0
++    hooks:
++      - id: ruff-check
++        args:
++          - --fix
++      - id: ruff-format
++        files: ^((velbusaio|tests)/.+)?[^/]+\.(py|pyi)$
+   - repo: https://github.com/asottile/pyupgrade
+     rev: v3.21.2
+     hooks:

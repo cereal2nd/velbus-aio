@@ -1,8 +1,9 @@
-"""Helper functions"""
+"""Helper functions."""
 
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import re
 from typing import Any
 
@@ -12,26 +13,25 @@ from velbusaio.const import CACHEDIR
 def keys_exists(element: dict[str, Any], *keys) -> dict:
     """Check if *keys (nested) exists in `element` (dict)."""
     if not isinstance(element, dict):
-        raise AttributeError("keys_exists() expects dict as first argument.")
+        raise TypeError("keys_exists() expects dict as first argument.")
     if len(keys) == 0:
         raise AttributeError("keys_exists() expects at least two arguments, one given.")
 
     _element = element
     for key in keys:
-        try:
-            _element = _element[key]
-        except KeyError:
+        _element = _element.get(key)
+        if _element is None:
             return False
     return _element
 
 
 def h2(inp: int) -> str:
-    """Format as hex uppercase"""
+    """Format as hex uppercase."""
     return format(inp, "02x").upper()
 
 
 def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) -> dict:
-    """Handle memory match from the module data"""
+    """Handle memory match from the module data."""
     match_result = {}
     binary_data = f"{int(data):08b}"
     for num, match_data in match_dict.items():
@@ -73,5 +73,5 @@ def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) ->
 
 def get_cache_dir() -> str:
     """Put together the default configuration directory based on the OS."""
-    data_dir = os.getenv("APPDATA") if os.name == "nt" else os.path.expanduser("~")
-    return os.path.join(data_dir, CACHEDIR)
+    data_dir = os.getenv("APPDATA") if os.name == "nt" else str(Path("~").expanduser())
+    return str(Path(data_dir) / CACHEDIR)
