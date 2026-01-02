@@ -18,10 +18,20 @@ if TYPE_CHECKING:
     from velbusaio.controller import Controller
 
 from velbusaio.channels import (
+    Blind,
     Button,
     ButtonCounter,
     Channel,
     Dimmer,
+    EdgeLit,
+    LightSensor,
+    Memo,
+    Relay,
+    SelectedProgram,
+    Sensor,
+    SensorNumber,
+    Temperature,
+    ThermostatChannel,
 )
 from velbusaio.channels import Temperature as TemperatureChannelType
 from velbusaio.command_registry import commandRegistry
