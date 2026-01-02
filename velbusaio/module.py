@@ -243,7 +243,9 @@ class Module:
 
     def __getstate__(self) -> dict:
         d = self.__dict__
-        self_dict = {k: d[k] for k in d if k != "_writer" and k != "_log"}
+        self_dict = {
+            k: d[k] for k in d if k != "_writer" and k != "_log" and k != "_controller"
+        }
         return self_dict
 
     def __setstate__(self, state: dict) -> None:
