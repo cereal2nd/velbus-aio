@@ -1,8 +1,6 @@
-from unittest.mock import MagicMock
-
 import pytest
 
-from velbusaio.module import Module, VmbDali
+from velbusaio.module import VmbDali
 
 
 class MockWriter:

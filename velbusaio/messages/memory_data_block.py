@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xCC
 
 @register(COMMAND_CODE)
 class MemoryDataBlockMessage(Message):
-    """
-    send by: VMB6IN, VMB4RYLD
+    """send by: VMB6IN, VMB4RYLD
     received by:
     """
 
@@ -25,9 +22,7 @@ class MemoryDataBlockMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return None
-        """
+        """:return None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 6)
@@ -37,7 +32,5 @@ class MemoryDataBlockMessage(Message):
         self.data = data[2:]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.high_address, self.low_address]) + self.data

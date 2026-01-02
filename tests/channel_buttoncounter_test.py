@@ -1,10 +1,4 @@
-"""
-Test cases for the ButtonCounter channel class
-"""
-
-from unittest.mock import AsyncMock, Mock, patch
-
-import pytest
+"""Test cases for the ButtonCounter channel class"""
 
 from velbusaio.channels import ButtonCounter
 from velbusaio.const import (

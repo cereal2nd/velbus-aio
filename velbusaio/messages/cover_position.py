@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0x1C
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class CoverPosMessage(Message):
-    """
-    sent by:
+    """sent by:
     received by: VMB2BLE
     """
 
@@ -24,9 +21,7 @@ class CoverPosMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 2)
@@ -41,9 +36,7 @@ class CoverPosMessage(Message):
         self.set_no_rtr()
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,

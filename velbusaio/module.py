@@ -1,6 +1,4 @@
-"""
-This represents a velbus module
-"""
+"""This represents a velbus module"""
 
 from __future__ import annotations
 
@@ -8,7 +6,6 @@ import asyncio
 import importlib.resources
 import json
 import logging
-import os
 import pathlib
 import struct
 import sys
@@ -21,24 +18,12 @@ if TYPE_CHECKING:
     from velbusaio.controller import Controller
 
 from velbusaio.channels import (
-    Blind,
     Button,
     ButtonCounter,
     Channel,
     Dimmer,
-    EdgeLit,
-    LightSensor,
-    Memo,
-    Relay,
-    SelectedProgram,
-    Sensor,
-    SensorNumber,
 )
-from velbusaio.channels import Temperature
 from velbusaio.channels import Temperature as TemperatureChannelType
-from velbusaio.channels import (
-    ThermostatChannel,
-)
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
     CHANNEL_LIGHT_VALUE,
@@ -75,10 +60,14 @@ from velbusaio.messages.clear_led import ClearLedMessage
 from velbusaio.messages.counter_status import CounterStatusMessage
 from velbusaio.messages.counter_status_request import CounterStatusRequestMessage
 from velbusaio.messages.counter_value import CounterValueMessage
-from velbusaio.messages.dali_device_settings import DaliDeviceSettingMsg
+from velbusaio.messages.dali_device_settings import (
+    DaliDeviceSettingMsg,
+)
 from velbusaio.messages.dali_device_settings import DeviceType as DaliDeviceType
 from velbusaio.messages.dali_device_settings import DeviceTypeMsg as DaliDeviceTypeMsg
-from velbusaio.messages.dali_device_settings import MemberOfGroupMsg
+from velbusaio.messages.dali_device_settings import (
+    MemberOfGroupMsg,
+)
 from velbusaio.messages.dali_device_settings_request import (
     COMMAND_CODE as DALI_DEVICE_SETTINGS_REQUEST_COMMAND_CODE,
 )
@@ -111,9 +100,7 @@ from velbusaio.messages.update_led_status import UpdateLedStatusMessage
 
 
 class Module:
-    """
-    Abstract class for Velbus hardware modules.
-    """
+    """Abstract class for Velbus hardware modules."""
 
     @classmethod
     def factory(
@@ -269,9 +256,7 @@ class Module:
         return self._address
 
     def get_addresses(self) -> list:
-        """
-        Get all addresses for this module
-        """
+        """Get all addresses for this module"""
         res = []
         res.append(self._address)
         for addr in self._sub_address.values():
@@ -279,9 +264,7 @@ class Module:
         return res
 
     def get_type(self) -> int:
-        """
-        Get the module type
-        """
+        """Get the module type"""
         return self._type
 
     def get_type_name(self) -> str:
@@ -296,7 +279,7 @@ class Module:
         return self._name
 
     def get_sw_version(self) -> str:
-        return f"{self.serial}-{self.memory_map_version}.{self.build_year}.{self.build_week}"
+        return f"{self.build_year}.{self.build_week}"
 
     def calc_channel_offset(self, address: int) -> int:
         _channel_offset = 0
@@ -321,12 +304,11 @@ class Module:
 
     @property
     def is_connected(self) -> bool:
+        """Return if the module is connected."""
         return self.controller.connected()
 
     async def on_message(self, message: Message) -> None:
-        """
-        Process received message
-        """
+        """Process received message"""
         self._log.debug(f"RX: {message}")
         _channel_offset = self.calc_channel_offset(message.address)
 
@@ -607,9 +589,7 @@ class Module:
             )
 
     def get_channels(self) -> dict:
-        """
-        List all channels for this module
-        """
+        """List all channels for this module"""
         return self._channels
 
     async def load_from_vlp(self, vlp_data: dict) -> None:
@@ -680,14 +660,10 @@ class Module:
         return cache
 
     def _load(self) -> None:
-        """
-        Method for per module type loading
-        """
-        pass
+        """Method for per module type loading"""
 
     def number_of_channels(self) -> int:
-        """
-        Retrieve the number of available channels in this module
+        """Retrieve the number of available channels in this module
 
         :return: int
         """
@@ -701,9 +677,7 @@ class Module:
         await self._channels[CHANNEL_MEMO_TEXT].set(txt)
 
     async def _process_memory_data_message(self, message: MemoryDataMessage) -> None:
-        addr = "{high:02X}{low:02X}".format(
-            high=message.high_address, low=message.low_address
-        )
+        addr = f"{message.high_address:02X}{message.low_address:02X}"
         if "Memory" not in self._data:
             return
         if "Address" not in self._data["Memory"]:
@@ -758,9 +732,7 @@ class Module:
         return int(channel)
 
     async def is_loaded(self) -> bool:
-        """
-        Check if all name messages have been received
-        """
+        """Check if all name messages have been received"""
         # if we are loaded, just return
         if self.loaded:
             return True
@@ -818,9 +790,7 @@ class Module:
             await self._writer(msg)
 
     async def __load_memory(self) -> None:
-        """
-        Request all needed memory addresses
-        """
+        """Request all needed memory addresses"""
         if "Memory" not in self._data:
             self._name = None
             return
@@ -830,7 +800,6 @@ class Module:
             return
 
         for memory_key, memory_part in self._data["Memory"].items():
-
             if memory_key == "Address":
                 for addr_int in memory_part.keys():
                     addr = struct.unpack(
@@ -873,8 +842,7 @@ class Module:
 
 
 class VmbDali(Module):
-    """
-    DALI has a variable number of channels: the number of channels
+    """DALI has a variable number of channels: the number of channels
     depends on the number of DALI devices on the DALI bus
     """
 
@@ -968,7 +936,7 @@ class VmbDali(Module):
                         await self._request_single_channel_name(message.channel)
 
             elif isinstance(message.data, MemberOfGroupMsg):
-                for group in range(0, 15 + 1):
+                for group in range(15 + 1):
                     this_group_members = self.group_members.setdefault(group, set())
                     if message.data.member_of_group[group]:
                         this_group_members.add(message.channel)

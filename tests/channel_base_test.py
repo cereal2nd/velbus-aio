@@ -1,6 +1,4 @@
-"""
-Test cases for the base Channel class
-"""
+"""Test cases for the base Channel class"""
 
 import pytest
 

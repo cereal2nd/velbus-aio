@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie
-"""
+""":author: Maikel Punie"""
 
 from __future__ import annotations
 
@@ -17,7 +15,6 @@ BACKUP = 0x03
 
 @register(COMMAND_CODE, ["VMBPSUMNGR-20"])
 class PsuLoadMessage(Message):
-
     def __init__(self, address=None):
         Message.__init__(self)
         self.mode = 0
@@ -26,9 +23,7 @@ class PsuLoadMessage(Message):
         self.out = 0
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 3)
@@ -39,9 +34,7 @@ class PsuLoadMessage(Message):
         self.out = data[3]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return (
             bytes(
                 [

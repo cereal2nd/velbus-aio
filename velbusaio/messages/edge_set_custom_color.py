@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xD4
 
 @register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO"])
 class EdgeSetCustomColor(Message):
-    """
-    send by:
+    """send by:
     received by: VMBEL1, VMBEL2, VMBEL4, VMBELO
     """
 
@@ -28,9 +25,7 @@ class EdgeSetCustomColor(Message):
         self.blue = 0
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)
         self.pallet = data[0]
@@ -41,9 +36,7 @@ class EdgeSetCustomColor(Message):
         self.blue = data[4]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,

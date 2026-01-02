@@ -1,6 +1,4 @@
-"""
-Test cases for VelbusProtocol writing functionality
-"""
+"""Test cases for VelbusProtocol writing functionality"""
 
 import asyncio
 from unittest.mock import AsyncMock, Mock, patch
@@ -96,7 +94,9 @@ class TestVelbusProtocolWriting:
 
         mock_message = Mock()
 
-        result = await protocol._write_message(mock_message)
+        # Call the undecorated implementation to avoid the backoff retry
+        # decorator, which would otherwise cause the test to wait.
+        result = await protocol._write_message.__wrapped__(protocol, mock_message)
 
         assert result is False
         mock_transport.write.assert_not_called()

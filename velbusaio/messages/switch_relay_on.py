@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0x02
 
 @register(COMMAND_CODE)
 class SwitchRelayOnMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMB4RYLD
     """
 
@@ -29,9 +26,7 @@ class SwitchRelayOnMessage(Message):
         self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -39,7 +34,5 @@ class SwitchRelayOnMessage(Message):
         self.relay_channels = self.byte_to_channels(data[0])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte(self.relay_channels)])

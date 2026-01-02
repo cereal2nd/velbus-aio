@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -14,8 +12,7 @@ COMMAND_CODE = 0x6A
 
 @register(COMMAND_CODE)
 class WriteModuleAddressAndSerialNumberMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMB4RYLD
     """
 
@@ -34,9 +31,7 @@ class WriteModuleAddressAndSerialNumberMessage(Message):
         self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_firmware_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 6)
@@ -48,9 +43,7 @@ class WriteModuleAddressAndSerialNumberMessage(Message):
         (self.new_serial,) = struct.unpack(">L", prefix + data[4] + data[5])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return (
             chr(COMMAND_CODE)
             + chr(self.module_type)

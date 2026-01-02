@@ -1,10 +1,4 @@
-"""
-Test cases for the ThermostatChannel channel class
-"""
-
-from unittest.mock import AsyncMock, Mock, patch
-
-import pytest
+"""Test cases for the ThermostatChannel channel class"""
 
 from velbusaio.channels import Button, Channel, ThermostatChannel
 

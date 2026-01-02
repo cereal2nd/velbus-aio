@@ -1,6 +1,4 @@
-"""
-:author: Tom Dupré <gitd8400@gmail.com>
-"""
+""":author: Tom Dupré <gitd8400@gmail.com>"""
 
 from __future__ import annotations
 
@@ -15,8 +13,7 @@ DSTATUS = {0: "off", 1: "up", 2: "down"}
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class BlindStatusNgMessage(Message):
-    """
-    sent by: VMB2BLE
+    """sent by: VMB2BLE
     received by:
     """
 
@@ -29,9 +26,7 @@ class BlindStatusNgMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -42,9 +37,7 @@ class BlindStatusNgMessage(Message):
         self.position = data[4]  # 0..255 (0=open, 255=closed)
 
     def to_json(self):
-        """
-        :return: str
-        """
+        """:return: str"""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
         json_dict["timeout"] = self.timeout
@@ -62,9 +55,7 @@ class BlindStatusNgMessage(Message):
         return self.status == 0x00
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,
@@ -81,8 +72,7 @@ class BlindStatusNgMessage(Message):
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class BlindStatusMessage(Message):
-    """
-    sent by: VMB2BLE
+    """sent by: VMB2BLE
     received by:
     """
 
@@ -94,9 +84,7 @@ class BlindStatusMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -111,9 +99,7 @@ class BlindStatusMessage(Message):
         self.status = (data[2] >> ((self.channel - 1) * 2)) & 0x03
 
     def to_json(self):
-        """
-        :return: str
-        """
+        """:return: str"""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
         json_dict["timeout"] = self.timeout

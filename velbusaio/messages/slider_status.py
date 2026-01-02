@@ -1,6 +1,4 @@
-"""
-:author: Frank van Breugel
-"""
+""":author: Frank van Breugel"""
 
 from __future__ import annotations
 
@@ -25,8 +23,7 @@ COMMAND_CODE = 0x0F
     ],
 )
 class SliderStatusMessage(Message):
-    """
-    sent by: VMBDME
+    """sent by: VMBDME
     received by:
     """
 
@@ -38,9 +35,7 @@ class SliderStatusMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 3)
@@ -50,15 +45,11 @@ class SliderStatusMessage(Message):
         self.slider_long_pressed = data[2]
 
     def cur_slider_state(self):
-        """
-        :return: int
-        """
+        """:return: int"""
         return self.slider_state
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,

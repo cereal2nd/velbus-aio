@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Validate module spec JSON files.
+"""Validate module spec JSON files.
 
 This script checks all JSON files under velbusaio/module_spec/*.json and fails
 if any module spec declares a channel with "Editable": "yes" but the module
@@ -17,7 +16,7 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any
 
 # How many directory levels to walk up from this script to try to find the repo root
 _MAX_UP_LEVELS = 6
@@ -34,8 +33,7 @@ def load_json(path: Path) -> Any:
 
 
 def locate_module_spec_dir(start: Path | None = None) -> Path | None:
-    """
-    Locate velbusaio/module_spec by walking up from start (defaults to this script's dir).
+    """Locate velbusaio/module_spec by walking up from start (defaults to this script's dir).
     Returns a pathlib.Path if found, otherwise None.
     """
     if start is None:

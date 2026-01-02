@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xE4
 
 @register(COMMAND_CODE)
 class SetTemperatureMessage(Message):
-    """
-    send by: VMB4RYLD
+    """send by: VMB4RYLD
     received by: VMB6IN
     """
 
@@ -24,9 +21,7 @@ class SetTemperatureMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -36,7 +31,5 @@ class SetTemperatureMessage(Message):
         self.temp = data[1] * 2
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, int(self.temp_type), int(self.temp)])

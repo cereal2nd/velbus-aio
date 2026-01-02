@@ -1,5 +1,4 @@
 import logging
-from unittest.mock import MagicMock
 
 import pytest
 
@@ -44,7 +43,7 @@ async def test_module_name(name):
     module_type = 0x0E  # VMB1TC
 
     memory = {}
-    for i in range(0, 16):
+    for i in range(16):
         memory[0xF0 + i] = 0xFF
     for i, c in enumerate(name):
         memory[0xF0 + i] = ord(c)

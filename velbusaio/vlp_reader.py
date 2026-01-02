@@ -11,7 +11,6 @@ from velbusaio.helpers import h2
 
 
 class VlpFile:
-
     def __init__(self, file_path) -> None:
         self._file_path = file_path
         self._modules = []
@@ -46,7 +45,6 @@ class VlpFile:
 
 
 class vlpModule:
-
     def __init__(self, name, addresses, build, serial, type, memory) -> None:
         self._name = name
         self._addresses = addresses
@@ -104,7 +102,7 @@ class vlpModule:
 
         if "Memory" not in self._spec:
             self._log.debug("  => no Memory locations found")
-            return None
+            return
 
         # channel names
         self._channels = self._spec.get("Channels", {})
@@ -125,7 +123,7 @@ class vlpModule:
         self._log.debug(" => Getting extra data")
         if "Extras" not in self._spec["Memory"]:
             self._log.debug("  => no Extra Memory locations found")
-            return None
+            return
         for addr, extra in self._spec["Memory"]["Extras"].items():
             byte_data = bytes.fromhex(self._read_from_memory(addr))
             self._log.debug(
@@ -162,8 +160,7 @@ class vlpModule:
                     )
 
     def _match_binary_pattern(self, pattern: str, byte_data: bytes) -> bool:
-        """
-        Match a binary pattern like %......00 against byte data.
+        """Match a binary pattern like %......00 against byte data.
         % indicates binary pattern
         . means don't care bit
         0/1 are specific bits that must match
@@ -191,7 +188,7 @@ class vlpModule:
             if pattern_bit == ".":
                 # Don't care bit, skip
                 continue
-            elif pattern_bit != data_bit:
+            if pattern_bit != data_bit:
                 # Specific bit must match
                 return False
 

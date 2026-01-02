@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,9 +10,7 @@ COMMAND_CODE = 0xAF
 
 @register(COMMAND_CODE)
 class SetDaylightSaving(Message):
-    """
-    received by all modules
-    """
+    """received by all modules"""
 
     def __init__(self, address=0x00, ds=None) -> None:
         Message.__init__(self)
@@ -28,9 +24,7 @@ class SetDaylightSaving(Message):
         self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data) -> None:
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -38,7 +32,5 @@ class SetDaylightSaving(Message):
         self._ds = data[0]
 
     def data_to_binary(self) -> bytes:
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self._ds])

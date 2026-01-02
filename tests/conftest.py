@@ -1,6 +1,4 @@
-"""
-Shared pytest fixtures for all test files
-"""
+"""Shared pytest fixtures for all test files"""
 
 from unittest.mock import AsyncMock, Mock
 

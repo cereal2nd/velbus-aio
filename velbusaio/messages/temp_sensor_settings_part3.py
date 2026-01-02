@@ -1,6 +1,4 @@
-"""
-:author: Danny De Gaspari
-"""
+""":author: Danny De Gaspari"""
 
 from __future__ import annotations
 
@@ -13,15 +11,11 @@ COMMAND_CODE = 0xC6
 @register(COMMAND_CODE)
 class TempSensorSettingsPart3(Message):
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE])

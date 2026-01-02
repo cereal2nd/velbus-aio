@@ -1,6 +1,6 @@
 import binascii
 import logging
-from typing import NamedTuple, Optional, Tuple
+from typing import NamedTuple, Optional
 
 from velbusaio.const import (
     END_BYTE,
@@ -54,7 +54,7 @@ class RawMessage(NamedTuple):
         )
 
 
-def create(rawmessage: bytearray) -> Tuple[Optional[RawMessage], bytearray]:
+def create(rawmessage: bytearray) -> tuple[Optional[RawMessage], bytearray]:
     rawmessage = _trim_buffer_garbage(rawmessage)
 
     while True:
@@ -77,7 +77,7 @@ class ParseError(Exception):
     pass
 
 
-def _parse(rawmessage: bytearray) -> Tuple[Optional[RawMessage], bytearray]:
+def _parse(rawmessage: bytearray) -> tuple[Optional[RawMessage], bytearray]:
     if len(rawmessage) < MINIMUM_MESSAGE_SIZE or len(rawmessage) > MAXIMUM_MESSAGE_SIZE:
         raise ValueError("Received a raw message with an illegal lemgth")
     if rawmessage[0] != START_BYTE:
@@ -122,9 +122,7 @@ def _parse(rawmessage: bytearray) -> Tuple[Optional[RawMessage], bytearray]:
 
 
 def _trim_buffer_garbage(rawmessage: bytearray) -> bytearray:
-    """
-    Remove leading garbage bytes from a byte stream.
-    """
+    """Remove leading garbage bytes from a byte stream."""
 
     # A proper message byte stream begins with 0x0F.
     if rawmessage and rawmessage[0] != START_BYTE:
@@ -137,13 +135,9 @@ def _trim_buffer_garbage(rawmessage: bytearray) -> bytearray:
             #                )
             #            )
             return rawmessage[start_index:]
-        else:
-            logging.debug(
-                "Trimming whole buffer as it does not contain the start byte: {buffer}".format(
-                    buffer=binascii.hexlify(rawmessage)
-                )
-            )
-            return []
+        logging.debug(
+            f"Trimming whole buffer as it does not contain the start byte: {binascii.hexlify(rawmessage)}"
+        )
+        return []
 
-    else:
-        return rawmessage
+    return rawmessage

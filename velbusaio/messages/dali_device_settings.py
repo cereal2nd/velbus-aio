@@ -1,6 +1,4 @@
-"""
-:author: Niels Laukens
-"""
+""":author: Niels Laukens"""
 
 from __future__ import annotations
 
@@ -15,8 +13,7 @@ COMMAND_CODE = 0xE8
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
 class DaliDeviceSettingMsg(Message):
-    """
-    send by: VMBDALI
+    """send by: VMBDALI
     received by:
     """
 
@@ -61,13 +58,13 @@ class DaliDeviceSettingSubMessage:
 
     @classmethod
     def from_data(cls, data: bytes) -> DaliDeviceSettingSubMessage:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def to_data(self) -> bytes:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def to_json_basic(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
 
 class DeviceType(enum.Enum):
@@ -115,7 +112,7 @@ class MemberOfGroupMsg(DaliDeviceSettingSubMessage):
             raise ValueError("Expected 2 bytes")
         i = int.from_bytes(data, "little")
         member_of_groups = []
-        for group_num in range(0, 16):
+        for group_num in range(16):
             member_of_groups.append(bool(i & (1 << group_num)))
         return MemberOfGroupMsg(member_of_groups)
 

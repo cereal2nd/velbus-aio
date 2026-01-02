@@ -1,14 +1,13 @@
 import math
-import typing
 
 import pytest
 
 from velbusaio.channels import Temperature
 
 
-@pytest.fixture()
+@pytest.fixture
 def temperature_profile(request):
-    ramp_up = [20.0000 + n * 1 / 16 for n in range(0, 17)]
+    ramp_up = [20.0000 + n * 1 / 16 for n in range(17)]
     ramp_down = reversed(ramp_up)
     return [*ramp_up, *ramp_down]
 
@@ -22,7 +21,7 @@ def temperature_profile(request):
     ],
 )
 async def test_temperature_same_precision(
-    temperature_profile: typing.List[float],
+    temperature_profile: list[float],
     precision: float,
 ):
     ch = Temperature(None, None, None, False, True, None, None)
@@ -35,7 +34,7 @@ async def test_temperature_same_precision(
 
 @pytest.mark.asyncio
 async def test_temperature_alternating_precision(
-    temperature_profile: typing.List[float],
+    temperature_profile: list[float],
 ):
     ch = Temperature(None, None, None, False, True, None, None)
     for temp in temperature_profile:

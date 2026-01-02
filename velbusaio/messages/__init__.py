@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 

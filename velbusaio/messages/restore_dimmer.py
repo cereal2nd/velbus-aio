@@ -1,6 +1,4 @@
-"""
-:author: Frank van Breugel
-"""
+""":author: Frank van Breugel"""
 
 from __future__ import annotations
 
@@ -25,8 +23,7 @@ COMMAND_CODE = 0x11
     ],
 )
 class RestoreDimmerMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMBDME, VMB4DC
     """
 
@@ -42,9 +39,7 @@ class RestoreDimmerMessage(Message):
         self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -55,9 +50,7 @@ class RestoreDimmerMessage(Message):
         )
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,

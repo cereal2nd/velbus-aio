@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org> and Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Thomas Delaet <thomas@delaet.org> and Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xEF
 
 @register(COMMAND_CODE)
 class ChannelNameRequestMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMB6IN, VMB4RYLD
     """
 
@@ -23,9 +20,7 @@ class ChannelNameRequestMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -33,9 +28,7 @@ class ChannelNameRequestMessage(Message):
         self.channels = self.byte_to_channels(data[0])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         if isinstance(self.channels, list):
             return bytes([0xEF, self.channels_to_byte(self.channels)])
         return bytes([0xEF, 0xFF])
@@ -43,15 +36,12 @@ class ChannelNameRequestMessage(Message):
 
 @register(COMMAND_CODE, ["VMB2BL"])
 class ChannelNameRequestMessage2(ChannelNameRequestMessage):
-    """
-    send by:
+    """send by:
     received by: VMB2BL
     """
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -60,9 +50,7 @@ class ChannelNameRequestMessage2(ChannelNameRequestMessage):
         self.channels = self.byte_to_channels(tmp)
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         tmp = 0x00
         if 1 in self.channels:
             tmp += 0x03
@@ -73,15 +61,12 @@ class ChannelNameRequestMessage2(ChannelNameRequestMessage):
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
 class ChannelNameRequestMessage3(ChannelNameRequestMessage):
-    """
-    send by:
+    """send by:
     received by: VMBDALI
     """
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -89,7 +74,5 @@ class ChannelNameRequestMessage3(ChannelNameRequestMessage):
         self.channels = data[0]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels])

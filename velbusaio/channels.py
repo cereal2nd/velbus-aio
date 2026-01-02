@@ -1,6 +1,4 @@
-"""
-author: Maikel Punie <maikel.punie@gmail.com>
-"""
+"""author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -28,9 +26,11 @@ if TYPE_CHECKING:
 
 
 class Channel:
-    """
-    A velbus channel
+    """A velbus channel.
+
     This is the basic abstract class of a velbus channel
+    Each specific channel type (Relay, Dimmer, Temperature, etc.) will inherit from this class
+    and implement its own specific methods and attributes.
     """
 
     def __init__(
@@ -57,58 +57,63 @@ class Channel:
         self._name_parts = {}
 
     def get_module_type(self) -> int:
+        """Return module type."""
         return self._module.get_type()
 
     def get_module_type_name(self) -> str:
+        """Return module type name."""
         return self._module.get_type_name()
 
     def get_module_serial(self) -> str:
+        """Return module serial number."""
         return self._module.get_serial()
 
     def get_module_address(self, chan_type: str = "") -> int:
-        """Return (sub)module address for channel"""
+        """Return (sub)module address for channel."""
         if chan_type == "Button" and self._num > 24:
             return self._module.get_addresses()[3]
-        elif chan_type == "Button" and self._num > 16:
+        if chan_type == "Button" and self._num > 16:
             return self._module.get_addresses()[2]
-        elif chan_type == "Button" and self._num > 8:
+        if chan_type == "Button" and self._num > 8:
             return self._module.get_addresses()[1]
-        else:
-            return self._address
+        return self._address
 
     def get_module_sw_version(self) -> str:
+        """Return module software version."""
         return self._module.get_sw_version()
 
     def get_channel_number(self) -> int:
+        """Return channel number."""
         return self._num
 
     def get_full_name(self) -> str:
+        """Return full channel name including module name and type."""
         if self._subDevice:
             return f"{self._module.get_name()} ({self._module.get_type_name()}) - {self._name}"
         return f"{self._module.get_name()} ({self._module.get_type_name()})"
 
     def is_loaded(self) -> bool:
-        """
-        Is this channel loaded
-        """
+        """Is this channel loaded."""
         return self._is_loaded
 
     def is_counter_channel(self) -> bool:
+        """Return if this channel is a counter channel."""
         return False
 
     def is_temperature(self) -> bool:
+        """Return if this channel is a temperature sensor."""
         return False
 
     def is_sub_device(self) -> bool:
+        """Return if this channel is a subdevice."""
         return self._subDevice
 
     def get_name(self) -> str:
-        """
-        :return: the channel name
-        """
+        """Return the channel name."""
         return self._name
 
     def set_name_char(self, pos: int, char: int) -> None:
+        """Set a char of the channel name."""
         self._is_loaded = True
         self._name_parts = {}
         # make sure the string is long enough
@@ -118,9 +123,7 @@ class Channel:
         self._name = self._name[: int(pos)] + chr(char) + self._name[int(pos) + 1 :]
 
     def set_name_part(self, part: int, name: str) -> None:
-        """
-        Set a part of the channel name
-        """
+        """Set a part of the channel name."""
         # if int(part) not in self._name_parts:
         #    return
         self._name_parts[int(part)] = name
@@ -128,15 +131,14 @@ class Channel:
             self._generate_name()
 
     def _generate_name(self) -> None:
-        """
-        Generate the channel name if all 3 parts are received
-        """
+        """Generate the channel name if all 3 parts are received."""
         name = self._name_parts[1] + self._name_parts[2] + self._name_parts[3]
         self._name = "".join(filter(lambda x: x in string.printable, name))
         self._is_loaded = True
         self._name_parts = {}
 
     def __getstate__(self):
+        """Get channel state for pickling."""
         d = self.__dict__
         return {
             k: d[k]
@@ -145,6 +147,7 @@ class Channel:
         }
 
     def to_cache(self) -> dict:
+        """Get channel state for caching."""
         dst = {
             "name": self._name,
             "type": type(self).__name__,
@@ -155,11 +158,13 @@ class Channel:
         return dst
 
     def __setstate__(self, state):
+        """Restore channel from cached state."""
         self.__dict__.update(state)
         self._on_status_update = []
         self._name_parts = {}
 
     def __repr__(self) -> str:
+        """Representation of this channel."""
         items = []
         for k, v in self.__dict__.items():
             if k not in ["_module", "_writer", "_name_parts", "_class"]:
@@ -167,9 +172,11 @@ class Channel:
         return "{}[{}]".format(type(self), ", ".join(items))
 
     def __str__(self) -> str:
+        """String representation of this channel."""
         return self.__repr__()
 
     def get_channel_info(self) -> dict[str, Any]:
+        """Get the channel info as a dictionary."""
         data = {}
         for key, value in self.__dict__.items():
             data["type"] = self.__class__.__name__
@@ -178,70 +185,66 @@ class Channel:
         return data
 
     async def update(self, data: dict) -> None:
-        """
-        Set the attributes of this channel
-        """
+        """Set the attributes of this channel."""
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
             if cur_val is None or cur_val != new_val:
                 setattr(self, f"_{key}", new_val)
-                for m in self._on_status_update:
-                    await m()
+                await self.status_update()
+
+    async def status_update(self) -> None:
+        """Call all registered status update methods."""
+        for m in self._on_status_update:
+            await m()
 
     def get_categories(self) -> list[str]:
-        """
-        Get the categories (mainly for home-assistant)
-        """
+        """Get the categories (mainly for home-assistant)."""
         # COMPONENT_TYPES = ["switch", "sensor", "binary_sensor", "cover", "climate", "light"]
         return []
 
     def on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Register a method to be called on status update."""
         self._on_status_update.append(meth)
 
     def remove_on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Remove a method from the status update callbacks."""
         self._on_status_update.remove(meth)
 
     def get_counter_state(self) -> int:
-        raise NotImplementedError()
+        """Return the current state of the counter."""
+        raise NotImplementedError
 
     def get_counter_unit(self) -> str:
-        raise NotImplementedError()
+        """Return the unit of the counter."""
+        raise NotImplementedError
 
     def get_max(self) -> int:
-        raise NotImplementedError()
+        """Return the maximum value."""
+        raise NotImplementedError
 
     def get_min(self) -> int:
-        raise NotImplementedError()
+        """Return the minimum value."""
+        raise NotImplementedError
 
     def is_water(self) -> bool:
+        """Return if this channel is a water channel."""
         return False
 
     async def press(self) -> None:
-        raise NotImplementedError()
+        """Simulate a press action on this channel."""
+        raise NotImplementedError
 
     def get_sensor_type(self) -> str | None:
+        """Return the sensor type."""
         return None
 
-    def on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self.module.on_connect(meth)
-
-    def remove_on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._module.remove_on_connect(meth)
-
-    def on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._module.on_disconnect(meth)
-
-    def remove_on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._module.remove_on_disconnect(meth)
-
     def is_connected(self) -> bool:
+        """Return if the module is connected."""
         return self._module.is_connected()
 
 
 class Blind(Channel):
-    """
-    A blind channel
-    """
+    """A blind channel"""
 
     _state = None
     # State reports the direction of *movement*: moving up, moving down or stopped
@@ -316,9 +319,7 @@ class Blind(Channel):
 
 
 class Button(Channel):
-    """
-    A Button channel
-    """
+    """A Button channel"""
 
     _enabled = True
     _closed = False
@@ -331,23 +332,17 @@ class Button(Channel):
         return []
 
     def is_closed(self) -> bool:
-        """
-        Return if this button is on
-        """
+        """Return if this button is on"""
         return self._closed
 
     def is_on(self) -> bool:
-        """
-        Return if this relay is on
-        """
+        """Return if this relay is on"""
         if self._led_state == "on":
             return True
         return False
 
     async def set_led_state(self, state: str) -> None:
-        """
-        Set led
-        """
+        """Set led"""
         if state == "on":
             code = 0xF6
         elif state == "slow":
@@ -368,9 +363,7 @@ class Button(Channel):
         await self.update({"led_state": state})
 
     async def press(self) -> None:
-        """
-        Press the button
-        """
+        """Press the button"""
         _mod_add = self.get_module_address("Button")
         _chn_num = self._num - self._module.calc_channel_offset(_mod_add)
         # send the just pressed
@@ -387,8 +380,7 @@ class Button(Channel):
 
 
 class ButtonCounter(Button):
-    """
-    A ButtonCounter channel
+    """A ButtonCounter channel
     This channel can act as a button and as a counter
     => standard     this is the calculated value
     => is_counter   this is the numeric value
@@ -426,9 +418,7 @@ class ButtonCounter(Button):
         val = 0
         if not self._delay or not self._Unit or self._delay == 0xFFFF:
             return round(0, 2)
-        if self._Unit == VOLUME_LITERS_HOUR:
-            val = (1000 * 3600) / (self._delay * self._pulses)
-        elif self._Unit == VOLUME_CUBIC_METER_HOUR:
+        if self._Unit == VOLUME_LITERS_HOUR or self._Unit == VOLUME_CUBIC_METER_HOUR:
             val = (1000 * 3600) / (self._delay * self._pulses)
         elif self._Unit == ENERGY_KILO_WATT_HOUR:
             val = (1000 * 1000 * 3600) / (self._delay * self._pulses)
@@ -460,8 +450,7 @@ class ButtonCounter(Button):
 
 
 class Sensor(Button):
-    """
-    A Sensor channel
+    """A Sensor channel
     This is a bit weird, but this happens because of code sharing with openhab
     A sensor in this case is actually a Button
     """
@@ -473,16 +462,13 @@ class Sensor(Button):
 
 
 class ThermostatChannel(Button):
-    """
-    A Thermostat channel
+    """A Thermostat channel
     These are the booster/heater/alarms
     """
 
 
 class Dimmer(Channel):
-    """
-    A Dimmer channel
-    """
+    """A Dimmer channel"""
 
     _state: int = 0
 
@@ -507,23 +493,17 @@ class Dimmer(Channel):
         return ["light"]
 
     def is_on(self) -> bool:
-        """
-        Check if a dimmer is turned on
-        """
+        """Check if a dimmer is turned on"""
         if self._state == 0:
             return False
         return True
 
     def get_dimmer_state(self) -> int:
-        """
-        Return the dimmer state
-        """
+        """Return the dimmer state"""
         return int(self._state * 100 / self.slider_scale)
 
     async def set_dimmer_state(self, slider: int, transitiontime: int = 0) -> None:
-        """
-        Set dimmer to slider
-        """
+        """Set dimmer to slider"""
         cls = commandRegistry.get_command(0x07, self._module.get_type())
         msg = cls(self._address)
         msg.dimmer_state = int(slider * self.slider_scale / 100)
@@ -532,9 +512,7 @@ class Dimmer(Channel):
         await self._writer(msg)
 
     async def restore_dimmer_state(self, transitiontime: int = 0) -> None:
-        """
-        restore dimmer to last known state
-        """
+        """Restore dimmer to last known state"""
         cls = commandRegistry.get_command(0x11, self._module.get_type())
         msg = cls(self._address)
         msg.dimmer_transitiontime = int(transitiontime)
@@ -543,9 +521,7 @@ class Dimmer(Channel):
 
 
 class Temperature(Channel):
-    """
-    A Temperature sensor channel
-    """
+    """A Temperature sensor channel"""
 
     _cur = 0
     _cur_precision = None
@@ -659,7 +635,7 @@ class Temperature(Channel):
             # Don't update (would lose high precision)
             return
 
-        elif (
+        if (
             current_temp_rounded_to_precision - precision
             <= new_temp
             < current_temp_rounded_to_precision
@@ -683,9 +659,7 @@ class Temperature(Channel):
 
 
 class SensorNumber(Channel):
-    """
-    A Numeric Sensor channel
-    """
+    """A Numeric Sensor channel"""
 
     _cur = 0
     _unit = None
@@ -708,9 +682,7 @@ class SensorNumber(Channel):
 
 
 class LightSensor(Channel):
-    """
-    A light sensor channel
-    """
+    """A light sensor channel"""
 
     _cur = 0
 
@@ -728,9 +700,7 @@ class LightSensor(Channel):
 
 
 class Relay(Channel):
-    """
-    A Relay channel
-    """
+    """A Relay channel"""
 
     _on = None
     _enabled = True
@@ -744,9 +714,7 @@ class Relay(Channel):
         return []
 
     def is_on(self) -> bool:
-        """
-        Return if this relay is on
-        """
+        """Return if this relay is on"""
         return self._on
 
     def is_inhibit(self) -> bool:
@@ -759,18 +727,14 @@ class Relay(Channel):
         return self._disabled
 
     async def turn_on(self) -> None:
-        """
-        Send the turn on message
-        """
+        """Send the turn on message"""
         cls = commandRegistry.get_command(0x02, self._module.get_type())
         msg = cls(self._address)
         msg.relay_channels = [self._num]
         await self._writer(msg)
 
     async def turn_off(self) -> None:
-        """
-        Send the turn off message
-        """
+        """Send the turn off message"""
         cls = commandRegistry.get_command(0x01, self._module.get_type())
         msg = cls(self._address)
         msg.relay_channels = [self._num]
@@ -778,9 +742,7 @@ class Relay(Channel):
 
 
 class EdgeLit(Channel):
-    """
-    An EdgeLit channel
-    """
+    """An EdgeLit channel"""
 
     async def reset_color(self, left=True, top=True, right=True, bottom=True):
         msg = SetEdgeColorMessage(self._address)
@@ -803,9 +765,7 @@ class EdgeLit(Channel):
         blinking=False,
         priority=CustomColorPriority.LOW_PRIORITY,
     ) -> None:
-        """
-        Send the turn off message
-        """
+        """Send the turn off message"""
 
         msg = SetEdgeColorMessage(self._address)
         msg.apply_background_color = True
@@ -821,9 +781,7 @@ class EdgeLit(Channel):
 
 
 class Memo(Channel):
-    """
-    A Memo text
-    """
+    """A Memo text"""
 
     async def set(self, txt: str) -> None:
         cls = commandRegistry.get_command(0xAC, self._module.get_type())
@@ -840,9 +798,7 @@ class Memo(Channel):
 
 
 class SelectedProgram(Channel):
-    """
-    A selected program channel
-    """
+    """A selected program channel"""
 
     _selected_program_str = None
 

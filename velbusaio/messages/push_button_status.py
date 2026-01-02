@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0x00
 
 @register(COMMAND_CODE)
 class PushButtonStatusMessage(Message):
-    """
-    send by: VMB6IN, VMB4RYLD
+    """send by: VMB6IN, VMB4RYLD
     received by: VMB4RYLD
     """
 
@@ -25,9 +22,7 @@ class PushButtonStatusMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 3)
@@ -43,15 +38,11 @@ class PushButtonStatusMessage(Message):
         self.set_no_rtr()
 
     def get_channels(self):
-        """
-        :return: list
-        """
+        """:return: list"""
         return self.closed + self.opened
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,

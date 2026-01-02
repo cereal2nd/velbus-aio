@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xF5
 
 @register(COMMAND_CODE)
 class ClearLedMessage(Message):
-    """
-    send by: VMB4RYLD
+    """send by: VMB4RYLD
     received by: VMB6IN, VMB4RYLD
     """
 
@@ -23,9 +20,7 @@ class ClearLedMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -33,7 +28,5 @@ class ClearLedMessage(Message):
         self.leds = self.byte_to_channels(data[0])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte(self.leds)])

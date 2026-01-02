@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -16,8 +14,7 @@ DMODE = {0: "safe", 16: "night", 32: "day", 64: "comfort"}
 
 @register(COMMAND_CODE)
 class TempSensorStatusMessage(Message):
-    """
-    send by: VMBGPOD
+    """send by: VMBGPOD
     received by:
     """
 
@@ -46,8 +43,7 @@ class TempSensorStatusMessage(Message):
         return self.current_temp
 
     def populate(self, priority, address, rtr, data):
-        """
-        -DB1    last bit        = local_control
+        """-DB1    last bit        = local_control
         -DB1    bit 2+3         = status_mode
         -DB1    bit 4           = auto send
         -DB1    bit 5+6+7       = mode
@@ -93,9 +89,7 @@ class TempSensorStatusMessage(Message):
         self.sleep_timer = (data[5] << 8) + data[6]
 
     def to_json(self):
-        """
-        :return: str
-        """
+        """:return: str"""
         json_dict = self.to_json_basic()
         json_dict["local_control"] = self.local_control
         json_dict["status_mode"] = DSTATUS[self.status_mode]

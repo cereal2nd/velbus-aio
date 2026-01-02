@@ -1,8 +1,4 @@
-"""
-Test cases for the LightSensor channel class
-"""
-
-from unittest.mock import AsyncMock, Mock, patch
+"""Test cases for the LightSensor channel class"""
 
 import pytest
 

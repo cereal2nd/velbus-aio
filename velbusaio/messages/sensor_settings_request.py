@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,15 +10,12 @@ COMMAND_CODE = 0xE7
 
 @register(COMMAND_CODE)
 class SensorSettingsRequestMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMB6IN, VMB4RYLD
     """
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_rtr(rtr)
         self.needs_no_data(data)
@@ -32,7 +27,5 @@ class SensorSettingsRequestMessage(Message):
         self.set_rtr()
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([])

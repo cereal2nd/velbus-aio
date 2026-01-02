@@ -1,6 +1,4 @@
-"""
-:author: Niels Laukens
-"""
+""":author: Niels Laukens"""
 
 from __future__ import annotations
 
@@ -14,8 +12,7 @@ COMMAND_CODE = 0xA5
     COMMAND_CODE, ["VMBDALI", "VMBDALI-20", "VMB8DC-20", "VMB4LEDPWM-20", "VMB2DC-20"]
 )
 class DimValueStatus(Message):
-    """
-    send by: VMBDALI
+    """send by: VMBDALI
     received by:
     """
 

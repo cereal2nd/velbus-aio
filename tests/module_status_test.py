@@ -1,5 +1,4 @@
-"""
-This test checks if with an incoming module_status message the selected program
+"""This test checks if with an incoming module_status message the selected program
 is correctly stored into the module.
 """
 

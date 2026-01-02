@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xE6
 
 @register(COMMAND_CODE)
 class SensorTemperatureMessage(Message):
-    """
-    send by: VMBTS, vmbg*pd, ...
+    """send by: VMBTS, vmbg*pd, ...
     received by:
     """
 
@@ -33,8 +30,7 @@ class SensorTemperatureMessage(Message):
         return self.min
 
     def populate(self, priority, address, rtr, data):
-        """
-        data bytes (high + low)
+        """Data bytes (high + low)
             1 + 2   = current temp
             3 + 4   = min temp
             5 + 6   = max temp

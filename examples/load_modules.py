@@ -26,7 +26,7 @@ async def main(connect_str: str, vlp: str):
     await velbus.start()
     for mod in (velbus.get_modules()).values():
         print(mod)
-        print("")
+        print()
     await velbus.stop()
 
 

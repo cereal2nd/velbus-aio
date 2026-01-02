@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xF2
 
 @register(COMMAND_CODE)
 class ChannelNamePart3Message(Message):
-    """
-    send by: VMB6IN, VMB4RYLD
+    """send by: VMB6IN, VMB4RYLD
     received by:
     """
 
@@ -24,9 +21,7 @@ class ChannelNamePart3Message(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 5)
@@ -37,9 +32,7 @@ class ChannelNamePart3Message(Message):
         self.name = "".join([chr(x) for x in data[1:5]])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte([self.channel])]) + bytes(
             self.name, "ascii", "ignore"
         )
@@ -92,15 +85,12 @@ class ChannelNamePart3Message(Message):
     ],
 )
 class ChannelNamePart3Message2(ChannelNamePart3Message):
-    """
-    send by: VMBGP*, VMBDALI
+    """send by: VMBGP*, VMBDALI
     received by:
     """
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 5)
@@ -111,15 +101,12 @@ class ChannelNamePart3Message2(ChannelNamePart3Message):
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class ChannelNamePart3Message3(ChannelNamePart3Message):
-    """
-    send by: VMBGP*
+    """send by: VMBGP*
     received by:
     """
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 5)

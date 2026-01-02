@@ -1,6 +1,4 @@
-"""
-Test cases for VelbusProtocol data_received method (serial/streaming protocol)
-"""
+"""Test cases for VelbusProtocol data_received method (serial/streaming protocol)"""
 
 import asyncio
 from unittest.mock import AsyncMock, Mock, patch
@@ -101,7 +99,6 @@ class TestVelbusProtocolDataReceived:
     @pytest.mark.asyncio
     async def test_data_received_updates_activity_time(self):
         """Test that receiving data updates last activity time."""
-        import time
 
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)

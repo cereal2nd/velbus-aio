@@ -1,8 +1,4 @@
-"""
-Test cases for the Sensor channel class
-"""
-
-from unittest.mock import AsyncMock, Mock, patch
+"""Test cases for the Sensor channel class"""
 
 import pytest
 

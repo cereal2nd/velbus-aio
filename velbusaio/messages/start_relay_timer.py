@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -14,8 +12,7 @@ COMMAND_CODE = 0x03
 
 @register(COMMAND_CODE)
 class StartRelayTimerMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMB4RYLD
     """
 
@@ -32,9 +29,7 @@ class StartRelayTimerMessage(Message):
         self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 4)
@@ -43,9 +38,7 @@ class StartRelayTimerMessage(Message):
         (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[1:])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return (
             bytes([COMMAND_CODE, self.channels_to_byte(self.relay_channels)])
             + struct.pack(">L", self.delay_time)[-3:]

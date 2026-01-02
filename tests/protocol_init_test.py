@@ -1,10 +1,6 @@
-"""
-Test cases for VelbusProtocol initialization
-"""
+"""Test cases for VelbusProtocol initialization"""
 
 from unittest.mock import AsyncMock, Mock
-
-import pytest
 
 from velbusaio.protocol import VelbusProtocol
 
@@ -26,7 +22,7 @@ class TestVelbusProtocolInit:
         assert (
             protocol._restart_writer is False
         )  # Not started until transport connected
-        assert protocol._connection_state_callbacks == []
+        assert protocol._connection_state_callback is None
 
     def test_init_with_connection_callback(self):
         """Test protocol initialization with connection state callback."""
@@ -35,7 +31,7 @@ class TestVelbusProtocolInit:
         protocol = VelbusProtocol(msg_callback, conn_callback)
 
         assert protocol._message_received_callback == msg_callback
-        assert protocol._connection_state_callbacks == [conn_callback]
+        assert protocol._connection_state_callback == conn_callback
 
     def test_buffer_initialization(self):
         """Test that buffer is properly initialized."""

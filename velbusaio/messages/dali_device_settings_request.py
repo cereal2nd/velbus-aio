@@ -1,6 +1,4 @@
-"""
-:author: Niels Laukens
-"""
+""":author: Niels Laukens"""
 
 from __future__ import annotations
 
@@ -20,8 +18,7 @@ class DataSource(enum.Enum):
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
 class DaliDeviceSettingsRequest(Message):
-    """
-    send by:
+    """send by:
     received by: VMBDALI
 
     Note: requesting a single setting for all (81) channels does not work (no response)

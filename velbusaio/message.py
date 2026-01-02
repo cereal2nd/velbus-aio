@@ -1,6 +1,4 @@
-"""
-The velbus abstract message class
-"""
+"""The velbus abstract message class"""
 
 from __future__ import annotations
 
@@ -11,15 +9,11 @@ from velbusaio.const import PRIORITY_FIRMWARE, PRIORITY_HIGH, PRIORITY_LOW
 
 
 class ParserError(Exception):
-    """
-    Error when invalid message is received
-    """
+    """Error when invalid message is received"""
 
 
 class Message:
-    """
-    Base Velbus message
-    """
+    """Base Velbus message"""
 
     def __init__(self, address: int = 0) -> None:
         self.priority = PRIORITY_LOW
@@ -37,8 +31,7 @@ class Message:
         raise NotImplementedError
 
     def set_defaults(self, address: int | None) -> None:
-        """
-        Set defaults
+        """Set defaults
 
         If a message has different than low priority or NO_RTR set,
         then this method needs override in subclass
@@ -52,12 +45,10 @@ class Message:
         self.address = address
 
     def data_to_binary(self) -> bytes:
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def to_json_basic(self) -> dict:
-        """
-        Create JSON structure with generic attributes
-        """
+        """Create JSON structure with generic attributes"""
         me = {}
         me["name"] = str(self.__class__.__name__)
         me.update(self.__dict__.copy())
@@ -76,8 +67,7 @@ class Message:
         return me
 
     def to_json(self) -> str:
-        """
-        Dump object structure to JSON
+        """Dump object structure to JSON
 
         This method should be overridden in subclasses to include more than just generic attributes
         """
@@ -89,7 +79,7 @@ class Message:
     def byte_to_channels(self, byte: int) -> list[int]:
         # pylint: disable-msg=R0201
         result = []
-        for offset in range(0, 8):
+        for offset in range(8):
             if byte & (1 << offset):
                 result.append(offset + 1)
         return result
@@ -97,7 +87,7 @@ class Message:
     def channels_to_byte(self, channels: list[int]) -> int:
         # pylint: disable-msg=R0201
         result = 0
-        for offset in range(0, 8):
+        for offset in range(8):
             if offset + 1 in channels:
                 result = result + (1 << offset)
         return result

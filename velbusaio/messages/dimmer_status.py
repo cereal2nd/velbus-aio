@@ -1,6 +1,4 @@
-"""
-:author: Frank van Breugel
-"""
+""":author: Frank van Breugel"""
 
 from __future__ import annotations
 
@@ -38,8 +36,7 @@ LED_VERY_FAST_BLINKING = 1 << 4
     ],
 )
 class DimmerStatusMessage(Message):
-    """
-    sent by: VMBDME
+    """sent by: VMBDME
     received by:
     """
 
@@ -55,9 +52,7 @@ class DimmerStatusMessage(Message):
         self.dimmer_config = 0
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -70,63 +65,43 @@ class DimmerStatusMessage(Message):
         self.dimmer_config = data[6]
 
     def is_start_stop(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_START_STOP
 
     def is_dimmer(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_DIMMER
 
     def is_dimmer_memory(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_MEMORY
 
     def is_staircase(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_STAIRCASE
 
     def is_multi(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_MULTI
 
     def is_slow(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_SLOW
 
     def is_slow_on(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_SLOW_ON
 
     def is_slow_off(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.dimmer_mode == MODE_SLOW_OFF
 
     def cur_dimmer_state(self):
-        """
-        :return: int
-        """
+        """:return: int"""
         return self.dimmer_state
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return (
             bytes(
                 [

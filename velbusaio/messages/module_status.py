@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -14,8 +12,7 @@ PROGRAM_SELECTION = {0: "none", 1: "summer", 2: "winter", 3: "holiday"}
 
 @register(COMMAND_CODE)
 class ModuleStatusMessage(Message):
-    """
-    send by: VMB6IN
+    """send by: VMB6IN
     received by:
     """
 
@@ -28,9 +25,7 @@ class ModuleStatusMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 4)
@@ -41,9 +36,7 @@ class ModuleStatusMessage(Message):
         self.led_fast_blinking = self.byte_to_channels(data[3])
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,
@@ -115,9 +108,7 @@ class ModuleStatusMessage2(Message):
         self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes(
             [
                 COMMAND_CODE,
@@ -166,9 +157,7 @@ class ModuleStatusPirMessage(Message):
         self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         raise NotImplementedError
 
 
@@ -208,7 +197,5 @@ class ModuleStatusGP4PirMessage(Message):
         self.light_value_send_interval = data[6]
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         raise NotImplementedError

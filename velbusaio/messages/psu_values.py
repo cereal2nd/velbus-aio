@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie
-"""
+""":author: Maikel Punie"""
 
 from __future__ import annotations
 
@@ -14,7 +12,6 @@ COMMAND_CODE = 0xA3
 
 @register(COMMAND_CODE, ["VMBPSUMNGR-20"])
 class PsuValuesMessage(Message):
-
     def __init__(self, address=None):
         Message.__init__(self)
         self.channel = 0
@@ -23,9 +20,7 @@ class PsuValuesMessage(Message):
         self.amp = 0
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 3)
@@ -36,9 +31,7 @@ class PsuValuesMessage(Message):
         self.amp = (data[5] << 8 | data[6]) / 1000
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return (
             bytes(
                 [

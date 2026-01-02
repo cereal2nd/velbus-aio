@@ -1,5 +1,4 @@
-"""
-Velbus packet handler
+"""Velbus packet handler
 :Author maikel punie <maikel.punie@gmail.com>
 """
 
@@ -33,9 +32,7 @@ if TYPE_CHECKING:
 
 
 class PacketHandler:
-    """
-    The PacketHandler class
-    """
+    """The PacketHandler class"""
 
     def __init__(
         self,
@@ -114,7 +111,9 @@ class PacketHandler:
             self._scan_complete = False
 
             self._log.debug("Waiting for Velbus bus to be ready to scan...")
-            await self._velbus.wait_on_all_messages_sent_async()  # don't start a scan while messages are still in the queue
+            await (
+                self._velbus.wait_on_all_messages_sent_async()
+            )  # don't start a scan while messages are still in the queue
             self._log.debug("Velbus bus is ready to scan!")
 
             self._log.info("Sending scan type requests to all addresses...")
@@ -200,9 +199,7 @@ class PacketHandler:
             self._log.info(f"Module scan completed in {total_time:.2f} seconds")
 
     async def __handle_module_type_response_async(self, rawmsg: RawMessage) -> None:
-        """
-        Handle a received module type response packet
-        """
+        """Handle a received module type response packet"""
         address = rawmsg.address
 
         if self.__scan_found_addresses is None:
@@ -219,9 +216,7 @@ class PacketHandler:
         self.__scan_found_addresses[address] = tmsg
 
     async def handle(self, rawmsg: RawMessage) -> None:
-        """
-        Handle a received packet
-        """
+        """Handle a received packet"""
         if rawmsg.address < 1 or rawmsg.address > 254:
             return
         if rawmsg.command is None:
@@ -254,17 +249,13 @@ class PacketHandler:
         # ignore broadcast
         elif command_value in self.broadcast:
             self._log.debug(
-                "Received broadcast message {} from {}, ignoring".format(
-                    self.broadcast[str(command_value).upper()], address
-                )
+                f"Received broadcast message {self.broadcast[str(command_value).upper()]} from {address}, ignoring"
             )
 
         # ignore messages
         elif command_value in self.ignore:
             self._log.debug(
-                "Received ignored message {} from {}, ignoring".format(
-                    self.ignore[str(command_value).upper()], address
-                )
+                f"Received ignored message {self.ignore[str(command_value).upper()]} from {address}, ignoring"
             )
 
         # handle other messages for modules that are already scanned
@@ -299,9 +290,7 @@ class PacketHandler:
     async def _handle_module_type(
         self, msg: ModuleTypeMessage | ModuleType2Message
     ) -> None:
-        """
-        load the module data
-        """
+        """Load the module data"""
         if msg is not None:
             module = self._velbus.get_module(msg.address)
             if module is None:

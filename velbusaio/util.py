@@ -1,6 +1,4 @@
-"""
-Some common utils.
-"""
+"""Some common utils."""
 
 from typing import Union
 

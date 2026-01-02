@@ -1,8 +1,6 @@
-"""
-Test cases for the Memo channel class
-"""
+"""Test cases for the Memo channel class"""
 
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 

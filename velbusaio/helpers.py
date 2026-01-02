@@ -1,6 +1,4 @@
-"""
-Helper functions
-"""
+"""Helper functions"""
 
 from __future__ import annotations
 
@@ -12,9 +10,7 @@ from velbusaio.const import CACHEDIR
 
 
 def keys_exists(element: dict[str, Any], *keys) -> dict:
-    """
-    Check if *keys (nested) exists in `element` (dict).
-    """
+    """Check if *keys (nested) exists in `element` (dict)."""
     if not isinstance(element, dict):
         raise AttributeError("keys_exists() expects dict as first argument.")
     if len(keys) == 0:
@@ -30,16 +26,12 @@ def keys_exists(element: dict[str, Any], *keys) -> dict:
 
 
 def h2(inp: int) -> str:
-    """
-    Format as hex uppercase
-    """
+    """Format as hex uppercase"""
     return format(inp, "02x").upper()
 
 
 def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) -> dict:
-    """
-    Handle memory match from the module data
-    """
+    """Handle memory match from the module data"""
     match_result = {}
     binary_data = f"{int(data):08b}"
     for num, match_data in match_dict.items():

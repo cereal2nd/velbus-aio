@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0xA9
 
 @register(COMMAND_CODE, ["VMBMETEO"])
 class MeteoRawMessage(Message):
-    """
-    send by: VMBMETEO
+    """send by: VMBMETEO
     received by:
     """
 
@@ -24,8 +21,7 @@ class MeteoRawMessage(Message):
         self.wind = 0
 
     def populate(self, priority, address, rtr, data):
-        """
-        data bytes (high + low)
+        """Data bytes (high + low)
             1 + 2   = current temp
             3 + 4   = min temp
             5 + 6   = max temp
@@ -41,8 +37,7 @@ class MeteoRawMessage(Message):
 
 @register(COMMAND_CODE, ["VMB4AN"])
 class SensorRawMessage(Message):
-    """
-    send by: VMB4AN
+    """send by: VMB4AN
     received by:
     """
 

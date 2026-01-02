@@ -1,6 +1,4 @@
-"""
-:author: Maikel Punie <maikel.punie@gmail.com>
-"""
+""":author: Maikel Punie <maikel.punie@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,9 +10,7 @@ COMMAND_CODE = 0xD8
 
 @register(COMMAND_CODE)
 class SetRealtimeClock(Message):
-    """
-    received by all modules
-    """
+    """received by all modules"""
 
     def __init__(self, address=0x00, wday=None, hour=None, min=None) -> None:
         Message.__init__(self)
@@ -30,9 +26,7 @@ class SetRealtimeClock(Message):
         self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data) -> None:
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 3)
@@ -42,7 +36,5 @@ class SetRealtimeClock(Message):
         self._min = data[2]
 
     def data_to_binary(self) -> bytes:
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self._wday, self._hour, self._min])

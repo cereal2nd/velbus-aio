@@ -1,6 +1,4 @@
-"""
-:author: Danny De Gaspari
-"""
+""":author: Danny De Gaspari"""
 
 from __future__ import annotations
 
@@ -18,9 +16,7 @@ class SelectProgramMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -29,7 +25,5 @@ class SelectProgramMessage(Message):
         self.select_program = data[0] & 0x03
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.select_program])

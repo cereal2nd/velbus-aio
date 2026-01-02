@@ -1,6 +1,4 @@
-"""
-Test cases for the Blind channel class
-"""
+"""Test cases for the Blind channel class"""
 
 from unittest.mock import Mock, patch
 

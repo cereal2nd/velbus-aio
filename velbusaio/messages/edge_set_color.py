@@ -16,8 +16,7 @@ class CustomColorPriority(IntEnum):
 
 @register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO"])
 class SetEdgeColorMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMBEL1, VMBEL2, VMBEL4, VMBELO
     """
 
@@ -41,9 +40,7 @@ class SetEdgeColorMessage(Message):
     color_idx: int = 0
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)
 
@@ -74,9 +71,7 @@ class SetEdgeColorMessage(Message):
         self.color_idx = data[2] & 0b0001_1111
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
 
         byte_2 = (
             self.apply_background_color * 0x01

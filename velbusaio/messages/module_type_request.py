@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -8,15 +6,12 @@ from velbusaio.message import Message
 
 
 class ModuleTypeRequestMessage(Message):
-    """
-    send by:
+    """send by:
     received by: VMB6IN, VMB4RYLD
     """
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_rtr(rtr)
         self.needs_no_data(data)
@@ -29,7 +24,5 @@ class ModuleTypeRequestMessage(Message):
         self.set_rtr()
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([])

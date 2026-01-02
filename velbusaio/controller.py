@@ -62,7 +62,6 @@ class Velbus:
         )
         self._closing = False
         self._auto_reconnect = True
-        self._is_connected = None
 
         self._destination = dsn
         self._handler = PacketHandler(self, one_address)
@@ -80,29 +79,12 @@ class Velbus:
         """Return connection state."""
         return self._is_connected
 
-    def _on_connection_state(self, is_connected: bool) -> None:
+    async def _on_connection_state(self, is_connected: bool) -> None:
         """Respond to Protocol connection state changes."""
         self._is_connected = is_connected
-        if is_connected:
-            self._log.info("Connected to transport")
-            for callback in self._on_connect_callbacks:
-                callback()
-        else:
-            self._log.info("Disconnected from transport")
-            for callback in self._on_disconnect_callbacks:
-                callback()
-
-    def _add_on_connect_callback(self, callback: t.Callable[[], None]) -> None:
-        self._on_connect_callbacks.append(callback)
-
-    def _add_on_disconnect_callback(self, callback: t.Callable[[], None]) -> None:
-        self._on_disconnect_callbacks.append(callback)
-
-    def _remove_on_connect_callback(self, callback: t.Callable[[], None]) -> None:
-        self._on_connect_callbacks.remove(callback)
-
-    def _remove_on_disconnect_callback(self, callback: t.Callable[[], None]) -> None:
-        self._on_disconnect_callbacks.remove(callback)
+        for mod in self._modules.values():
+            for chan in mod.get_channels().values():
+                await chan.status_update()
 
     def get_cache_dir(self) -> str:
         return self._cache_dir
@@ -206,18 +188,19 @@ class Velbus:
         else:
             # serial port
             try:
-                _transport, _protocol = (
-                    await serial_asyncio_fast.create_serial_connection(
-                        asyncio.get_event_loop(),
-                        lambda: self._protocol,
-                        url=self._destination,
-                        baudrate=38400,
-                        bytesize=serial.EIGHTBITS,
-                        parity=serial.PARITY_NONE,
-                        stopbits=serial.STOPBITS_ONE,
-                        xonxoff=0,
-                        rtscts=1,
-                    )
+                (
+                    _transport,
+                    _protocol,
+                ) = await serial_asyncio_fast.create_serial_connection(
+                    asyncio.get_event_loop(),
+                    lambda: self._protocol,
+                    url=self._destination,
+                    baudrate=38400,
+                    bytesize=serial.EIGHTBITS,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    xonxoff=0,
+                    rtscts=1,
                 )
             except (FileNotFoundError, serial.SerialException) as err:
                 raise VelbusConnectionFailed from err

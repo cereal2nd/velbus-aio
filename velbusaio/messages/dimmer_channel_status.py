@@ -1,6 +1,4 @@
-"""
-:author: Frank van Breugel
-"""
+""":author: Frank van Breugel"""
 
 from __future__ import annotations
 
@@ -27,8 +25,7 @@ LED_VERY_FAST_BLINKING = 1 << 4
     ["VMB4DC", "VMBDMI", "VMBDMI-R", "VMB8DC-20", "VMB4LEDPWM-20", "VMB2DC-20"],
 )
 class DimmerChannelStatusMessage(Message):
-    """
-    sent by: VMB4DC
+    """sent by: VMB4DC
     received by:
     """
 
@@ -42,9 +39,7 @@ class DimmerChannelStatusMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -56,39 +51,27 @@ class DimmerChannelStatusMessage(Message):
         (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[4:])
 
     def is_normal(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.disable_inhibit_forced == CHANNEL_NORMAL
 
     def is_inhibited(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.disable_inhibit_forced == CHANNEL_INHIBITED
 
     def is_forced_on(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.disable_inhibit_forced == CHANNEL_FORCED_ON
 
     def is_disabled(self):
-        """
-        :return: bool
-        """
+        """:return: bool"""
         return self.disable_inhibit_forced == CHANNEL_DISABLED
 
     def cur_dimmer_state(self):
-        """
-        :return: int
-        """
+        """:return: int"""
         return self.dimmer_state
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return (
             bytes(
                 [

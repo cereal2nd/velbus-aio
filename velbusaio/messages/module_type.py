@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -91,8 +89,7 @@ MODULES_WITHOUT_SERIAL = {
     ],
 )
 class ModuleTypeMessage(Message):
-    """
-    send by: VMB6IN, VMB4RYLD
+    """send by: VMB6IN, VMB4RYLD
     received by:
     """
 
@@ -111,9 +108,7 @@ class ModuleTypeMessage(Message):
         self.set_defaults(address)
 
     def module_type_name(self) -> str:
-        """
-        :return: str
-        """
+        """:return: str"""
 
         return (
             MODULE_DIRECTORY[self.module_type]
@@ -122,9 +117,7 @@ class ModuleTypeMessage(Message):
         )
 
     def populate(self, priority, address, rtr, data) -> None:
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)
@@ -174,15 +167,11 @@ class ModuleType2Message(Message):
         self.set_defaults(address)
 
     def module_name(self) -> str:
-        """
-        :return: str
-        """
+        """:return: str"""
         return "Unknown"
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)

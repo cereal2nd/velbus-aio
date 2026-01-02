@@ -1,6 +1,4 @@
-"""
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+""":author: Thomas Delaet <thomas@delaet.org>"""
 
 from __future__ import annotations
 
@@ -18,8 +16,7 @@ COMMAND_CODE_3 = 0xA6
 @register(COMMAND_CODE_2)
 @register(COMMAND_CODE_3)
 class ModuleSubTypeMessage(Message):
-    """
-    send by: VMB6IN, VMB4RYLD
+    """send by: VMB6IN, VMB4RYLD
     received by:
     """
 
@@ -37,15 +34,11 @@ class ModuleSubTypeMessage(Message):
         self.sub_address_offset = sub_address_offset
 
     def module_name(self) -> str:
-        """
-        :return: str
-        """
+        """:return: str"""
         return "Unknown"
 
     def populate(self, priority, address, rtr, data) -> None:
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         # self.needs_data(data, 6)

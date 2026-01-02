@@ -3,9 +3,8 @@ from __future__ import annotations
 import asyncio
 import json
 import socket
-from typing import Tuple
 
-Address = Tuple[str, int]
+Address = tuple[str, int]
 
 
 class VelbusDiscoveryProtocol(asyncio.DatagramProtocol):

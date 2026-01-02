@@ -1,6 +1,4 @@
-"""
-Test cases for VelbusProtocol buffer_updated method (network/buffered protocol)
-"""
+"""Test cases for VelbusProtocol buffer_updated method (network/buffered protocol)"""
 
 import asyncio
 from unittest.mock import AsyncMock, Mock, patch
@@ -55,7 +53,6 @@ class TestVelbusProtocolBufferUpdated:
     @pytest.mark.asyncio
     async def test_buffer_updated_updates_activity_time(self):
         """Test that buffer_updated updates last activity time."""
-        import time
 
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)

@@ -1,6 +1,4 @@
-"""
-Test cases for VelbusProtocol message processing
-"""
+"""Test cases for VelbusProtocol message processing"""
 
 from unittest.mock import AsyncMock, Mock
 

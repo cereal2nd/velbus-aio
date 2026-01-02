@@ -1,6 +1,4 @@
-"""
-:author: Tom Dupré <gitd8400@gmail.com>
-"""
+""":author: Tom Dupré <gitd8400@gmail.com>"""
 
 from __future__ import annotations
 
@@ -12,8 +10,7 @@ COMMAND_CODE = 0x04
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class CoverOffMessage(Message):
-    """
-    sent by:
+    """sent by:
     received by: VMB2BLE
     """
 
@@ -23,9 +20,7 @@ class CoverOffMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -39,16 +34,13 @@ class CoverOffMessage(Message):
         self.set_no_rtr()
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte([self.channel])])
 
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class CoverOffMessage2(Message):
-    """
-    sent by:
+    """sent by:
     received by: VMB1BL VMB2BL
     """
 
@@ -59,9 +51,7 @@ class CoverOffMessage2(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """
-        :return: None
-        """
+        """:return: None"""
         self.needs_high_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 1)
@@ -79,9 +69,7 @@ class CoverOffMessage2(Message):
         self.set_no_rtr()
 
     def data_to_binary(self):
-        """
-        :return: bytes
-        """
+        """:return: bytes"""
         if self.channel == 0x01:
             tmp = 0x03
         else:
