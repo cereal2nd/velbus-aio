@@ -32,7 +32,7 @@ class Property:
         """Representation of this property."""
         items = []
         for k, v in self.__dict__.items():
-            if k not in ["_module", "_class"]:
+            if k not in ["_module", "_class", "_on_status_update"]:
                 items.append(f"{k} = {v!r}")
         return "{}[{}]".format(type(self), ", ".join(items))
 
