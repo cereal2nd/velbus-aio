@@ -85,7 +85,10 @@ class Property:
 class PSUPower(Property):
     """PSU Power property."""
 
-    _cur: float = 0
+    def __init__(self, module: Module, name: str):
+        """Initialize PSU power property with per-instance current value."""
+        super().__init__(module, name)
+        self._cur: float = 0.0
 
     def get_state(self) -> float:
         """Return the current state of the PSU power."""
