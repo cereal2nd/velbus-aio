@@ -44,14 +44,14 @@ class Property:
         """Get the category of this property.
 
         default is 'sensor'.
-        override in subclass if needed
+        Override in subclass if needed.
         """
         return ["sensor"]
 
     def get_sensor_type(self) -> str:
         """Get the sensor type of this property.
 
-        override in subclass if needed
+        Override in subclass if needed.
         """
         return type(self).__name__
 
