@@ -76,15 +76,17 @@
     "18": {
       "Name": "Alarm 4",
       "Type": "ThermostatChannel"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",
   "Memory": {
     "ModuleName": "03BC-03FB"
+  },
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    }
   }
 }

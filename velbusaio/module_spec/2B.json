@@ -31,10 +31,6 @@
     "96": {
       "Name": "SelectedProgram",
       "Type": "SelectedProgram"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Info": "Ceiling PIR detector module",
@@ -235,5 +231,11 @@
     },
     "ModuleName": "00B0-00EF"
   },
-  "Type": "VMBPIRC"
+  "Type": "VMBPIRC",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    }
+  }
 }

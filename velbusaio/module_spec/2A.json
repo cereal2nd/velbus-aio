@@ -27,14 +27,6 @@
     "07": {
       "Name": "Absence output",
       "Type": "Sensor"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Info": "Mini PIR detector module",
@@ -235,5 +227,11 @@
     },
     "ModuleName": "00B0-00EF"
   },
-  "Type": "VMBPIRM"
+  "Type": "VMBPIRM",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    }
+  }
 }

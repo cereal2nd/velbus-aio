@@ -35,8 +35,9 @@ from velbusaio.channels import (
 )
 from velbusaio.channels import Temperature as TemperatureChannelType
 from velbusaio.command_registry import commandRegistry
+from velbusaio import properties as properties_module
+from velbusaio import channels as channels_module
 from velbusaio.const import (
-    CHANNEL_LIGHT_VALUE,
     CHANNEL_MEMO_TEXT,
     CHANNEL_SELECTED_PROGRAM,
     PRIORITY_LOW,
@@ -107,6 +108,7 @@ from velbusaio.messages.slider_status import SliderStatusMessage
 from velbusaio.messages.slow_blinking_led import SlowBlinkingLedMessage
 from velbusaio.messages.temp_sensor_status import TempSensorStatusMessage
 from velbusaio.messages.update_led_status import UpdateLedStatusMessage
+from velbusaio.properties import Property
 
 
 class Module:
@@ -168,7 +170,8 @@ class Module:
         self._is_loading = False
         self._got_status = asyncio.Event()
         self._got_status.clear()
-        self._channels = {}
+        self._channels: dict[int, Channel] = {}
+        self._properties: dict[str, Property] = {}
         self.loaded = False
         self._use_cache = True
         self._loaded_cache = {}
@@ -252,17 +255,19 @@ class Module:
         self.__dict__ = state
 
     def __repr__(self) -> str:
-        return f"<{self._name} type:{self._type} address:{self._address} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels}>"
+        return f"<{self._name} type:{self._type} address:{self._address} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels} properties: {self._properties}>"
 
     def __str__(self) -> str:
         return self.__repr__()
 
     def to_cache(self) -> dict:
-        d = {"name": self._name, "channels": {}, "sub_addresses": {}}
+        d = {"name": self._name, "channels": {}, "sub_addresses": {}, "properties": {}}
         for num, chan in self._channels.items():
             d["channels"][num] = chan.to_cache()
         for num, address in self._sub_address.items():
             d["sub_addresses"][num] = address
+        for num, prop in self._properties.items():
+            d["properties"][num] = prop.to_cache()
         return d
 
     def get_address(self) -> int:
@@ -488,9 +493,7 @@ class Module:
                 },
             )
         elif isinstance(message, ModuleStatusPirMessage):
-            await self._update_channel(
-                CHANNEL_LIGHT_VALUE, {"cur": message.light_value}
-            )
+            await self._update_property("light_value", {"cur": message.light_value})
             await self._update_channel(1, {"closed": message.dark})
             await self._update_channel(2, {"closed": message.light})
             await self._update_channel(3, {"closed": message.motion1})
@@ -507,9 +510,7 @@ class Module:
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, ModuleStatusGP4PirMessage):
-            await self._update_channel(
-                CHANNEL_LIGHT_VALUE, {"cur": message.light_value}
-            )
+            await self._update_property("light_value", {"cur": message.light_value})
             for channel_id in range(1, 9):
                 channel = self._translate_channel_name(channel_id + _channel_offset)
                 await self._update_channel(
@@ -601,20 +602,33 @@ class Module:
                 f"channel {channel} does not exist for module @ address {self}"
             )
 
+    async def _update_property(self, property_name: str, updates: dict):
+        try:
+            await self._properties[property_name].update(updates)
+        except KeyError:
+            self._log.info(
+                f"property {property_name} does not exist for module @ address {self}"
+            )
+
     def get_channels(self) -> dict:
-        """List all channels for this module"""
+        """List all channels for this module."""
         return self._channels
 
+    def get_properties(self) -> dict:
+        """List all properties for this module."""
+        return self._properties
+
     async def load_from_vlp(self, vlp_data: dict) -> None:
+        self._is_loading = True
+        self._use_cache = False
         self._name = vlp_data.get_name()
         self._data["Channels"] = vlp_data.get_channels()
-        self._use_cache = False
-        self._is_loading = False
-        self.loaded = True
         await self._load_default_channels()
-        # TODO set all channels to _is_loaded = True
+        await self._load_properties()
         for chan in self._channels.values():
             chan._is_loaded = True
+        self.loaded = True
+        self._is_loading = False
         await self._request_module_status()
 
     async def load(self, from_cache: bool = False) -> None:
@@ -625,6 +639,7 @@ class Module:
         self._loaded_cache = cache
         # load default channels
         await self._load_default_channels()
+        await self._load_properties()
 
         # load the data from memory ( the stuff that we need)
         if "name" in cache and cache["name"] != "":
@@ -824,6 +839,20 @@ class Module:
                     msg.low_address = addr[1]
                     await self._writer(msg)
 
+    async def _load_properties(self) -> None:
+        """Method for per module type loading of properties."""
+        if "Properties" not in self._data:
+            return
+
+        for prop, prop_data in self._data["Properties"].items():
+            if "Type" not in prop_data:
+                continue
+            cls = getattr(properties_module, prop_data["Type"])
+            self._properties[prop] = cls(
+                module=self,
+                name=prop,
+            )
+
     async def _load_default_channels(self) -> None:
         if "Channels" not in self._data:
             return
@@ -835,7 +864,7 @@ class Module:
                 edit = False
             if "Subdevice" not in chan_data or chan_data["Subdevice"] != "yes":
                 sub = False
-            cls = getattr(sys.modules[__name__], chan_data["Type"])
+            cls = getattr(channels_module, chan_data["Type"])
             self._channels[int(chan)] = cls(
                 module=self,
                 num=int(chan),
