@@ -70,11 +70,14 @@ class Property:
 
     async def update(self, data: dict) -> None:
         """Set the attributes of this property."""
+        changed = False
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
             if cur_val is None or cur_val != new_val:
                 setattr(self, f"_{key}", new_val)
-                await self.status_update()
+                changed = True
+        if changed:
+            await self.status_update()
 
     async def status_update(self) -> None:
         """Call all registered status update methods."""
