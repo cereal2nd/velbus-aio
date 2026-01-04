@@ -117,3 +117,12 @@ class SelectedProgram(Property):
 
 class LightValue(Property):
     """Light value property."""
+
+    def __init__(self, module: Module, name: str):
+        """Initialize light value property with per-instance current value."""
+        super().__init__(module, name)
+        self._cur: float = 0.0
+
+    def get_state(self) -> float:
+        """Return the current light sensor value."""
+        return round(self._cur, 2)
