@@ -608,23 +608,24 @@ class Module:
             )
 
     def get_channels(self) -> dict:
-        """List all channels for this module"""
+        """List all channels for this module."""
         return self._channels
 
     def get_properties(self) -> dict:
-        """List all properties for this module"""
+        """List all properties for this module."""
         return self._properties
 
     async def load_from_vlp(self, vlp_data: dict) -> None:
+        self._is_loading = True
+        self._use_cache = False
         self._name = vlp_data.get_name()
         self._data["Channels"] = vlp_data.get_channels()
-        self._use_cache = False
-        self._is_loading = False
-        self.loaded = True
         await self._load_default_channels()
         await self._load_properties()
         for chan in self._channels.values():
             chan._is_loaded = True
+        self.loaded = True
+        self._is_loading = False
         await self._request_module_status()
 
     async def load(self, from_cache: bool = False) -> None:

@@ -40,13 +40,13 @@ class Property:
         """String representation of this property."""
         return self.__repr__()
 
-    def get_category(self) -> str:
+    def get_categories(self) -> list[str]:
         """Get the category of this property.
 
         default is 'sensor'.
         override in subclass if needed
         """
-        return "sensor"
+        return ["sensor"]
 
     def get_sensor_type(self) -> str:
         """Get the sensor type of this property.
@@ -55,8 +55,21 @@ class Property:
         """
         return type(self).__name__
 
+    def to_cache(self) -> dict:
+        """Return a cacheable representation of this property.
+
+        By default, all instance attributes except internal references
+        like the parent module and callbacks are included.
+        """
+        data: dict = {}
+        for key, value in self.__dict__.items():
+            if key in ("_module", "_on_status_update"):
+                continue
+            data[key] = value
+        return data
+
     async def update(self, data: dict) -> None:
-        """Set the attributes of this channel."""
+        """Set the attributes of this property."""
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
             if cur_val is None or cur_val != new_val:
@@ -75,7 +88,7 @@ class PSUPower(Property):
     _cur: float = 0
 
     def get_state(self) -> float:
-        """Return the current state of the temperature sensor."""
+        """Return the current state of the PSU power."""
         return round(self._cur, 2)
 
 
