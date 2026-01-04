@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import itertools
 import logging
 import pathlib
 import re
@@ -130,7 +131,6 @@ class Velbus:
                 continue
             self._submodules.append(sub_addr)
             module._sub_address[sub_num] = sub_addr
-            self._modules[sub_addr] = module
         module.cleanupSubChannels()
 
     def addr_is_submodule(self, addr: int) -> bool:
@@ -327,7 +327,9 @@ class Velbus:
             chan
             for addr, mod in (self.get_modules()).items()
             if addr not in self._submodules
-            for chan in (mod.get_channels()).values()
+            for chan in itertools.chain(
+                (mod.get_channels()).values(), (mod.get_properties()).values()
+            )
             if class_name in chan.get_categories()
         ]
 
