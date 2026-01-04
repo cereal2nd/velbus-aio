@@ -847,7 +847,17 @@ class Module:
         for prop, prop_data in self._data["Properties"].items():
             if "Type" not in prop_data:
                 continue
-            cls = getattr(properties_module, prop_data["Type"])
+            prop_type = prop_data["Type"]
+            try:
+                cls = getattr(properties_module, prop_type)
+            except AttributeError:
+                logging.error(
+                    "Unknown property type '%s' for property '%s' on module address %s",
+                    prop_type,
+                    prop,
+                    getattr(self, "_address", "unknown"),
+                )
+                continue
             self._properties[prop] = cls(
                 module=self,
                 name=prop,
