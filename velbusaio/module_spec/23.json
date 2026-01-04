@@ -48,10 +48,6 @@
     "96": {
       "Name": "SelectedProgram",
       "Type": "SelectedProgram"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Memory": {
@@ -125,5 +121,11 @@
   },
   "TemperatureChannel": "09",
   "Info": "Outdoor PIR detector module",
-  "Type": "VMBPIRO-10"
+  "Type": "VMBPIRO-10",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    }
+  }
 }

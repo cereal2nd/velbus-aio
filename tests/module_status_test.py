@@ -9,7 +9,6 @@ import pytest
 
 from velbusaio.channels import Channel, LightSensor, SelectedProgram
 from velbusaio.const import (
-    CHANNEL_LIGHT_VALUE,
     CHANNEL_SELECTED_PROGRAM,
     NO_RTR,
     PRIORITY_LOW,
@@ -62,7 +61,7 @@ async def test_module_status_selected_program(module_type):
     # load the module with dummy channels
     for chan in range(1, 9):
         m._channels[chan] = Channel(None, None, None, False, False, None, None)
-    m._channels[CHANNEL_LIGHT_VALUE] = LightSensor(
+    m._properties["light_value"] = LightSensor(
         None, None, None, False, False, None, None
     )
     m._channels[CHANNEL_SELECTED_PROGRAM] = SelectedProgram(
@@ -109,4 +108,4 @@ async def test_module_status_selected_program(module_type):
             [0x00, databyte1, databyte2, 0x00, 0x00, 0x00, 0x00],
         )
         await m.on_message(msg)
-        assert m._channels[CHANNEL_LIGHT_VALUE].get_state() == light_value
+        assert m._properties["light_value"].get_state() == light_value

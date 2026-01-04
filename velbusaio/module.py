@@ -38,7 +38,6 @@ from velbusaio.command_registry import commandRegistry
 from velbusaio import properties as properties_module
 from velbusaio import channels as channels_module
 from velbusaio.const import (
-    CHANNEL_LIGHT_VALUE,
     CHANNEL_MEMO_TEXT,
     CHANNEL_SELECTED_PROGRAM,
     PRIORITY_LOW,
@@ -494,9 +493,7 @@ class Module:
                 },
             )
         elif isinstance(message, ModuleStatusPirMessage):
-            await self._update_channel(
-                CHANNEL_LIGHT_VALUE, {"cur": message.light_value}
-            )
+            await self._update_property("light_value", {"cur": message.light_value})
             await self._update_channel(1, {"closed": message.dark})
             await self._update_channel(2, {"closed": message.light})
             await self._update_channel(3, {"closed": message.motion1})
@@ -513,9 +510,7 @@ class Module:
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, ModuleStatusGP4PirMessage):
-            await self._update_channel(
-                CHANNEL_LIGHT_VALUE, {"cur": message.light_value}
-            )
+            await self._update_property("light_value", {"cur": message.light_value})
             for channel_id in range(1, 9):
                 channel = self._translate_channel_name(channel_id + _channel_offset)
                 await self._update_channel(
@@ -605,6 +600,14 @@ class Module:
         except KeyError:
             self._log.info(
                 f"channel {channel} does not exist for module @ address {self}"
+            )
+
+    async def _update_property(self, property_name: str, updates: dict):
+        try:
+            await self._properties[property_name].update(updates)
+        except KeyError:
+            self._log.info(
+                f"property {property_name} does not exist for module @ address {self}"
             )
 
     def get_channels(self) -> dict:
