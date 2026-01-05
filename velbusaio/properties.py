@@ -5,6 +5,7 @@ author: Maikel Punie <maikel.punie@gmail.com>
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -22,11 +23,15 @@ class Property:
         """Initialize the property."""
         self._module = module
         self._name = name
-        self._on_status_update = []
+        self._on_status_update: list[Callable[[], Awaitable[None]]] = []
 
     def get_module(self) -> Module:
         """Get the module this property belongs to."""
         return self._module
+
+    def get_name(self) -> str:
+        """Return the channel name."""
+        return self._name
 
     def __repr__(self) -> str:
         """Representation of this property."""
@@ -73,6 +78,7 @@ class Property:
         changed = False
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
+            print(f"Property {self._name}: updating {key} from {cur_val} to {new_val}")
             if cur_val is None or cur_val != new_val:
                 setattr(self, f"_{key}", new_val)
                 changed = True
@@ -83,6 +89,14 @@ class Property:
         """Call all registered status update methods."""
         for m in self._on_status_update:
             await m()
+
+    def on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Register a method to be called on status update."""
+        self._on_status_update.append(meth)
+
+    def remove_on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Remove a method from the status update callbacks."""
+        self._on_status_update.remove(meth)
 
 
 class PSUPower(Property):

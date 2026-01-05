@@ -614,7 +614,7 @@ class Module:
         """List all channels for this module."""
         return self._channels
 
-    def get_properties(self) -> dict:
+    def get_properties(self) -> dict[str, Property]:
         """List all properties for this module."""
         return self._properties
 
