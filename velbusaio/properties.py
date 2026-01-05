@@ -78,7 +78,6 @@ class Property:
         changed = False
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
-            print(f"Property {self._name}: updating {key} from {cur_val} to {new_val}")
             if cur_val is None or cur_val != new_val:
                 setattr(self, f"_{key}", new_val)
                 changed = True

@@ -99,6 +99,8 @@ from velbusaio.messages.module_status import (
 from velbusaio.messages.module_status_request import ModuleStatusRequestMessage
 from velbusaio.messages.module_type_request import ModuleTypeRequestMessage
 from velbusaio.messages.push_button_status import PushButtonStatusMessage
+from velbusaio.messages.psu_load import PsuLoadMessage
+from velbusaio.messages.psu_values import PsuValuesMessage
 from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
 from velbusaio.messages.relay_status import RelayStatusMessage, RelayStatusMessage2
@@ -591,7 +593,19 @@ class Module:
             for offset, dim_value in enumerate(message.dim_values):
                 channel = message.channel + offset
                 await self._update_channel(channel, {"state": dim_value})
-        # notigy status
+        elif isinstance(message, PsuLoadMessage):
+            await self._update_property("psu_load_out", {"cur": message.out})
+            await self._update_property("psu_load_1", {"cur": message.load_1})
+            await self._update_property("psu_load_2", {"cur": message.load_2})
+        elif isinstance(message, PsuValuesMessage):
+            if message.channel == 3:
+                append = "out"
+            else:
+                append = f"{message.channel}"
+            await self._update_property(f"psu_power_{append}", {"cur": message.watt})
+            await self._update_property(f"psu_voltage_{append}", {"cur": message.volt})
+            await self._update_property(f"psu_current_{append}", {"cur": message.amp})
+        # notify status
         self._got_status.set()
 
     async def _update_channel(self, channel: int, updates: dict):
@@ -688,10 +702,10 @@ class Module:
         return cache
 
     def _load(self) -> None:
-        """Method for per module type loading"""
+        """Method for per module type loading."""
 
     def number_of_channels(self) -> int:
-        """Retrieve the number of available channels in this module
+        """Retrieve the number of available channels in this module.
 
         :return: int
         """
@@ -851,7 +865,7 @@ class Module:
             try:
                 cls = getattr(properties_module, prop_type)
             except AttributeError:
-                logging.error(
+                self._log.error(
                     "Unknown property type '%s' for property '%s' on module address %s",
                     prop_type,
                     prop,
@@ -874,7 +888,18 @@ class Module:
                 edit = False
             if "Subdevice" not in chan_data or chan_data["Subdevice"] != "yes":
                 sub = False
-            cls = getattr(channels_module, chan_data["Type"])
+            chan_type = chan_data["Type"]
+            try:
+                cls = getattr(channels_module, chan_type)
+            except AttributeError:
+                self._log.error(
+                    "Unknown channel type '%s' for property '%s' on module address %s",
+                    chan_type,
+                    chan,
+                    getattr(self, "_address", "unknown"),
+                )
+                continue
+
             self._channels[int(chan)] = cls(
                 module=self,
                 num=int(chan),
