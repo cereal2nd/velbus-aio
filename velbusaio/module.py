@@ -311,15 +311,19 @@ class Module:
         return _channel_offset
 
     def on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Register a coroutine to be called on connect."""
         self._controller._add_on_connext_callback(meth)
 
     def remove_on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Remove a previously registered on connect coroutine."""
         self._controller._remove_on_connect_callback(meth)
 
     def on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Register a coroutine to be called on disconnect."""
         self._controller._add_on_disconnect_callback(meth)
 
     def remove_on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
+        """Remove a previously registered on disconnect coroutine."""
         self._controller._remove_on_disconnect_callback(meth)
 
     @property
@@ -328,7 +332,7 @@ class Module:
         return self._controller.connected
 
     async def on_message(self, message: Message) -> None:
-        """Process received message"""
+        """Process received message."""
         self._log.debug(f"RX: {message}")
         _channel_offset = self.calc_channel_offset(message.address)
 
@@ -832,7 +836,7 @@ class Module:
             await self._writer(msg)
 
     async def __load_memory(self) -> None:
-        """Request all needed memory addresses"""
+        """Request all needed memory addresses."""
         if "Memory" not in self._data:
             self._name = None
             return
@@ -919,8 +923,10 @@ class Module:
 
 
 class VmbDali(Module):
-    """DALI has a variable number of channels: the number of channels
-    depends on the number of DALI devices on the DALI bus
+    """DALI has a variable number of channels.
+
+    Therefore we create a module that first creates 64 placeholder channels.
+    After that it requests the DALI device settings to find out
     """
 
     def __init__(

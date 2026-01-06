@@ -11,6 +11,7 @@ import math
 import string
 from typing import TYPE_CHECKING, Any, Callable
 
+from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
     DEVICE_CLASS_ILLUMINANCE,
@@ -28,7 +29,7 @@ if TYPE_CHECKING:
     from velbusaio.module import Module
 
 
-class Channel:
+class Channel(BaseItem):
     """A velbus channel.
 
     This is the basic abstract class of a velbus channel
@@ -47,9 +48,8 @@ class Channel:
         address: int,
     ):
         """Initialize the channel."""
+        super().__init__(module, name)
         self._num = num
-        self._module = module
-        self._name = name
         self._subDevice = subDevice
         if not nameEditable:
             self._is_loaded = True
@@ -60,17 +60,11 @@ class Channel:
         self._on_status_update = []
         self._name_parts = {}
 
-    def get_module_type(self) -> int:
-        """Return module type."""
-        return self._module.get_type()
-
-    def get_module_type_name(self) -> str:
-        """Return module type name."""
-        return self._module.get_type_name()
-
-    def get_module_serial(self) -> str:
-        """Return module serial number."""
-        return self._module.get_serial()
+    def get_identifier(self) -> str:
+        """Return the identifier of the entity."""
+        if not self.is_sub_device():
+            return self.get_module_address()
+        return f"{self.get_module_address()}-{self.get_channel_number()}"
 
     def get_module_address(self, chan_type: str = "") -> int:
         """Return (sub)module address for channel."""
@@ -82,19 +76,9 @@ class Channel:
             return self._module.get_addresses()[1]
         return self._address
 
-    def get_module_sw_version(self) -> str:
-        """Return module software version."""
-        return self._module.get_sw_version()
-
     def get_channel_number(self) -> int:
         """Return channel number."""
         return self._num
-
-    def get_full_name(self) -> str:
-        """Return full channel name including module name and type."""
-        if self._subDevice:
-            return f"{self._module.get_name()} ({self._module.get_type_name()}) - {self._name}"
-        return f"{self._module.get_name()} ({self._module.get_type_name()})"
 
     def is_loaded(self) -> bool:
         """Is this channel loaded."""
@@ -111,10 +95,6 @@ class Channel:
     def is_sub_device(self) -> bool:
         """Return if this channel is a subdevice."""
         return self._subDevice
-
-    def get_name(self) -> str:
-        """Return the channel name."""
-        return self._name
 
     def set_name_char(self, pos: int, char: int) -> None:
         """Set a char of the channel name."""
@@ -202,8 +182,10 @@ class Channel:
             await m()
 
     def get_categories(self) -> list[str]:
-        """Get the categories (mainly for home-assistant)."""
-        # COMPONENT_TYPES = ["switch", "sensor", "binary_sensor", "cover", "climate", "light"]
+        """Get the categories (mainly for home-assistant).
+
+        COMPONENT_TYPES = ["switch", "sensor", "binary_sensor", "cover", "climate", "light"]
+        """
         return []
 
     def on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
@@ -242,10 +224,6 @@ class Channel:
         """Return the sensor type."""
         return None
 
-    def is_connected(self) -> bool:
-        """Return if the module is connected."""
-        return self._module.is_connected
-
 
 class Blind(Channel):
     """A blind channel."""
@@ -283,7 +261,6 @@ class Blind(Channel):
         """Report if the blind is fully closed."""
         if self._position is None:
             return None
-        # else:
         return self._position == 100
 
     def is_open(self) -> bool | None:

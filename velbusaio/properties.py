@@ -5,45 +5,28 @@ author: Maikel Punie <maikel.punie@gmail.com>
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING
+
+from velbusaio.baseItem import BaseItem
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
 
 
-class Property:
+class Property(BaseItem):
     """Base class for module-level properties."""
 
-    def __init__(
-        self,
-        module: Module,
-        name: str,
-    ):
-        """Initialize the property."""
-        self._module = module
-        self._name = name
-        self._on_status_update: list[Callable[[], Awaitable[None]]] = []
+    def get_channel_number(self):
+        """Return the channel number of this property (always 0)."""
+        return 0
 
-    def get_module(self) -> Module:
-        """Get the module this property belongs to."""
-        return self._module
+    def get_identifier(self) -> str:
+        """Return the identifier of the entity."""
+        return self.get_module_address()
 
-    def get_name(self) -> str:
-        """Return the channel name."""
-        return self._name
-
-    def __repr__(self) -> str:
-        """Representation of this property."""
-        items = []
-        for k, v in self.__dict__.items():
-            if k not in ["_module", "_class", "_on_status_update"]:
-                items.append(f"{k} = {v!r}")
-        return "{}[{}]".format(type(self), ", ".join(items))
-
-    def __str__(self) -> str:
-        """String representation of this property."""
-        return self.__repr__()
+    def is_sub_device(self) -> bool:
+        """Return false, a property is never a subdevice."""
+        return False
 
     def get_categories(self) -> list[str]:
         """Get the category of this property.
@@ -59,43 +42,6 @@ class Property:
         Override in subclass if needed.
         """
         return type(self).__name__
-
-    def to_cache(self) -> dict:
-        """Return a cacheable representation of this property.
-
-        By default, all instance attributes except internal references
-        like the parent module and callbacks are included.
-        """
-        data: dict = {}
-        for key, value in self.__dict__.items():
-            if key in ("_module", "_on_status_update"):
-                continue
-            data[key] = value
-        return data
-
-    async def update(self, data: dict) -> None:
-        """Set the attributes of this property."""
-        changed = False
-        for key, new_val in data.items():
-            cur_val = getattr(self, f"_{key}", None)
-            if cur_val is None or cur_val != new_val:
-                setattr(self, f"_{key}", new_val)
-                changed = True
-        if changed:
-            await self.status_update()
-
-    async def status_update(self) -> None:
-        """Call all registered status update methods."""
-        for m in self._on_status_update:
-            await m()
-
-    def on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
-        """Register a method to be called on status update."""
-        self._on_status_update.append(meth)
-
-    def remove_on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
-        """Remove a method from the status update callbacks."""
-        self._on_status_update.remove(meth)
 
 
 class PSUPower(Property):
