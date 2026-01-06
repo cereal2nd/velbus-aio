@@ -39,10 +39,6 @@
       "Editable": "yes",
       "Name": "Push button 8",
       "Type": "Button"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Push button interface module",
@@ -125,5 +121,11 @@
       "08": "0700-070F"
     }
   },
-  "Type": "VMB8PBU"
+  "Type": "VMB8PBU",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

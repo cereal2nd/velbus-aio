@@ -8,6 +8,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from velbusaio.baseItem import BaseItem
+from velbusaio.command_registry import commandRegistry
+from velbusaio.messages.module_status import PROGRAM_SELECTION
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
@@ -47,9 +49,9 @@ class Property(BaseItem):
 class PSUPower(Property):
     """PSU Power property."""
 
-    def __init__(self, module: Module, name: str):
+    def __init__(self, module: Module, name: str, writer: callable[[object], object]):
         """Initialize PSU power property with per-instance current value."""
-        super().__init__(module, name)
+        super().__init__(module, name, writer)
         self._cur: float = 0.0
 
     def get_state(self) -> float:
@@ -72,17 +74,63 @@ class PSULoad(PSUPower):
 class MemoText(Property):
     """Memo text property."""
 
+    def get_categories(self):
+        """The MemoText property has no categories."""
+        return []
+
+    async def set(self, txt: str) -> None:
+        """Set the memo text."""
+        cls = commandRegistry.get_command(0xAC, self._module.get_type())
+        msg = cls(self.get_module_address())
+        msgcntr = 0
+        for char in txt:
+            msg.memo_text += char
+            if len(msg.memo_text) >= 5:
+                msgcntr += 5
+                await self._writer(msg)
+                msg = cls(self.get_module_address())
+                msg.start = msgcntr
+        await self._writer(msg)
+
 
 class SelectedProgram(Property):
-    """Selected program property."""
+    """A selected program property."""
+
+    _selected_program_str = None
+
+    def get_categories(self) -> list[str]:
+        """Return the categories for this property."""
+        return ["select"]
+
+    def get_class(self) -> None:
+        """Return the device class for this property."""
+        return
+
+    def get_options(self) -> list:
+        """Return the available program options for this property."""
+        return list(PROGRAM_SELECTION.values())
+
+    def get_selected_program(self) -> str:
+        """Return the currently selected program."""
+        return self._selected_program_str
+
+    async def set_selected_program(self, program_str: str) -> None:
+        """Set the currently selected program."""
+        self._selected_program_str = program_str
+        command_code = 0xB3
+        cls = commandRegistry.get_command(command_code, self._module.get_type())
+        index = list(PROGRAM_SELECTION.values()).index(program_str)
+        program = list(PROGRAM_SELECTION.keys())[index]
+        msg = cls(self.get_module_address(), program)
+        await self._writer(msg)
 
 
 class LightValue(Property):
     """Light value property."""
 
-    def __init__(self, module: Module, name: str):
+    def __init__(self, module: Module, name: str, writer: callable[[object], object]):
         """Initialize light value property with per-instance current value."""
-        super().__init__(module, name)
+        super().__init__(module, name, writer)
         self._cur: float = 0.0
 
     def get_state(self) -> float:

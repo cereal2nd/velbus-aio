@@ -39,10 +39,6 @@
       "Editable": "yes",
       "Name": "Virtual button",
       "Type": "Button"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Push button module for 1 or 2 NIKO push buttons",
@@ -125,5 +121,11 @@
       "08": "0070-007F"
     }
   },
-  "Type": "VMB2PBN"
+  "Type": "VMB2PBN",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

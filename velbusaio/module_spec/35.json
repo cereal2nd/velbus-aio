@@ -87,14 +87,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "97": {
-      "Name": "Edge Lit",
-      "Type": "EdgeLit"
     }
   },
   "Info": "VMBEL2-20 VMBEL4",
@@ -309,5 +301,11 @@
   },
   "TemperatureChannel": "09",
   "ThermostatAddr": "0",
-  "Type": "VMBEL2"
+  "Type": "VMBEL2",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

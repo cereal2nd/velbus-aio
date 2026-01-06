@@ -24,10 +24,6 @@
       "Name": "Dimmer 4",
       "Type": "Dimmer",
       "Subdevice": "yes"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Memory": {
@@ -106,5 +102,11 @@
     }
   },
   "Info": "4 channel led PWM dimmer module",
-  "Type": "VMB4LEDPWM-20"
+  "Type": "VMB4LEDPWM-20",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

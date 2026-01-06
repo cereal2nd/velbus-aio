@@ -87,10 +87,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "97": {
-      "Name": "Edge Lit",
-      "Type": "EdgeLit"
     }
   },
   "TemperatureChannel": "09",

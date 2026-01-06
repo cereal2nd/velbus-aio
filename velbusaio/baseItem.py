@@ -9,6 +9,8 @@ from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, final
 
+from velbusaio.message import Message
+
 if TYPE_CHECKING:
     from velbusaio.module import Module
 
@@ -20,10 +22,12 @@ class BaseItem(ABC):
         self,
         module: Module,
         name: str,
+        writer: Callable[[Message], Awaitable[None]],
     ):
         """Initialize the property."""
         self._module = module
         self._name = name
+        self._writer = writer
         self._on_status_update: list[Callable[[], Awaitable[None]]] = []
 
     @final
@@ -78,7 +82,7 @@ class BaseItem(ABC):
         """Representation of this property."""
         items = []
         for k, v in self.__dict__.items():
-            if k not in ["_module", "_class", "_on_status_update"]:
+            if k not in ["_module", "_class", "_on_status_update", "_writer"]:
                 items.append(f"{k} = {v!r}")
         return "{}[{}]".format(type(self), ", ".join(items))
 
@@ -116,7 +120,7 @@ class BaseItem(ABC):
         """
         data: dict = {}
         for key, value in self.__dict__.items():
-            if key in ("_module", "_on_status_update"):
+            if key in ("_module", "_on_status_update", "_writer"):
                 continue
             data[key] = value
         return data

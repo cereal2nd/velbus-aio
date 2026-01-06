@@ -44,10 +44,6 @@
       "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Outdoor PIR detector module",
@@ -254,6 +250,10 @@
     "light_value": {
       "Type": "LightValue",
       "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

@@ -51,10 +51,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "TemperatureChannel": "9",
@@ -75,6 +71,10 @@
     "light_value": {
       "Type": "LightValue",
       "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

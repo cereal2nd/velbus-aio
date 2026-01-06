@@ -21,10 +21,7 @@ from velbusaio.channels import (
     ButtonCounter,
     Dimmer,
     EdgeLit,
-    LightSensor,
-    Memo,
     Relay,
-    SelectedProgram,
     Sensor,
     SensorNumber,
     Temperature,
@@ -39,6 +36,7 @@ from velbusaio.messages.set_date import SetDate
 from velbusaio.messages.set_daylight_saving import SetDaylightSaving
 from velbusaio.messages.set_realtime_clock import SetRealtimeClock
 from velbusaio.module import Module
+from velbusaio.properties import LightValue, SelectedProgram
 from velbusaio.protocol import VelbusProtocol
 from velbusaio.raw_message import RawMessage
 from velbusaio.vlp_reader import VlpFile
@@ -269,7 +267,7 @@ class Velbus:
 
     def get_all_sensor(
         self,
-    ) -> list[ButtonCounter | Temperature | LightSensor | SensorNumber]:
+    ) -> list[ButtonCounter | Temperature | LightValue | SensorNumber]:
         """Get all sensors."""
         return self._get_all("sensor")
 
@@ -316,10 +314,8 @@ class Velbus:
         | Dimmer
         | Temperature
         | SensorNumber
-        | LightSensor
         | Relay
         | EdgeLit
-        | Memo
         | SelectedProgram
     ]:
         """Get all channels."""

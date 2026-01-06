@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Any, Callable
 from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
-    DEVICE_CLASS_ILLUMINANCE,
     DEVICE_CLASS_TEMPERATURE,
     ENERGY_KILO_WATT_HOUR,
     TEMP_CELSIUS,
@@ -23,7 +22,6 @@ from velbusaio.const import (
 )
 from velbusaio.message import Message
 from velbusaio.messages.edge_set_color import CustomColorPriority, SetEdgeColorMessage
-from velbusaio.messages.module_status import PROGRAM_SELECTION
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
@@ -48,14 +46,13 @@ class Channel(BaseItem):
         address: int,
     ):
         """Initialize the channel."""
-        super().__init__(module, name)
+        super().__init__(module, name, writer)
         self._num = num
         self._subDevice = subDevice
         if not nameEditable:
             self._is_loaded = True
         else:
             self._is_loaded = False
-        self._writer = writer
         self._address = address
         self._on_status_update = []
         self._name_parts = {}
@@ -711,28 +708,6 @@ class SensorNumber(Channel):
         return self._sensor_type
 
 
-class LightSensor(Channel):
-    """A light sensor channel."""
-
-    _cur = 0
-
-    def get_categories(self) -> list[str]:
-        """Return the categories for this channel."""
-        return ["sensor"]
-
-    def get_class(self) -> str:
-        """Return the device class for this channel."""
-        return DEVICE_CLASS_ILLUMINANCE
-
-    def get_unit(self) -> None:
-        """Return the unit of measurement for this channel."""
-        return
-
-    def get_state(self) -> float:
-        """Return the current state of the light sensor."""
-        return round(self._cur, 2)
-
-
 class Relay(Channel):
     """A Relay channel."""
 
@@ -816,54 +791,4 @@ class EdgeLit(Channel):
         msg.apply_to_bottom_edge = bottom
         msg.apply_to_all_pages = True
         msg.custom_color_priority = priority
-        await self._writer(msg)
-
-
-class Memo(Channel):
-    """A Memo text."""
-
-    async def set(self, txt: str) -> None:
-        """Set the memo text."""
-        cls = commandRegistry.get_command(0xAC, self._module.get_type())
-        msg = cls(self._address)
-        msgcntr = 0
-        for char in txt:
-            msg.memo_text += char
-            if len(msg.memo_text) >= 5:
-                msgcntr += 5
-                await self._writer(msg)
-                msg = cls(self._address)
-                msg.start = msgcntr
-        await self._writer(msg)
-
-
-class SelectedProgram(Channel):
-    """A selected program channel."""
-
-    _selected_program_str = None
-
-    def get_categories(self) -> list[str]:
-        """Return the categories for this channel."""
-        return ["select"]
-
-    def get_class(self) -> None:
-        """Return the device class for this channel."""
-        return
-
-    def get_options(self) -> list:
-        """Return the available program options for this channel."""
-        return list(PROGRAM_SELECTION.values())
-
-    def get_selected_program(self) -> str:
-        """Return the currently selected program."""
-        return self._selected_program_str
-
-    async def set_selected_program(self, program_str: str) -> None:
-        """Set the currently selected program."""
-        self._selected_program_str = program_str
-        command_code = 0xB3
-        cls = commandRegistry.get_command(command_code, self._module.get_type())
-        index = list(PROGRAM_SELECTION.values()).index(program_str)
-        program = list(PROGRAM_SELECTION.keys())[index]
-        msg = cls(self._address, program)
         await self._writer(msg)

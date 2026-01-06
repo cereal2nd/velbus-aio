@@ -207,18 +207,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "97": {
-      "Name": "Edge Lit",
-      "Type": "EdgeLit"
-    },
-    "98": {
-      "Name": "Memo Text",
-      "Type": "Memo"
     }
   },
   "Info": "VMBELO Edge-lit touch panel with Oled",
@@ -329,5 +317,15 @@
   },
   "TemperatureChannel": "33",
   "ThermostatAddr": "3",
-  "Type": "VMBELO"
+  "Type": "VMBELO",
+  "Properties": {
+    "memo_text": {
+      "Type": "MemoText",
+      "Name": "Memo Text"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

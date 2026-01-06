@@ -205,14 +205,6 @@
     "42": {
       "Name": "Alarm 4",
       "Type": "ThermostatChannel"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "98": {
-      "Name": "Memo Text",
-      "Type": "Memo"
     }
   },
   "Info": "Touch panel with Oled display",
@@ -450,5 +442,15 @@
   },
   "TemperatureChannel": "34",
   "ThermostatAddr": "3",
-  "Type": "VMBGPOD"
+  "Type": "VMBGPOD",
+  "Properties": {
+    "memotext": {
+      "Type": "MemoText",
+      "Name": "Memo Text"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

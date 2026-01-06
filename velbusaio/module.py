@@ -18,28 +18,16 @@ if TYPE_CHECKING:
     from velbusaio.controller import Controller
 
 from velbusaio.channels import (
-    Blind,
     Button,
     ButtonCounter,
     Channel,
     Dimmer,
-    EdgeLit,
-    LightSensor,
-    Memo,
-    Relay,
-    SelectedProgram,
-    Sensor,
-    SensorNumber,
-    Temperature,
-    ThermostatChannel,
 )
 from velbusaio.channels import Temperature as TemperatureChannelType
 from velbusaio.command_registry import commandRegistry
 from velbusaio import properties as properties_module
 from velbusaio import channels as channels_module
 from velbusaio.const import (
-    CHANNEL_MEMO_TEXT,
-    CHANNEL_SELECTED_PROGRAM,
     PRIORITY_LOW,
     SCAN_MODULEINFO_TIMEOUT_INITIAL,
 )
@@ -482,8 +470,8 @@ class Module:
                 ):
                     await self._update_channel(channel, {"enabled": False})
             # self.selected_program_str = message.selected_program_str
-            await self._update_channel(
-                CHANNEL_SELECTED_PROGRAM,
+            await self._update_property(
+                "selected_program",
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, CounterStatusMessage) and isinstance(
@@ -511,8 +499,8 @@ class Module:
             if 8 in self._channels:
                 await self._update_channel(8, {"closed": message.high_temp_alarm})
             # self.selected_program_str = message.selected_program_str
-            await self._update_channel(
-                CHANNEL_SELECTED_PROGRAM,
+            await self._update_property(
+                "selected_program",
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, ModuleStatusGP4PirMessage):
@@ -528,8 +516,8 @@ class Module:
                         channel, {"enabled": channel_id in message.enabled}
                     )
             # self.selected_program_str = message.selected_program_str
-            await self._update_channel(
-                CHANNEL_SELECTED_PROGRAM,
+            await self._update_property(
+                "selected_program",
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, UpdateLedStatusMessage):
@@ -718,9 +706,9 @@ class Module:
         return max(self._channels.keys())
 
     async def set_memo_text(self, txt: str) -> None:
-        if CHANNEL_MEMO_TEXT not in self._channels.keys():
+        if "memo_text" not in self._properties.keys():
             return
-        await self._channels[CHANNEL_MEMO_TEXT].set(txt)
+        await self._properties["memo_text"].set(txt)
 
     async def _process_memory_data_message(self, message: MemoryDataMessage) -> None:
         addr = f"{message.high_address:02X}{message.low_address:02X}"
@@ -879,6 +867,7 @@ class Module:
             self._properties[prop] = cls(
                 module=self,
                 name=prop,
+                writer=self._writer,
             )
 
     async def _load_default_channels(self) -> None:

@@ -27,10 +27,6 @@
     "07": {
       "Name": "Absence output",
       "Type": "Sensor"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Ceiling PIR detector module",
@@ -236,6 +232,10 @@
     "light_value": {
       "Type": "LightValue",
       "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

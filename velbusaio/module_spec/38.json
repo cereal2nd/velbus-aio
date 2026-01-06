@@ -81,14 +81,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "97": {
-      "Name": "Edge Lit",
-      "Type": "EdgeLit"
     }
   },
   "Info": "Edge-lit Motion detector with one touch button module",
@@ -108,6 +100,10 @@
     "light_value": {
       "Type": "LightValue",
       "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

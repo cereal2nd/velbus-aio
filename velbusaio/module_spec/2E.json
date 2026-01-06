@@ -4,10 +4,6 @@
       "Editable": "yes",
       "Name": "Blind",
       "Type": "Blind"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "1 channel blind module",
@@ -211,5 +207,11 @@
       "01": "0000-000F"
     }
   },
-  "Type": "VMB1BLS"
+  "Type": "VMB1BLS",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

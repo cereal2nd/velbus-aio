@@ -79,10 +79,6 @@
       "Editable": "yes",
       "Name": "Sensor 4",
       "Type": "SensorNumber"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Analog I/O module",
@@ -381,5 +377,11 @@
       "12": "0614-0623"
     }
   },
-  "Type": "VMB4AN"
+  "Type": "VMB4AN",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }
