@@ -81,18 +81,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "97": {
-      "Name": "Edge Lit",
-      "Type": "EdgeLit"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Info": "Edge-lit Motion detector with one touch button module",
@@ -106,6 +94,16 @@
       "02": "0030-003F",
       "09": "0350-036F",
       "18": "0384-0393"
+    }
+  },
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

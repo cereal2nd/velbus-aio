@@ -207,14 +207,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "97": {
-      "Name": "Edge Lit",
-      "Type": "EdgeLit"
-    },
-    "98": {
-      "Name": "Memo Text",
-      "Type": "Memo"
     }
   },
   "Memory": {
@@ -452,5 +444,11 @@
   },
   "TemperatureChannel": "33",
   "ThermostatAddr": "3",
-  "Type": "VMBELO-20"
+  "Type": "VMBELO-20",
+  "Properties": {
+    "memo_text": {
+      "Type": "MemoText",
+      "Name": "Memo Text"
+    }
+  }
 }

@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Set Slow Blinking LED Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xF7
 
 @register(COMMAND_CODE)
 class SlowBlinkingLedMessage(Message):
-    """send by: VMB4RYLD
-    received by: VMB6IN
-    """
+    """Set Slow Blinking LED Message."""
 
     def __init__(self, address=None):
+        """Initialize Set Slow Blinking LED Message Object."""
         Message.__init__(self)
         self.leds = []
         self.set_defaults(address)

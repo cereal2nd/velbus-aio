@@ -1,4 +1,7 @@
-""":author: Danny De Gaspari"""
+"""Select Program Message.
+
+:author: Danny De Gaspari
+"""
 
 from __future__ import annotations
 
@@ -10,7 +13,10 @@ COMMAND_CODE = 0xB3
 
 @register(COMMAND_CODE)
 class SelectProgramMessage(Message):
+    """Select Program Message."""
+
     def __init__(self, address=None, program=0):
+        """Initialize Select Program Message Object."""
         Message.__init__(self)
         self.select_program = program
         self.set_defaults(address)

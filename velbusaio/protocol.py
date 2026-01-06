@@ -3,23 +3,16 @@
 from __future__ import annotations
 
 import asyncio
+from asyncio import transports
 import binascii
 import logging
 import time
 import typing as t
-from asyncio import transports
 
 import backoff
 
 from velbusaio.const import MAXIMUM_MESSAGE_SIZE, MINIMUM_MESSAGE_SIZE, SLEEP_TIME
-from velbusaio.raw_message import RawMessage
-from velbusaio.raw_message import create as create_message_info
-
-
-def _on_write_backoff(details):
-    logging.debug(
-        f"Transport is not open, waiting {details['wait']} seconds after {details['tries']}"
-    )
+from velbusaio.raw_message import RawMessage, create as create_message_info
 
 
 class VelbusProtocol(asyncio.BufferedProtocol):
@@ -34,6 +27,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         message_received_callback: t.Callable[[RawMessage], t.Awaitable[None]],
         connection_state_callback: t.Callable[[bool], None] | None = None,
     ) -> None:
+        """Initialize VelbusProtocol with callbacks."""
         super().__init__()
         self._log = logging.getLogger("velbus-protocol")
         self._message_received_callback = message_received_callback
@@ -97,7 +91,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         if self.transport:
             self.transport.close()
 
-    def connection_lost(self, exc: t.Optional[Exception]) -> None:
+    def connection_lost(self, exc: Exception | None) -> None:
         """Called when the Velbus connection is lost."""
         self.transport = None
 
@@ -109,7 +103,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
             self._log.error(f"Velbus connection lost: {exc!r}")
 
         self.transport = None
-        asyncio.ensure_future(self.pause_writing())
+        asyncio.ensure_future(self.pause_writing())  # noqa: RUF006
 
         # Notify callbacks that connection is lost
         self._notify_connection_state_callbacks(False)
@@ -144,7 +138,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
             )
 
             if msg is not None:
-                asyncio.ensure_future(self._process_message(msg))
+                asyncio.ensure_future(self._process_message(msg))  # noqa: RUF006
                 _recheck = True
             else:
                 _recheck = False
@@ -162,7 +156,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
             msg, remaining_data = create_message_info(self._buffer)
 
             if msg is not None:
-                asyncio.ensure_future(self._process_message(msg))
+                asyncio.ensure_future(self._process_message(msg))  # noqa: RUF006
 
             self._new_buffer(remaining_data)
 
@@ -218,7 +212,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
                 if not self._closing:
                     self._log.error(f"Stopping Velbus writer due to {exc!r}")
                 self._restart_writer = False
-            except Exception as exc:
+            except (OSError, RuntimeError) as exc:
                 self._log.error(f"Restarting Velbus writer due to {exc!r}")
                 self._restart_writer = True
         if self._write_transport_lock.locked():
@@ -245,7 +239,6 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         backoff.expo,
         lambda is_sent: not is_sent,
         max_tries=10,
-        on_backoff=_on_write_backoff,
     )
     async def _write_message(self, msg: RawMessage) -> bool:
         """Write a message to Velbus."""

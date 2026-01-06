@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Bus Off message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,9 +13,7 @@ COMMAND_CODE = 0x09
 
 @register(COMMAND_CODE)
 class BusOffMessage(Message):
-    """send by:
-    received by: VMB1USB
-    """
+    """Bus Off message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

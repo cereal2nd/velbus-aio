@@ -46,7 +46,6 @@ SCAN_MODULEINFO_TIMEOUT_INTERVAL: Final = (
     150  # time to wait for info interval (between next message)
 )
 
-DEVICE_CLASS_ILLUMINANCE: Final = "illuminance"
 DEVICE_CLASS_TEMPERATURE: Final = "temperature"
 TEMP_CELSIUS: Final = "°C"
 ENERGY_KILO_WATT_HOUR: Final = "kWh"
@@ -55,10 +54,5 @@ VOLUME_CUBIC_METER: Final = "m³"  # Not an official constant at HA yet
 VOLUME_CUBIC_METER_HOUR: Final = "m³/h"  # Not an official constant at HA yet
 VOLUME_LITERS: Final = "L"
 VOLUME_LITERS_HOUR: Final = "L/h"  # Not an official constant at HA yet
-
-CHANNEL_SELECTED_PROGRAM: Final = 96
-CHANNEL_EDGE_LIT: Final = 97
-CHANNEL_MEMO_TEXT: Final = 98
-CHANNEL_LIGHT_VALUE: Final = 99
 
 SLEEP_TIME = 60 / 1000

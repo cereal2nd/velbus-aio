@@ -51,10 +51,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "TemperatureChannel": "09",
@@ -265,6 +261,12 @@
       "08": "00A8-00B7",
       "09": "0398-03A7",
       "18": "03CC-03DB"
+    }
+  },
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

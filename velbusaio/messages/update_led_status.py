@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Update LED Status Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xF4
 
 @register(COMMAND_CODE)
 class UpdateLedStatusMessage(Message):
-    """send by:
-    received by: VMB6IN
-    """
+    """Update LED Status Message."""
 
     def __init__(self, address=None):
+        """Initialize UpdateLedStatusMessage instance."""
         Message.__init__(self)
         self.led_on = []
         self.led_slow_blinking = []

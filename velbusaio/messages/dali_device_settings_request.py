@@ -1,4 +1,7 @@
-""":author: Niels Laukens"""
+"""Dali Device Settings Request message.
+
+:author: Niels Laukens
+"""
 
 from __future__ import annotations
 
@@ -12,19 +15,18 @@ COMMAND_CODE = 0xE7
 
 
 class DataSource(enum.Enum):
+    """Data source enum."""
+
     FromMemory = 0
     FromDaliDevice = 1
 
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
 class DaliDeviceSettingsRequest(Message):
-    """send by:
-    received by: VMBDALI
-
-    Note: requesting a single setting for all (81) channels does not work (no response)
-    """
+    """Dali Device Settings Request message."""
 
     def __init__(self, address: int | None = None):
+        """Initialize Dali Device Settings Request message."""
         super().__init__()
         self.channel: int = None
         self.data_source: DataSource = None
@@ -32,6 +34,7 @@ class DaliDeviceSettingsRequest(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address: int, rtr: int, data: bytes) -> None:
+        """Populate message attributes."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 2)
@@ -44,6 +47,7 @@ class DaliDeviceSettingsRequest(Message):
             self.settings = None  # all
 
     def data_to_binary(self) -> bytes:
+        """Generate binary data for the message."""
         data = bytearray([COMMAND_CODE, self.channel, DataSource.FromMemory.value])
         if self.settings is not None:
             data.append(self.settings.value)

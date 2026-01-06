@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Module Type Request Message class.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -6,9 +9,7 @@ from velbusaio.message import Message
 
 
 class ModuleTypeRequestMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Module Type Request Message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -18,6 +19,7 @@ class ModuleTypeRequestMessage(Message):
         self.set_attributes(priority, address, rtr)
 
     def set_defaults(self, address):
+        """Set defaults."""
         if address is not None:
             self.set_address(address)
         self.set_low_priority()

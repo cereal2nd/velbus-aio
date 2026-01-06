@@ -28,10 +28,6 @@
     "07": {
       "Name": "Absence",
       "Type": "Sensor"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Memory": {
@@ -104,5 +100,11 @@
     "ModuleName": "03BC-03FB"
   },
   "Info": "Mini PIR detector module",
-  "Type": "VMBPIR-20"
+  "Type": "VMBPIR-20",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    }
+  }
 }

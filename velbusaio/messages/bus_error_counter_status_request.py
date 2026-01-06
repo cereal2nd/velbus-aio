@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Bus Error Counter Status Request message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,9 +13,7 @@ COMMAND_CODE = 0xD9
 
 @register(COMMAND_CODE)
 class BusErrorStatusRequestMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Bus Error Counter Status Request message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

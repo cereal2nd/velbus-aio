@@ -7,13 +7,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from velbusaio.channels import Channel, LightSensor, SelectedProgram
-from velbusaio.const import (
-    CHANNEL_LIGHT_VALUE,
-    CHANNEL_SELECTED_PROGRAM,
-    NO_RTR,
-    PRIORITY_LOW,
-)
+from velbusaio.channels import Channel
+from velbusaio.const import NO_RTR, PRIORITY_LOW
 from velbusaio.controller import Velbus
 from velbusaio.helpers import get_cache_dir
 from velbusaio.messages.module_status import (
@@ -23,6 +18,7 @@ from velbusaio.messages.module_status import (
     ModuleStatusPirMessage,
 )
 from velbusaio.module import Module
+from velbusaio.properties import LightValue, SelectedProgram
 
 # some modules to test
 VMBGP4 = 0x20
@@ -62,12 +58,8 @@ async def test_module_status_selected_program(module_type):
     # load the module with dummy channels
     for chan in range(1, 9):
         m._channels[chan] = Channel(None, None, None, False, False, None, None)
-    m._channels[CHANNEL_LIGHT_VALUE] = LightSensor(
-        None, None, None, False, False, None, None
-    )
-    m._channels[CHANNEL_SELECTED_PROGRAM] = SelectedProgram(
-        m, None, None, False, False, velbus.send, None
-    )
+    m._properties["light_value"] = LightValue(m, "Light", velbus.send)
+    m._properties["selected_program"] = SelectedProgram(m, "program", velbus.send)
 
     messages_to_test = [
         ModuleStatusMessage2,
@@ -85,12 +77,12 @@ async def test_module_status_selected_program(module_type):
             msg.selected_program_str = PROGRAM_SELECTION[program]
             await m.on_message(msg)
             assert (
-                m._channels[CHANNEL_SELECTED_PROGRAM].get_selected_program()
+                m._properties["selected_program"].get_selected_program()
                 == PROGRAM_SELECTION[program]
             )
 
             # Send the select_program message and check if the binary data is ok
-            await m._channels[CHANNEL_SELECTED_PROGRAM].set_selected_program(
+            await m._properties["selected_program"].set_selected_program(
                 PROGRAM_SELECTION[program]
             )
             msg_info = await velbus._protocol._send_queue.get()
@@ -109,4 +101,4 @@ async def test_module_status_selected_program(module_type):
             [0x00, databyte1, databyte2, 0x00, 0x00, 0x00, 0x00],
         )
         await m.on_message(msg)
-        assert m._channels[CHANNEL_LIGHT_VALUE].get_state() == light_value
+        assert m._properties["light_value"].get_state() == light_value

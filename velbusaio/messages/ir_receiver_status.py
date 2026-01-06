@@ -1,4 +1,7 @@
-""":author: David Danssaert <david.danssaert@gmail.com>"""
+"""IR Receiver Status message class.
+
+:author: David Danssaert <david.danssaert@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,6 +13,4 @@ COMMAND_CODE = 0xEB
 
 @register(COMMAND_CODE, ["VMB8IR"])
 class IRReceiverStatusMessage(ModuleStatusMessage):
-    """send by: VMB8IR
-    received by:
-    """
+    """IR Receiver Status message."""

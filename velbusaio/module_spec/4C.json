@@ -39,10 +39,6 @@
       "Editable": "yes",
       "Name": "Virtual button 2",
       "Type": "Button"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "6 button interface module",
@@ -125,5 +121,11 @@
       "08": "008C-009B"
     }
   },
-  "Type": "VMB6PB-20"
+  "Type": "VMB6PB-20",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

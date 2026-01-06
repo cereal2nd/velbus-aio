@@ -6,14 +6,14 @@ author: Maikel Punie <maikel.punie@gmail.com>
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
 import math
 import string
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
+from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
-    DEVICE_CLASS_ILLUMINANCE,
     DEVICE_CLASS_TEMPERATURE,
     ENERGY_KILO_WATT_HOUR,
     TEMP_CELSIUS,
@@ -22,13 +22,12 @@ from velbusaio.const import (
 )
 from velbusaio.message import Message
 from velbusaio.messages.edge_set_color import CustomColorPriority, SetEdgeColorMessage
-from velbusaio.messages.module_status import PROGRAM_SELECTION
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
 
 
-class Channel:
+class Channel(BaseItem):
     """A velbus channel.
 
     This is the basic abstract class of a velbus channel
@@ -47,30 +46,21 @@ class Channel:
         address: int,
     ):
         """Initialize the channel."""
+        super().__init__(module, name, writer)
         self._num = num
-        self._module = module
-        self._name = name
         self._subDevice = subDevice
         if not nameEditable:
             self._is_loaded = True
         else:
             self._is_loaded = False
-        self._writer = writer
         self._address = address
-        self._on_status_update = []
         self._name_parts = {}
 
-    def get_module_type(self) -> int:
-        """Return module type."""
-        return self._module.get_type()
-
-    def get_module_type_name(self) -> str:
-        """Return module type name."""
-        return self._module.get_type_name()
-
-    def get_module_serial(self) -> str:
-        """Return module serial number."""
-        return self._module.get_serial()
+    def get_identifier(self) -> str:
+        """Return the identifier of the entity."""
+        if not self.is_sub_device():
+            return str(self.get_module_address())
+        return f"{self.get_module_address()}-{self.get_channel_number()}"
 
     def get_module_address(self, chan_type: str = "") -> int:
         """Return (sub)module address for channel."""
@@ -82,19 +72,13 @@ class Channel:
             return self._module.get_addresses()[1]
         return self._address
 
-    def get_module_sw_version(self) -> str:
-        """Return module software version."""
-        return self._module.get_sw_version()
-
     def get_channel_number(self) -> int:
         """Return channel number."""
         return self._num
 
-    def get_full_name(self) -> str:
-        """Return full channel name including module name and type."""
-        if self._subDevice:
-            return f"{self._module.get_name()} ({self._module.get_type_name()}) - {self._name}"
-        return f"{self._module.get_name()} ({self._module.get_type_name()})"
+    def set_loaded(self, loaded: bool) -> None:
+        """Set if this channel is loaded."""
+        self._is_loaded = loaded
 
     def is_loaded(self) -> bool:
         """Is this channel loaded."""
@@ -108,13 +92,13 @@ class Channel:
         """Return if this channel is a temperature sensor."""
         return False
 
+    def set_sub_device(self, sub_device: bool) -> None:
+        """Set if this channel is a subdevice."""
+        self._subDevice = sub_device
+
     def is_sub_device(self) -> bool:
         """Return if this channel is a subdevice."""
         return self._subDevice
-
-    def get_name(self) -> str:
-        """Return the channel name."""
-        return self._name
 
     def set_name_char(self, pos: int, char: int) -> None:
         """Set a char of the channel name."""
@@ -202,8 +186,10 @@ class Channel:
             await m()
 
     def get_categories(self) -> list[str]:
-        """Get the categories (mainly for home-assistant)."""
-        # COMPONENT_TYPES = ["switch", "sensor", "binary_sensor", "cover", "climate", "light"]
+        """Get the categories (mainly for home-assistant).
+
+        COMPONENT_TYPES = ["switch", "sensor", "binary_sensor", "cover", "climate", "light"]
+        """
         return []
 
     def on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
@@ -242,10 +228,6 @@ class Channel:
         """Return the sensor type."""
         return None
 
-    def is_connected(self) -> bool:
-        """Return if the module is connected."""
-        return self._module.is_connected
-
 
 class Blind(Channel):
     """A blind channel."""
@@ -283,7 +265,6 @@ class Blind(Channel):
         """Report if the blind is fully closed."""
         if self._position is None:
             return None
-        # else:
         return self._position == 100
 
     def is_open(self) -> bool | None:
@@ -456,6 +437,10 @@ class ButtonCounter(Button):
         if self._Unit == ENERGY_KILO_WATT_HOUR:
             return "W"
         return None
+
+    def set_unit(self, unit: str) -> None:
+        """Set the unit of the counter."""
+        self._Unit = unit
 
     def get_counter_state(self) -> int:
         """Return the current state of the counter."""
@@ -734,28 +719,6 @@ class SensorNumber(Channel):
         return self._sensor_type
 
 
-class LightSensor(Channel):
-    """A light sensor channel."""
-
-    _cur = 0
-
-    def get_categories(self) -> list[str]:
-        """Return the categories for this channel."""
-        return ["sensor"]
-
-    def get_class(self) -> str:
-        """Return the device class for this channel."""
-        return DEVICE_CLASS_ILLUMINANCE
-
-    def get_unit(self) -> None:
-        """Return the unit of measurement for this channel."""
-        return
-
-    def get_state(self) -> float:
-        """Return the current state of the light sensor."""
-        return round(self._cur, 2)
-
-
 class Relay(Channel):
     """A Relay channel."""
 
@@ -839,54 +802,4 @@ class EdgeLit(Channel):
         msg.apply_to_bottom_edge = bottom
         msg.apply_to_all_pages = True
         msg.custom_color_priority = priority
-        await self._writer(msg)
-
-
-class Memo(Channel):
-    """A Memo text."""
-
-    async def set(self, txt: str) -> None:
-        """Set the memo text."""
-        cls = commandRegistry.get_command(0xAC, self._module.get_type())
-        msg = cls(self._address)
-        msgcntr = 0
-        for char in txt:
-            msg.memo_text += char
-            if len(msg.memo_text) >= 5:
-                msgcntr += 5
-                await self._writer(msg)
-                msg = cls(self._address)
-                msg.start = msgcntr
-        await self._writer(msg)
-
-
-class SelectedProgram(Channel):
-    """A selected program channel."""
-
-    _selected_program_str = None
-
-    def get_categories(self) -> list[str]:
-        """Return the categories for this channel."""
-        return ["select"]
-
-    def get_class(self) -> None:
-        """Return the device class for this channel."""
-        return
-
-    def get_options(self) -> list:
-        """Return the available program options for this channel."""
-        return list(PROGRAM_SELECTION.values())
-
-    def get_selected_program(self) -> str:
-        """Return the currently selected program."""
-        return self._selected_program_str
-
-    async def set_selected_program(self, program_str: str) -> None:
-        """Set the currently selected program."""
-        self._selected_program_str = program_str
-        command_code = 0xB3
-        cls = commandRegistry.get_command(command_code, self._module.get_type())
-        index = list(PROGRAM_SELECTION.values()).index(program_str)
-        program = list(PROGRAM_SELECTION.keys())[index]
-        msg = cls(self._address, program)
         await self._writer(msg)

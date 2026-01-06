@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Sensor Temperature Request Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,6 +13,8 @@ COMMAND_CODE = 0xE5
 
 @register(COMMAND_CODE)
 class SensorTempRequest(Message):
+    """Sensor Temperature Request Message."""
+
     def populate(self, priority, address, rtr, data):
         """:return: None"""
         self.needs_low_priority(priority)

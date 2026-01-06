@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Raw Messages.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,18 +13,19 @@ COMMAND_CODE = 0xA9
 
 @register(COMMAND_CODE, ["VMBMETEO"])
 class MeteoRawMessage(Message):
-    """send by: VMBMETEO
-    received by:
-    """
+    """Meteo Raw Message."""
 
     def __init__(self, address=None):
+        """Initialize Meteo Raw Message Object."""
         Message.__init__(self)
         self.rain = 0
         self.light = 0
         self.wind = 0
 
     def populate(self, priority, address, rtr, data):
-        """Data bytes (high + low)
+        """Populate the Meteo Raw Message Object.
+
+        Data bytes (high + low)
             1 + 2   = current temp
             3 + 4   = min temp
             5 + 6   = max temp
@@ -37,11 +41,10 @@ class MeteoRawMessage(Message):
 
 @register(COMMAND_CODE, ["VMB4AN"])
 class SensorRawMessage(Message):
-    """send by: VMB4AN
-    received by:
-    """
+    """Sensor Raw Message."""
 
     def __init__(self, address=None):
+        """Initialize Sensor Raw Message Object."""
         Message.__init__(self)
         self.sensor = 0
         self.mode = 0
@@ -49,6 +52,7 @@ class SensorRawMessage(Message):
         self.unit = None
 
     def populate(self, priority, address, rtr, data):
+        """Populate the Sensor Raw Message Object."""
         self.needs_no_rtr(rtr)
         self.needs_data(data, 5)
         self.set_attributes(priority, address, rtr)

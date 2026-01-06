@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Bus Error Counter Status message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xDA
 
 @register(COMMAND_CODE)
 class BusErrorCounterStatusMessage(Message):
-    """send by: VMB6IN, VMB4RYLD
-    received by:
-    """
+    """Bus Error Counter Status message."""
 
     def __init__(self, address=None):
+        """Initialize Bus Error Counter Status message."""
         Message.__init__(self)
         self.transmit_error_counter = 0
         self.receive_error_counter = 0

@@ -51,14 +51,6 @@
       "Editable": "yes",
       "Name": "Output",
       "Type": "Relay"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "TemperatureChannel": "9",
@@ -73,6 +65,16 @@
       "04": "0058-0067",
       "09": "036C-037B",
       "11": "03A0-03AF"
+    }
+  },
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

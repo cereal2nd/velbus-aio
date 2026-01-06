@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Memo Text Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xAC
 
 @register(COMMAND_CODE)
 class MemoTextMessage(Message):
-    """send by:
-    received by: VMBGPO, VMBGPOD
-    """
+    """Memo Text Message."""
 
     def __init__(self, address=None):
+        """Initialize Memo Text Message object."""
         Message.__init__(self)
         self.start = 0x00
         self.memo_text = ""

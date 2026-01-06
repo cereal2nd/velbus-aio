@@ -205,14 +205,6 @@
     "42": {
       "Name": "Alarm 4",
       "Type": "ThermostatChannel"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "98": {
-      "Name": "Memo Text",
-      "Type": "Memo"
     }
   },
   "TemperatureChannel": "34",
@@ -255,6 +247,16 @@
       "31": "0274-0283",
       "32": "0288-0297",
       "34": "05E4-05F3"
+    }
+  },
+  "Properties": {
+    "memo_text": {
+      "Type": "MemoText",
+      "Name": "Memo Text"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }

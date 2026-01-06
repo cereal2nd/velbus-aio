@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Set led Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xF6
 
 @register(COMMAND_CODE)
 class SetLedMessage(Message):
-    """send by: VMB4RYLD
-    received by: VMB6IN
-    """
+    """Set led Message."""
 
     def __init__(self, address=None):
+        """Initialize Set led Message Object."""
         Message.__init__(self)
         self.leds = []
         self.set_defaults(address)

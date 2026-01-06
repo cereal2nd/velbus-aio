@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Module Type Message class.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -89,13 +92,10 @@ MODULES_WITHOUT_SERIAL = {
     ],
 )
 class ModuleTypeMessage(Message):
-    """send by: VMB6IN, VMB4RYLD
-    received by:
-    """
-
-    # pylint: disable-msg=R0902
+    """Module Type Message."""
 
     def __init__(self, address=None) -> None:
+        """Initialize Module Type Message object."""
         Message.__init__(self)
         self.module_type = 0x00
         self.led_on = []
@@ -109,12 +109,7 @@ class ModuleTypeMessage(Message):
 
     def module_type_name(self) -> str:
         """:return: str"""
-
-        return (
-            MODULE_DIRECTORY[self.module_type]
-            if self.module_type in MODULE_DIRECTORY
-            else "Unknown"
-        )
+        return MODULE_DIRECTORY.get(self.module_type, "Unknown")
 
     def populate(self, priority, address, rtr, data) -> None:
         """:return: None"""
@@ -153,7 +148,10 @@ class ModuleTypeMessage(Message):
     ],
 )
 class ModuleType2Message(Message):
+    """Module Type Message."""
+
     def __init__(self, address=None) -> None:
+        """Initialize Module Type Message object."""
         Message.__init__(self)
         self.module_type = 0x00
         self.led_on = []

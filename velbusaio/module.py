@@ -1,47 +1,32 @@
-"""This represents a velbus module"""
+"""This represents a velbus module."""
 
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Awaitable, Callable
 import importlib.resources
 import json
 import logging
 import pathlib
 import struct
 import sys
-from collections.abc import Awaitable
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from aiofile import async_open
 
 if TYPE_CHECKING:
     from velbusaio.controller import Controller
 
+from velbusaio import channels as channels_module, properties as properties_module
 from velbusaio.channels import (
-    Blind,
     Button,
     ButtonCounter,
     Channel,
     Dimmer,
-    EdgeLit,
-    LightSensor,
-    Memo,
-    Relay,
-    SelectedProgram,
-    Sensor,
-    SensorNumber,
-    Temperature,
-    ThermostatChannel,
+    Temperature as TemperatureChannelType,
 )
-from velbusaio.channels import Temperature as TemperatureChannelType
 from velbusaio.command_registry import commandRegistry
-from velbusaio.const import (
-    CHANNEL_LIGHT_VALUE,
-    CHANNEL_MEMO_TEXT,
-    CHANNEL_SELECTED_PROGRAM,
-    PRIORITY_LOW,
-    SCAN_MODULEINFO_TIMEOUT_INITIAL,
-)
+from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
 from velbusaio.message import Message
 from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage
@@ -62,8 +47,6 @@ from velbusaio.messages.channel_name_part3 import (
 )
 from velbusaio.messages.channel_name_request import (
     COMMAND_CODE as CHANNEL_NAME_REQUEST_COMMAND_CODE,
-)
-from velbusaio.messages.channel_name_request import (
     ChannelNameRequestMessage,
 )
 from velbusaio.messages.clear_led import ClearLedMessage
@@ -72,16 +55,12 @@ from velbusaio.messages.counter_status_request import CounterStatusRequestMessag
 from velbusaio.messages.counter_value import CounterValueMessage
 from velbusaio.messages.dali_device_settings import (
     DaliDeviceSettingMsg,
-)
-from velbusaio.messages.dali_device_settings import DeviceType as DaliDeviceType
-from velbusaio.messages.dali_device_settings import DeviceTypeMsg as DaliDeviceTypeMsg
-from velbusaio.messages.dali_device_settings import (
+    DeviceType as DaliDeviceType,
+    DeviceTypeMsg as DaliDeviceTypeMsg,
     MemberOfGroupMsg,
 )
 from velbusaio.messages.dali_device_settings_request import (
     COMMAND_CODE as DALI_DEVICE_SETTINGS_REQUEST_COMMAND_CODE,
-)
-from velbusaio.messages.dali_device_settings_request import (
     DaliDeviceSettingsRequest,
 )
 from velbusaio.messages.dali_dim_value_status import DimValueStatus
@@ -97,6 +76,8 @@ from velbusaio.messages.module_status import (
 )
 from velbusaio.messages.module_status_request import ModuleStatusRequestMessage
 from velbusaio.messages.module_type_request import ModuleTypeRequestMessage
+from velbusaio.messages.psu_load import PsuLoadMessage
+from velbusaio.messages.psu_values import PsuValuesMessage
 from velbusaio.messages.push_button_status import PushButtonStatusMessage
 from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
@@ -107,6 +88,7 @@ from velbusaio.messages.slider_status import SliderStatusMessage
 from velbusaio.messages.slow_blinking_led import SlowBlinkingLedMessage
 from velbusaio.messages.temp_sensor_status import TempSensorStatusMessage
 from velbusaio.messages.update_led_status import UpdateLedStatusMessage
+from velbusaio.properties import Property
 
 
 class Module:
@@ -123,7 +105,8 @@ class Module:
         build_week: int | None = None,
         cache_dir: str | None = None,
     ) -> Module:
-        if module_type == 0x45 or module_type == 0x5A:
+        """Module factory method."""
+        if module_type in {0x45, 0x5A}:
             return VmbDali(
                 module_address,
                 module_type,
@@ -154,6 +137,7 @@ class Module:
         build_week: int | None = None,
         cache_dir: str | None = None,
     ) -> None:
+        """Initialize Module object."""
         self._address = module_address
         self._type = int(module_type)
         self._data = {}
@@ -168,23 +152,27 @@ class Module:
         self._is_loading = False
         self._got_status = asyncio.Event()
         self._got_status.clear()
-        self._channels = {}
+        self._channels: dict[int, Channel] = {}
+        self._properties: dict[str, Property] = {}
         self.loaded = False
         self._use_cache = True
         self._loaded_cache = {}
 
     async def wait_for_status_messages(self) -> None:
+        """Wait for status messages to be received."""
         try:
             await asyncio.wait_for(self._got_status.wait(), 2)
-        except Exception:
+        except TimeoutError:
             self._log.warning(f"Timeout waiting for status messages for: {self}")
 
     def get_initial_timeout(self) -> int:
+        """Get initial timeout for scanning module info."""
         return SCAN_MODULEINFO_TIMEOUT_INITIAL
 
     async def initialize(
         self, writer: Callable[[Message], Awaitable[None]], controller: Controller
     ) -> None:
+        """Initialize the module."""
         self._controller = controller
         self._log = logging.getLogger("velbus-module")
         # load the protocol data
@@ -212,9 +200,10 @@ class Module:
         # set some params from the velbus controller
         self._writer = writer
         for chan in self._channels.values():
-            chan._writer = writer
+            chan.set_writer(writer)
 
     def cleanupSubChannels(self) -> None:
+        """Cleanup subchannels that are not defined."""
         # TODO: 21/11/2022 DannyDeGaspari: Fix needed
         # Care should be taken for this function, not all subaddresses have their channels on multiples of 8.
         # The last subaddress contain typically the temperature channels, has more then 8 channels
@@ -242,59 +231,71 @@ class Module:
             await fl.write(json.dumps(self.to_cache(), indent=4))
 
     def __getstate__(self) -> dict:
+        """Get state for pickling."""
         d = self.__dict__
-        self_dict = {
-            k: d[k] for k in d if k != "_writer" and k != "_log" and k != "_controller"
-        }
-        return self_dict
+        return {k: d[k] for k in d if k not in {"_writer", "_log", "_controller"}}
 
     def __setstate__(self, state: dict) -> None:
+        """Set state for unpickling."""
         self.__dict__ = state
 
     def __repr__(self) -> str:
-        return f"<{self._name} type:{self._type} address:{self._address} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels}>"
+        """Return string representation of the module."""
+        return f"<{self._name} type:{self._type} address:{self._address} loaded:{self.loaded} loading:{self._is_loading} channels: {self._channels} properties: {self._properties}>"
 
     def __str__(self) -> str:
+        """Return string representation of the module."""
         return self.__repr__()
 
     def to_cache(self) -> dict:
-        d = {"name": self._name, "channels": {}, "sub_addresses": {}}
+        """Build cache dict."""
+        d = {"name": self._name, "channels": {}, "sub_addresses": {}, "properties": {}}
         for num, chan in self._channels.items():
             d["channels"][num] = chan.to_cache()
         for num, address in self._sub_address.items():
             d["sub_addresses"][num] = address
+        for num, prop in self._properties.items():
+            d["properties"][num] = prop.to_cache()
         return d
 
     def get_address(self) -> int:
+        """Get the module address."""
         return self._address
 
     def get_addresses(self) -> list:
-        """Get all addresses for this module"""
-        res = []
-        res.append(self._address)
-        for addr in self._sub_address.values():
-            res.append(addr)
+        """Get all addresses for this module."""
+        res = [self._address]
+        res.extend(self._sub_address.values())
         return res
 
+    def add_subaddress(self, num, addr) -> None:
+        """Add a subaddress to this module."""
+        self._sub_address[num] = addr
+
     def get_type(self) -> int:
-        """Get the module type"""
+        """Get the module type."""
         return self._type
 
     def get_type_name(self) -> str:
+        """Get the module type name."""
         if "Type" in self._data:
             return self._data["Type"]
         return "UNKNOWN"
 
     def get_serial(self) -> str | None:
+        """Get the module serial number."""
         return self.serial
 
     def get_name(self) -> str:
+        """Get the module name."""
         return self._name
 
     def get_sw_version(self) -> str:
+        """Get the module software version."""
         return f"{self.build_year}.{self.build_week}"
 
     def calc_channel_offset(self, address: int) -> int:
+        """Calculate channel offset based on address."""
         _channel_offset = 0
         if self._address != address:
             for _sub_addr_key, _sub_addr_val in self._sub_address.items():
@@ -304,24 +305,28 @@ class Module:
         return _channel_offset
 
     def on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._controller._add_on_connext_callback(meth)
+        """Register a coroutine to be called on connect."""
+        self._controller.add_connect_callback(meth)
 
     def remove_on_connect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._controller._remove_on_connect_callback(meth)
+        """Remove a previously registered on connect coroutine."""
+        self._controller.remove_connect_callback(meth)
 
     def on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._controller._add_on_disconnect_callback(meth)
+        """Register a coroutine to be called on disconnect."""
+        self._controller.add_disconnect_callback(meth)
 
     def remove_on_disconnect(self, meth: Callable[[], Awaitable[None]]) -> None:
-        self._controller._remove_on_disconnect_callback(meth)
+        """Remove a previously registered on disconnect coroutine."""
+        self._controller.remove_disconnect_callback(meth)
 
     @property
     def is_connected(self) -> bool:
         """Return if the module is connected."""
         return self._controller.connected
 
-    async def on_message(self, message: Message) -> None:
-        """Process received message"""
+    async def on_message(self, message: Message) -> None:  # noqa: C901
+        """Process received message."""
         self._log.debug(f"RX: {message}")
         _channel_offset = self.calc_channel_offset(message.address)
 
@@ -471,8 +476,8 @@ class Module:
                 ):
                     await self._update_channel(channel, {"enabled": False})
             # self.selected_program_str = message.selected_program_str
-            await self._update_channel(
-                CHANNEL_SELECTED_PROGRAM,
+            await self._update_property(
+                "selected_program",
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, CounterStatusMessage) and isinstance(
@@ -488,9 +493,7 @@ class Module:
                 },
             )
         elif isinstance(message, ModuleStatusPirMessage):
-            await self._update_channel(
-                CHANNEL_LIGHT_VALUE, {"cur": message.light_value}
-            )
+            await self._update_property("light_value", {"cur": message.light_value})
             await self._update_channel(1, {"closed": message.dark})
             await self._update_channel(2, {"closed": message.light})
             await self._update_channel(3, {"closed": message.motion1})
@@ -502,14 +505,12 @@ class Module:
             if 8 in self._channels:
                 await self._update_channel(8, {"closed": message.high_temp_alarm})
             # self.selected_program_str = message.selected_program_str
-            await self._update_channel(
-                CHANNEL_SELECTED_PROGRAM,
+            await self._update_property(
+                "selected_program",
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, ModuleStatusGP4PirMessage):
-            await self._update_channel(
-                CHANNEL_LIGHT_VALUE, {"cur": message.light_value}
-            )
+            await self._update_property("light_value", {"cur": message.light_value})
             for channel_id in range(1, 9):
                 channel = self._translate_channel_name(channel_id + _channel_offset)
                 await self._update_channel(
@@ -521,8 +522,8 @@ class Module:
                         channel, {"enabled": channel_id in message.enabled}
                     )
             # self.selected_program_str = message.selected_program_str
-            await self._update_channel(
-                CHANNEL_SELECTED_PROGRAM,
+            await self._update_property(
+                "selected_program",
                 {"selected_program_str": message.selected_program_str},
             )
         elif isinstance(message, UpdateLedStatusMessage):
@@ -590,7 +591,19 @@ class Module:
             for offset, dim_value in enumerate(message.dim_values):
                 channel = message.channel + offset
                 await self._update_channel(channel, {"state": dim_value})
-        # notigy status
+        elif isinstance(message, PsuLoadMessage):
+            await self._update_property("psu_load_out", {"cur": message.out})
+            await self._update_property("psu_load_1", {"cur": message.load_1})
+            await self._update_property("psu_load_2", {"cur": message.load_2})
+        elif isinstance(message, PsuValuesMessage):
+            if message.channel == 3:
+                suffix = "out"
+            else:
+                suffix = f"{message.channel}"
+            await self._update_property(f"psu_power_{suffix}", {"cur": message.watt})
+            await self._update_property(f"psu_voltage_{suffix}", {"cur": message.volt})
+            await self._update_property(f"psu_current_{suffix}", {"cur": message.amp})
+        # notify status
         self._got_status.set()
 
     async def _update_channel(self, channel: int, updates: dict):
@@ -601,23 +614,38 @@ class Module:
                 f"channel {channel} does not exist for module @ address {self}"
             )
 
+    async def _update_property(self, property_name: str, updates: dict):
+        try:
+            await self._properties[property_name].update(updates)
+        except KeyError:
+            self._log.info(
+                f"property {property_name} does not exist for module @ address {self}"
+            )
+
     def get_channels(self) -> dict:
-        """List all channels for this module"""
+        """List all channels for this module."""
         return self._channels
 
+    def get_properties(self) -> dict[str, Property]:
+        """List all properties for this module."""
+        return self._properties
+
     async def load_from_vlp(self, vlp_data: dict) -> None:
+        """Initialize the module from VLP data."""
+        self._is_loading = True
+        self._use_cache = False
         self._name = vlp_data.get_name()
         self._data["Channels"] = vlp_data.get_channels()
-        self._use_cache = False
-        self._is_loading = False
-        self.loaded = True
         await self._load_default_channels()
-        # TODO set all channels to _is_loaded = True
+        await self._load_properties()
         for chan in self._channels.values():
-            chan._is_loaded = True
+            chan.set_loaded(True)
+        self.loaded = True
+        self._is_loading = False
         await self._request_module_status()
 
     async def load(self, from_cache: bool = False) -> None:
+        """Initialize the module."""
         # start the loading
         self._is_loading = True
         # see if we have a cache
@@ -625,6 +653,7 @@ class Module:
         self._loaded_cache = cache
         # load default channels
         await self._load_default_channels()
+        await self._load_properties()
 
         # load the data from memory ( the stuff that we need)
         if "name" in cache and cache["name"] != "":
@@ -647,14 +676,14 @@ class Module:
         # load the channel names
         if "channels" in cache:
             for num, chan in cache["channels"].items():
-                self._channels[int(num)]._name = chan["name"]
+                self._channels[int(num)].set_name(chan["name"])
                 if "subdevice" in chan:
-                    self._channels[int(num)]._subDevice = chan["subdevice"]
+                    self._channels[int(num)].set_sub_device(chan["subdevice"])
                 else:
-                    self._channels[int(num)]._subDevice = False
+                    self._channels[int(num)].set_sub_device(False)
                 if "Unit" in chan:
-                    self._channels[int(num)]._Unit = chan["Unit"]
-                self._channels[int(num)]._is_loaded = True
+                    self._channels[int(num)].set_unit(chan["Unit"])
+                self._channels[int(num)].set_loaded(True)
         else:
             await self._request_channel_name()
         # load the module specific stuff
@@ -673,10 +702,10 @@ class Module:
         return cache
 
     def _load(self) -> None:
-        """Method for per module type loading"""
+        """Method for per module type loading."""
 
     def number_of_channels(self) -> int:
-        """Retrieve the number of available channels in this module
+        """Retrieve the number of available channels in this module.
 
         :return: int
         """
@@ -685,9 +714,10 @@ class Module:
         return max(self._channels.keys())
 
     async def set_memo_text(self, txt: str) -> None:
-        if CHANNEL_MEMO_TEXT not in self._channels.keys():
+        """Set memo text property."""
+        if "memo_text" not in self._properties:
             return
-        await self._channels[CHANNEL_MEMO_TEXT].set(txt)
+        await self._properties["memo_text"].set(txt)
 
     async def _process_memory_data_message(self, message: MemoryDataMessage) -> None:
         addr = f"{message.high_address:02X}{message.low_address:02X}"
@@ -719,7 +749,7 @@ class Module:
             if len(spl) == 2:
                 [chan, pos] = spl
             elif len(spl) == 3:
-                [chan, pos, dummy] = spl
+                [chan, pos, _] = spl
             chan = self._translate_channel_name(chan)
             self._channels[chan].set_name_char(pos, message.data)
         else:
@@ -745,7 +775,7 @@ class Module:
         return int(channel)
 
     async def is_loaded(self) -> bool:
-        """Check if all name messages have been received"""
+        """Check if all name messages have been received."""
         # if we are loaded, just return
         if self.loaded:
             return True
@@ -803,7 +833,7 @@ class Module:
             await self._writer(msg)
 
     async def __load_memory(self) -> None:
-        """Request all needed memory addresses"""
+        """Request all needed memory addresses."""
         if "Memory" not in self._data:
             self._name = None
             return
@@ -814,7 +844,7 @@ class Module:
 
         for memory_key, memory_part in self._data["Memory"].items():
             if memory_key == "Address":
-                for addr_int in memory_part.keys():
+                for addr_int in memory_part:
                     addr = struct.unpack(
                         ">BB", struct.pack(">h", int("0x" + addr_int, 0))
                     )
@@ -823,6 +853,31 @@ class Module:
                     msg.high_address = addr[0]
                     msg.low_address = addr[1]
                     await self._writer(msg)
+
+    async def _load_properties(self) -> None:
+        """Method for per module type loading of properties."""
+        if "Properties" not in self._data:
+            return
+
+        for prop, prop_data in self._data["Properties"].items():
+            if "Type" not in prop_data:
+                continue
+            prop_type = prop_data["Type"]
+            try:
+                cls = getattr(properties_module, prop_type)
+            except AttributeError:
+                self._log.error(
+                    "Unknown property type '%s' for property '%s' on module address %s",
+                    prop_type,
+                    prop,
+                    getattr(self, "_address", "unknown"),
+                )
+                continue
+            self._properties[prop] = cls(
+                module=self,
+                name=prop,
+                writer=self._writer,
+            )
 
     async def _load_default_channels(self) -> None:
         if "Channels" not in self._data:
@@ -835,7 +890,18 @@ class Module:
                 edit = False
             if "Subdevice" not in chan_data or chan_data["Subdevice"] != "yes":
                 sub = False
-            cls = getattr(sys.modules[__name__], chan_data["Type"])
+            chan_type = chan_data["Type"]
+            try:
+                cls = getattr(channels_module, chan_type)
+            except AttributeError:
+                self._log.error(
+                    "Unknown channel type '%s' for channel '%s' on module address %s",
+                    chan_type,
+                    chan,
+                    getattr(self, "_address", "unknown"),
+                )
+                continue
+
             self._channels[int(chan)] = cls(
                 module=self,
                 num=int(chan),
@@ -855,8 +921,10 @@ class Module:
 
 
 class VmbDali(Module):
-    """DALI has a variable number of channels: the number of channels
-    depends on the number of DALI devices on the DALI bus
+    """DALI has a variable number of channels.
+
+    Therefore we create a module that first creates 64 placeholder channels.
+    After that it requests the DALI device settings to determine the actual channels.
     """
 
     def __init__(
@@ -869,6 +937,7 @@ class VmbDali(Module):
         build_week: int | None = None,
         cache_dir: str | None = None,
     ) -> None:
+        """Initialize DALI module."""
         super().__init__(
             module_address,
             module_type,
@@ -881,6 +950,7 @@ class VmbDali(Module):
         self.group_members: dict[int, set[int]] = {}
 
     def get_initial_timeout(self) -> int:
+        """Get initial timeout for loading this module."""
         return 100000
 
     async def _load_default_channels(self) -> None:
@@ -910,6 +980,7 @@ class VmbDali(Module):
         await self._writer(msg)
 
     async def on_message(self, message: Message) -> None:
+        """Process received message."""
         if isinstance(message, DaliDeviceSettingMsg):
             if isinstance(message.data, DaliDeviceTypeMsg):
                 if message.data.device_type == DaliDeviceType.NoDevicePresent:
@@ -990,6 +1061,7 @@ class VmbDali(Module):
 
         else:
             return await super().on_message(message)
+        return None
 
     async def _request_channel_name(self) -> None:
         # Channel names are requested after channel scan

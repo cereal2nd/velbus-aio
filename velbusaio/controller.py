@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Awaitable
+import itertools
 import logging
 import pathlib
 import re
@@ -20,10 +22,7 @@ from velbusaio.channels import (
     ButtonCounter,
     Dimmer,
     EdgeLit,
-    LightSensor,
-    Memo,
     Relay,
-    SelectedProgram,
     Sensor,
     SensorNumber,
     Temperature,
@@ -38,6 +37,7 @@ from velbusaio.messages.set_date import SetDate
 from velbusaio.messages.set_daylight_saving import SetDaylightSaving
 from velbusaio.messages.set_realtime_clock import SetRealtimeClock
 from velbusaio.module import Module
+from velbusaio.properties import LightValue, SelectedProgram
 from velbusaio.protocol import VelbusProtocol
 from velbusaio.raw_message import RawMessage
 from velbusaio.vlp_reader import VlpFile
@@ -73,6 +73,23 @@ class Velbus:
         self._is_connected: bool = False
         self._on_connect_callbacks: list[t.Callable[[], None]] = []
         self._on_disconnect_callbacks: list[t.Callable[[], None]] = []
+        self._background_tasks: set[asyncio.Task] = set()
+
+    def add_connect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
+        """Register a coroutine to be called on connect."""
+        self._on_connect_callbacks.append(meth)
+
+    def remove_connect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
+        """Remove a previously registered on connect coroutine."""
+        self._on_connect_callbacks.remove(meth)
+
+    def add_disconnect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
+        """Register a coroutine to be called on disconnect."""
+        self._on_disconnect_callbacks.append(meth)
+
+    def remove_disconnect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
+        """Remove a previously registered on disconnect coroutine."""
+        self._on_disconnect_callbacks.remove(meth)
 
     @property
     def connected(self) -> bool:
@@ -98,7 +115,9 @@ class Velbus:
         """Respond to Protocol connection lost."""
         if self._auto_reconnect and not self._closing:
             self._log.debug("Reconnecting to transport")
-            asyncio.ensure_future(self.connect())
+            task = asyncio.ensure_future(self.connect())
+            self._background_tasks.add(task)
+            task.add_done_callback(self._background_tasks.discard)
 
     async def add_module(
         self,
@@ -129,8 +148,7 @@ class Velbus:
             if sub_addr == 0xFF:
                 continue
             self._submodules.append(sub_addr)
-            module._sub_address[sub_num] = sub_addr
-            self._modules[sub_addr] = module
+            module.add_subaddress(sub_num, sub_addr)
         module.cleanupSubChannels()
 
     def addr_is_submodule(self, addr: int) -> bool:
@@ -173,7 +191,9 @@ class Velbus:
                 self._destination = f"tcp://{self._destination}"
             parts = urlparse(self._destination)
             if parts.scheme == "tls":
-                ctx = ssl._create_unverified_context()
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
             else:
                 ctx = None
             try:
@@ -272,7 +292,7 @@ class Velbus:
 
     def get_all_sensor(
         self,
-    ) -> list[ButtonCounter | Temperature | LightSensor | SensorNumber]:
+    ) -> list[ButtonCounter | Temperature | LightValue | SensorNumber]:
         """Get all sensors."""
         return self._get_all("sensor")
 
@@ -319,10 +339,8 @@ class Velbus:
         | Dimmer
         | Temperature
         | SensorNumber
-        | LightSensor
         | Relay
         | EdgeLit
-        | Memo
         | SelectedProgram
     ]:
         """Get all channels."""
@@ -330,7 +348,9 @@ class Velbus:
             chan
             for addr, mod in (self.get_modules()).items()
             if addr not in self._submodules
-            for chan in (mod.get_channels()).values()
+            for chan in itertools.chain(
+                (mod.get_channels()).values(), (mod.get_properties()).values()
+            )
             if class_name in chan.get_categories()
         ]
 

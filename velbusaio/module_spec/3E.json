@@ -81,14 +81,6 @@
     "18": {
       "Name": "Alarm 4",
       "Type": "ThermostatChannel"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Info": "Four touch buttons with PIR detector module  (ed2)",
@@ -298,5 +290,15 @@
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",
-  "Type": "VMBGP4PIR-2"
+  "Type": "VMBGP4PIR-2",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

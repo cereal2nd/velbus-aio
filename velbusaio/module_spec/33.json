@@ -35,10 +35,6 @@
       "Editable": "yes",
       "Name": "Virtual button 2",
       "Type": "Button"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Doorbird interface module",
@@ -245,5 +241,11 @@
       "08": "0010-001F"
     }
   },
-  "Type": "VMBVP1"
+  "Type": "VMBVP1",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

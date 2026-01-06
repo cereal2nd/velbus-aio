@@ -58,10 +58,6 @@
     "13": {
       "Name": "Wind speed",
       "Type": "SensorNumber"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "Meteo station",
@@ -461,5 +457,11 @@
     }
   },
   "TemperatureChannel": "10",
-  "Type": "VMBMETEO"
+  "Type": "VMBMETEO",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

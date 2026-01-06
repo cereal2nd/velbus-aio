@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org> and Maikel Punie <maikel.punie@gmail.com>"""
+"""Channel Name Request message.
+
+:author: Thomas Delaet <thomas@delaet.org> and Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xEF
 
 @register(COMMAND_CODE)
 class ChannelNameRequestMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Channel Name Request message."""
 
     def __init__(self, address=None):
+        """Initialize Channel Name Request message."""
         Message.__init__(self)
         self.channels = []
         self.set_defaults(address)
@@ -36,9 +38,7 @@ class ChannelNameRequestMessage(Message):
 
 @register(COMMAND_CODE, ["VMB2BL"])
 class ChannelNameRequestMessage2(ChannelNameRequestMessage):
-    """send by:
-    received by: VMB2BL
-    """
+    """Channel Name Request message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -61,9 +61,7 @@ class ChannelNameRequestMessage2(ChannelNameRequestMessage):
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
 class ChannelNameRequestMessage3(ChannelNameRequestMessage):
-    """send by:
-    received by: VMBDALI
-    """
+    """Channel Name Request message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

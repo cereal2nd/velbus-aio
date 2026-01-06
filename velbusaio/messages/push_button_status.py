@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Push Button Status Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0x00
 
 @register(COMMAND_CODE)
 class PushButtonStatusMessage(Message):
-    """send by: VMB6IN, VMB4RYLD
-    received by: VMB4RYLD
-    """
+    """Push Button Status Message."""
 
     def __init__(self, address=None):
+        """Initialize Push Button Status Message Object."""
         Message.__init__(self)
         self.closed = []
         self.opened = []
@@ -32,6 +34,7 @@ class PushButtonStatusMessage(Message):
         self.closed_long = self.byte_to_channels(data[2])
 
     def set_defaults(self, address):
+        """:return: None"""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

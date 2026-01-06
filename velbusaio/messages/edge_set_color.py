@@ -1,3 +1,5 @@
+"""Set Edge Color message class."""
+
 from __future__ import annotations
 
 from enum import IntEnum
@@ -9,6 +11,8 @@ COMMAND_CODE = 0xD4
 
 
 class CustomColorPriority(IntEnum):
+    """Custom Color Priority enum."""
+
     LOW_PRIORITY = 1
     MID_PRIORITY = 2
     HIGH_PRIORITY = 3
@@ -16,9 +20,7 @@ class CustomColorPriority(IntEnum):
 
 @register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO"])
 class SetEdgeColorMessage(Message):
-    """send by:
-    received by: VMBEL1, VMBEL2, VMBEL4, VMBELO
-    """
+    """Set Edge Color message."""
 
     apply_background_color = False
     apply_continuous_feedback_color = False

@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Set Daylight Saving Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,14 +13,16 @@ COMMAND_CODE = 0xAF
 
 @register(COMMAND_CODE)
 class SetDaylightSaving(Message):
-    """received by all modules"""
+    """Set Daylight Saving Message."""
 
     def __init__(self, address=0x00, ds=None) -> None:
+        """Initialize Set Daylight Saving Message Object."""
         Message.__init__(self)
         self._ds = ds
         self.set_defaults(address)
 
     def set_defaults(self, address) -> None:
+        """Set default values."""
         if address is not None:
             self.set_address(address)
         self.set_low_priority()

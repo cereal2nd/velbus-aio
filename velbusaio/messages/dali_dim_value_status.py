@@ -1,4 +1,7 @@
-""":author: Niels Laukens"""
+"""Dali Dim Value Status message class.
+
+:author: Niels Laukens
+"""
 
 from __future__ import annotations
 
@@ -12,11 +15,10 @@ COMMAND_CODE = 0xA5
     COMMAND_CODE, ["VMBDALI", "VMBDALI-20", "VMB8DC-20", "VMB4LEDPWM-20", "VMB2DC-20"]
 )
 class DimValueStatus(Message):
-    """send by: VMBDALI
-    received by:
-    """
+    """Dali Dim Value Status message."""
 
-    def __init__(self, address: int = None) -> None:
+    def __init__(self, address: int | None = None) -> None:
+        """Initialize Dali Dim Value Status message."""
         super().__init__()
         self.set_defaults(address)
         self.channel: int = 0
@@ -24,6 +26,7 @@ class DimValueStatus(Message):
         # dim_values contain dim value of channel, channel+1, ...
 
     def populate(self, priority, address: int, rtr: int, data: int) -> None:
+        """Populate message attributes."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)
@@ -33,6 +36,7 @@ class DimValueStatus(Message):
         self.dim_values = list(data[1:])
 
     def data_to_binary(self) -> bytes:
+        """To binary representation of the message data."""
         return bytes(
             [
                 COMMAND_CODE,

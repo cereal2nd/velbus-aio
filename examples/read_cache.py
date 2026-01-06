@@ -1,6 +1,6 @@
-import pickle
 from os import listdir
 from os.path import isfile, join
+import pickle
 
 from velbusaio.helpers import get_cache_dir
 

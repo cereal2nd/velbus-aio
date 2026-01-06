@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Counter Status message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xBE
 
 @register(COMMAND_CODE, ["VMB7IN"])
 class CounterStatusMessage(Message):
-    """send by: VMB7IN
-    received by:
-    """
+    """Counter Status message."""
 
     def __init__(self, address=None):
+        """Initialize Counter Status message."""
         Message.__init__(self)
         self.channel = 0
         self.pulses = 0
@@ -24,7 +26,9 @@ class CounterStatusMessage(Message):
         self.watt = 0
 
     def populate(self, priority, address, rtr, data):
-        """-DB1    last 2 bits   = channel
+        """Parses the received data.
+
+        -DB1    last 2 bits   = channel
         -DB1    first 6 bist  = pulses
         -DB2-5                = pulse counter
         -DB6-7                = ms/pulse

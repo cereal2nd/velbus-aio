@@ -1,3 +1,8 @@
+"""VlpReader class.
+
+Handles reading and parsing Velbus VLP files.
+"""
+
 import importlib.resources
 import json
 import logging
@@ -11,15 +16,20 @@ from velbusaio.helpers import h2
 
 
 class VlpFile:
+    """VLP file reader and parser."""
+
     def __init__(self, file_path) -> None:
+        """Initialize VLP file reader."""
         self._file_path = file_path
         self._modules = []
         self._log = logging.getLogger("velbus-vlpFile")
 
     def get(self) -> dict:
+        """Return the parsed modules."""
         return self._modules
 
     async def read(self) -> None:
+        """Read and parse the VLP file."""
         async with async_open(self._file_path) as file:
             xml_content = await file.read()
         _soup = BeautifulSoup(xml_content, "xml")
@@ -36,16 +46,20 @@ class VlpFile:
             await mod.parse()
         self._modules.sort(key=lambda mod: mod.get_decimal_addr())
 
-    def dump(self) -> None:
-        for m in self._modules:
-            print(f"Module {m.get_decimal_addr()}: {m._name}, type {m._type_id}")
-            for key, value in m._channels.items():
-                name = value["Name"]
-                print(f"  {key} => {name}")
+    # def dump(self) -> None:
+    #    """Dump the parsed modules to the log."""
+    #    for m in self._modules:
+    #        print(f"Module {m.get_decimal_addr()}: {m._name}, type {m._type_id}")
+    #        for key, value in m._channels.items():
+    #            name = value["Name"]
+    #            print(f"  {key} => {name}")
 
 
 class vlpModule:
+    """VLP module representation."""
+
     def __init__(self, name, addresses, build, serial, type, memory) -> None:
+        """Initialize VLP module."""
         self._name = name
         self._addresses = addresses
         self._build = build
@@ -63,41 +77,47 @@ class vlpModule:
             f"=> Created vlpModule address: {self._addresses} type: {self._type} ({self._type_id})"
         )
 
-    def get(self) -> None:
-        print(self._channels)
-        print(self)
-
     def get_addr(self) -> str:
+        """Get module address."""
         return self._addresses
 
     def get_name(self) -> str:
+        """Get module name."""
         return self._name
 
     def get_type(self) -> int | None:
+        """Get module type ID."""
         return self._type_id
 
     def get_serial(self) -> str:
+        """Get module serial number."""
         return self._serial
 
     def get_memory(self) -> str:
+        """Get module memory."""
         return self._memory
 
     def get_build(self) -> str:
+        """Get module build."""
         return self._build
 
     def get_channels(self) -> dict:
+        """Get module channels."""
         return self._channels
 
     def __str__(self):
+        """String representation of the module."""
         return f"vlpModule(name={self._name}, addresses={self._addresses}, build={self._build}, serial={self._serial}, type={self._type})"
 
     def get_decimal_addr(
         self,
-    ) -> int:  # lgor: get the numeric value of primary module address
+    ) -> int:
+        """Get decimal primary module address."""
         addr = self._addresses.split(",")[0]
         return int(addr, 16)
 
     async def parse(self) -> None:
+        """Parse the VLP module memory and extract channel names."""
         await self._load_module_spec()
 
         if "Memory" not in self._spec:
@@ -120,6 +140,7 @@ class vlpModule:
         self._load_extra_data()
 
     def _load_extra_data(self) -> None:
+        """Load extra data from memory."""
         self._log.debug(" => Getting extra data")
         if "Extras" not in self._spec["Memory"]:
             self._log.debug("  => no Extra Memory locations found")
@@ -161,6 +182,7 @@ class vlpModule:
 
     def _match_binary_pattern(self, pattern: str, byte_data: bytes) -> bool:
         """Match a binary pattern like %......00 against byte data.
+
         % indicates binary pattern
         . means don't care bit
         0/1 are specific bits that must match
@@ -184,7 +206,9 @@ class vlpModule:
             return False
 
         # Check each bit position
-        for i, (pattern_bit, data_bit) in enumerate(zip(binary_pattern, binary_data)):
+        for _i, (pattern_bit, data_bit) in enumerate(
+            zip(binary_pattern, binary_data, strict=True)
+        ):
             if pattern_bit == ".":
                 # Don't care bit, skip
                 continue
@@ -195,6 +219,7 @@ class vlpModule:
         return True
 
     def _get_channel_name(self, chan: int) -> str | None:
+        """Get the name of a channel from memory."""
         if "Channels" not in self._spec["Memory"]:
             self._log.debug("  => no Channels Memory locations found")
             return None
@@ -215,6 +240,7 @@ class vlpModule:
         return name
 
     async def _load_module_spec(self) -> None:
+        """Load the module specification JSON based on type ID."""
         self._log.debug(f" => Load module spec for {self._type_id}")
 
         # remap VMBELx modules to unified memorymap based on build number
@@ -252,6 +278,7 @@ class vlpModule:
                 self._spec = json.loads(await protocol_file.read())
 
     def _read_from_memory(self, address_range) -> str | None:
+        """Read a range of bytes from the module memory."""
         # its a single address
         if "-" not in address_range:
             start = int(address_range, 16) * 2

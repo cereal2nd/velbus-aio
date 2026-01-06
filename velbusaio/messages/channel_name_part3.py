@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Channel Name Part 3 message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xF2
 
 @register(COMMAND_CODE)
 class ChannelNamePart3Message(Message):
-    """send by: VMB6IN, VMB4RYLD
-    received by:
-    """
+    """Channel Name Part 3 message."""
 
     def __init__(self, address=None):
+        """Initialize Channel Name Part 3 message."""
         Message.__init__(self)
         self.channel = 0
         self.name = ""
@@ -85,9 +87,7 @@ class ChannelNamePart3Message(Message):
     ],
 )
 class ChannelNamePart3Message2(ChannelNamePart3Message):
-    """send by: VMBGP*, VMBDALI
-    received by:
-    """
+    """Channel Name Part 3 message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -101,9 +101,7 @@ class ChannelNamePart3Message2(ChannelNamePart3Message):
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class ChannelNamePart3Message3(ChannelNamePart3Message):
-    """send by: VMBGP*
-    received by:
-    """
+    """Channel Name Part 3 message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

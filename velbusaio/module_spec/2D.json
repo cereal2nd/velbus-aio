@@ -49,14 +49,6 @@
       "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
-    },
-    "99": {
-      "Name": "Light value",
-      "Type": "LightSensor"
     }
   },
   "Info": "Four touch buttons with PIR detector module",
@@ -266,5 +258,15 @@
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",
-  "Type": "VMBGP4PIR"
+  "Type": "VMBGP4PIR",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

@@ -1,4 +1,7 @@
-""":author: Tom Dupré <gitd8400@gmail.com>"""
+"""Cover Off message.
+
+:author: Tom Dupré <gitd8400@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0x04
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class CoverOffMessage(Message):
-    """sent by:
-    received by: VMB2BLE
-    """
+    """Cover Off message."""
 
     def __init__(self, address=None):
+        """Initialize Cover Off message."""
         Message.__init__(self)
         self.channel = 0
         self.set_defaults(address)
@@ -28,6 +30,7 @@ class CoverOffMessage(Message):
         self.channel = self.byte_to_channel(data[0])
 
     def set_defaults(self, address):
+        """Logic to set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()
@@ -40,11 +43,10 @@ class CoverOffMessage(Message):
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class CoverOffMessage2(Message):
-    """sent by:
-    received by: VMB1BL VMB2BL
-    """
+    """Cover Off message."""
 
     def __init__(self, address=None):
+        """Initialize Cover Off message."""
         Message.__init__(self)
         self.channel = 0
         self.delay_time = 0
@@ -63,6 +65,7 @@ class CoverOffMessage2(Message):
         self.channel = self.byte_to_channel(tmp)
 
     def set_defaults(self, address):
+        """Logic to set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

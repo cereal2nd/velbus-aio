@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Reads memory data block from Velbus module.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xCC
 
 @register(COMMAND_CODE)
 class MemoryDataBlockMessage(Message):
-    """send by: VMB6IN, VMB4RYLD
-    received by:
-    """
+    """Memory Data Block Message."""
 
     def __init__(self, address=None):
+        """Initialize Memory Data Block Message object."""
         Message.__init__(self)
         self.high_address = 0x00
         self.low_address = 0x00

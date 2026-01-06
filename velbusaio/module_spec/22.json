@@ -46,10 +46,6 @@
       "Editable": "yes",
       "Name": "Virtual button",
       "Type": "Button"
-    },
-    "96": {
-      "Name": "SelectedProgram",
-      "Type": "SelectedProgram"
     }
   },
   "Info": "7 channel input module",
@@ -422,5 +418,11 @@
       }
     }
   },
-  "Type": "VMB7IN"
+  "Type": "VMB7IN",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

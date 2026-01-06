@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Set Temperature Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xE4
 
 @register(COMMAND_CODE)
 class SetTemperatureMessage(Message):
-    """send by: VMB4RYLD
-    received by: VMB6IN
-    """
+    """Set Temperature Message."""
 
     def __init__(self, address=None):
+        """Initialize Set Temperature Message Object."""
         Message.__init__(self)
         self.temp_type = 0x00
         self.temp = 0x00

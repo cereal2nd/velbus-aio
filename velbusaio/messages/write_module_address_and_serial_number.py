@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Write Module Address And Serial Number Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -12,11 +15,10 @@ COMMAND_CODE = 0x6A
 
 @register(COMMAND_CODE)
 class WriteModuleAddressAndSerialNumberMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Write Module Address And Serial Number Message."""
 
     def __init__(self, address=None):
+        """Initialize WriteModuleAddressAndSerialNumberMessage class."""
         Message.__init__(self)
         self.module_type = 0x00
         self.current_serial = 0
@@ -25,6 +27,7 @@ class WriteModuleAddressAndSerialNumberMessage(Message):
         self.set_defaults(address)
 
     def set_defaults(self, address):
+        """Set the default values."""
         if address is not None:
             self.set_address(address)
         self.set_firmware_priority()

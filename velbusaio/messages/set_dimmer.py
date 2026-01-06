@@ -1,4 +1,7 @@
-""":author: Frank van Breugel"""
+"""Set Dimmer Message.
+
+:author: Frank van Breugel
+"""
 
 from __future__ import annotations
 
@@ -13,12 +16,13 @@ COMMAND_CODE = 0x07
     ["VMB1DM", "VMBDME", "VMB4DC", "VMB1LED"],
 )
 class SetDimmerMessage(Message):
-    """with this message the channel numbering is a bitnumber
-    send by:
-    received by: VMBDME, VMB4DC
+    """Set Dimmer Message.
+
+    with this message the channel numbering is a bitnumber
     """
 
     def __init__(self, address=None):
+        """Initialize Set Dimmer Message Object."""
         Message.__init__(self)
         self.dimmer_channels = []
         self.dimmer_state = 0
@@ -26,6 +30,7 @@ class SetDimmerMessage(Message):
         self.set_defaults(address)
 
     def set_defaults(self, address):
+        """Set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()
@@ -67,15 +72,17 @@ class SetDimmerMessage(Message):
     ],
 )
 class SetDimmerMessage2(SetDimmerMessage):
-    """This with this message the channel numbering is an integer
-    send by:
-    received by: VMBDALI
+    """Set Dimmer Message.
+
+    This with this message the channel numbering is an integer
     """
 
     def byte_to_channels(self, byte: int) -> list[int]:
+        """Byte to channels."""
         return [byte]
 
     def channels_to_byte(self, channels) -> int:
+        """Channels to byte."""
         if len(channels) != 1:
             raise ValueError("We should have exact one channel")
         return channels[0]

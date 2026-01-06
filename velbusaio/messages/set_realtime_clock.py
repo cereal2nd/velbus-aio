@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Set realtime Clock Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,9 +13,10 @@ COMMAND_CODE = 0xD8
 
 @register(COMMAND_CODE)
 class SetRealtimeClock(Message):
-    """received by all modules"""
+    """Set realtime Clock Message."""
 
     def __init__(self, address=0x00, wday=None, hour=None, min=None) -> None:
+        """Initialize Set realtime Clock Message Object."""
         Message.__init__(self)
         self._wday = wday
         self._hour = hour
@@ -20,6 +24,7 @@ class SetRealtimeClock(Message):
         self.set_defaults(address)
 
     def set_defaults(self, address) -> None:
+        """Set default values."""
         if address is not None:
             self.set_address(address)
         self.set_low_priority()

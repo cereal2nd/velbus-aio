@@ -1,4 +1,7 @@
-""":author: Frank van Breugel"""
+"""Slider Status Message.
+
+:author: Frank van Breugel
+"""
 
 from __future__ import annotations
 
@@ -23,11 +26,10 @@ COMMAND_CODE = 0x0F
     ],
 )
 class SliderStatusMessage(Message):
-    """sent by: VMBDME
-    received by:
-    """
+    """Slider Status Message."""
 
     def __init__(self, address=None):
+        """Initialize Slider Status Message Object."""
         Message.__init__(self)
         self.channel = 0
         self.slider_state = 0

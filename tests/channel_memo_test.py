@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from velbusaio.channels import Memo
+from velbusaio.properties import MemoText
 
 
 class TestMemo:
@@ -20,7 +20,7 @@ class TestMemo:
             mock_msg.memo_text = ""
             mock_msg_class.return_value = mock_msg
 
-            memo = Memo(mock_module, 1, "Memo", False, True, mock_writer, 0x01)
+            memo = MemoText(mock_module, "Memo", mock_writer)
             await memo.set("Test")
 
             # Should be called once for short text
@@ -41,7 +41,7 @@ class TestMemo:
 
             mock_msg_class.side_effect = create_msg
 
-            memo = Memo(mock_module, 1, "Memo", False, True, mock_writer, 0x01)
+            memo = MemoText(mock_module, "Memo", mock_writer)
             await memo.set("This is a long text message")
 
             # Should be called multiple times for long text (chunks of 5)

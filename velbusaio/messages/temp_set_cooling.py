@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""TempSetCoolingMessage class.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xDF
 
 @register(COMMAND_CODE)
 class TempSetCoolingMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Temp Set Cooling Message."""
 
     def __init__(self, address=None):
+        """Initialize TempSetCoolingMessage class."""
         Message.__init__(self)
         self.set_defaults(address)
 

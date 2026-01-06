@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Set Date Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,9 +13,10 @@ COMMAND_CODE = 0xB7
 
 @register(COMMAND_CODE)
 class SetDate(Message):
-    """received by all modules"""
+    """Set Date Message."""
 
     def __init__(self, address=0x00, day=None, mon=None, year=None) -> None:
+        """Initialize Set Date Message Object."""
         Message.__init__(self)
         self._day = day
         self._mon = mon
@@ -20,6 +24,7 @@ class SetDate(Message):
         self.set_defaults(address)
 
     def set_defaults(self, address) -> None:
+        """Set default values."""
         if address is not None:
             self.set_address(address)
         self.set_low_priority()
