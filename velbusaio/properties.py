@@ -6,9 +6,11 @@ author: Maikel Punie <maikel.punie@gmail.com>
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from collections.abc import Awaitable
 
 from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry
+from velbusaio.message import Message
 from velbusaio.messages.module_status import PROGRAM_SELECTION
 
 if TYPE_CHECKING:
@@ -18,13 +20,13 @@ if TYPE_CHECKING:
 class Property(BaseItem):
     """Base class for module-level properties."""
 
-    def get_channel_number(self):
+    def get_channel_number(self) -> int:
         """Return the channel number of this property (always 0)."""
         return 0
 
     def get_identifier(self) -> str:
         """Return the identifier of the entity."""
-        return self.get_module_address()
+        return str(self.get_module_address())
 
     def is_sub_device(self) -> bool:
         """Return false, a property is never a subdevice."""
@@ -49,7 +51,9 @@ class Property(BaseItem):
 class PSUPower(Property):
     """PSU Power property."""
 
-    def __init__(self, module: Module, name: str, writer: callable[[object], object]):
+    def __init__(
+        self, module: Module, name: str, writer: callable[[Message], Awaitable[None]]
+    ):
         """Initialize PSU power property with per-instance current value."""
         super().__init__(module, name, writer)
         self._cur: float = 0.0
@@ -74,7 +78,7 @@ class PSULoad(PSUPower):
 class MemoText(Property):
     """Memo text property."""
 
-    def get_categories(self):
+    def get_categories(self) -> list[str]:
         """The MemoText property has no categories."""
         return []
 
@@ -96,7 +100,12 @@ class MemoText(Property):
 class SelectedProgram(Property):
     """A selected program property."""
 
-    _selected_program_str = None
+    def __init__(
+        self, module: Module, name: str, writer: callable[[Message], Awaitable[None]]
+    ):
+        """Initialize PSU power property with per-instance current value."""
+        super().__init__(module, name, writer)
+        self._selected_program_str = None
 
     def get_categories(self) -> list[str]:
         """Return the categories for this property."""

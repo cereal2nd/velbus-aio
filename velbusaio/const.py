@@ -46,7 +46,6 @@ SCAN_MODULEINFO_TIMEOUT_INTERVAL: Final = (
     150  # time to wait for info interval (between next message)
 )
 
-DEVICE_CLASS_ILLUMINANCE: Final = "illuminance"
 DEVICE_CLASS_TEMPERATURE: Final = "temperature"
 TEMP_CELSIUS: Final = "°C"
 ENERGY_KILO_WATT_HOUR: Final = "kWh"

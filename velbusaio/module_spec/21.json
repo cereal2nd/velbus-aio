@@ -348,7 +348,7 @@
   "ThermostatAddr": "3",
   "Type": "VMBGPO",
   "Properties": {
-    "memotext": {
+    "memo_text": {
       "Type": "MemoText",
       "Name": "Memo Text"
     },

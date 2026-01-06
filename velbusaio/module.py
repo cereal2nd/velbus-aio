@@ -591,12 +591,12 @@ class Module:
             await self._update_property("psu_load_2", {"cur": message.load_2})
         elif isinstance(message, PsuValuesMessage):
             if message.channel == 3:
-                append = "out"
+                suffix = "out"
             else:
-                append = f"{message.channel}"
-            await self._update_property(f"psu_power_{append}", {"cur": message.watt})
-            await self._update_property(f"psu_voltage_{append}", {"cur": message.volt})
-            await self._update_property(f"psu_current_{append}", {"cur": message.amp})
+                suffix = f"{message.channel}"
+            await self._update_property(f"psu_power_{suffix}", {"cur": message.watt})
+            await self._update_property(f"psu_voltage_{suffix}", {"cur": message.volt})
+            await self._update_property(f"psu_current_{suffix}", {"cur": message.amp})
         # notify status
         self._got_status.set()
 
@@ -886,7 +886,7 @@ class Module:
                 cls = getattr(channels_module, chan_type)
             except AttributeError:
                 self._log.error(
-                    "Unknown channel type '%s' for property '%s' on module address %s",
+                    "Unknown channel type '%s' for channel '%s' on module address %s",
                     chan_type,
                     chan,
                     getattr(self, "_address", "unknown"),
@@ -915,7 +915,7 @@ class VmbDali(Module):
     """DALI has a variable number of channels.
 
     Therefore we create a module that first creates 64 placeholder channels.
-    After that it requests the DALI device settings to find out
+    After that it requests the DALI device settings to determine the actual channels.
     """
 
     def __init__(

@@ -3,7 +3,6 @@
 import pytest
 
 from velbusaio.properties import LightValue
-from velbusaio.const import DEVICE_CLASS_ILLUMINANCE
 
 
 class TestLightSensor:

@@ -446,7 +446,7 @@
   "ThermostatAddr": "3",
   "Type": "VMBELO-20",
   "Properties": {
-    "memotext": {
+    "memo_text": {
       "Type": "MemoText",
       "Name": "Memo Text"
     }

@@ -54,13 +54,12 @@ class Channel(BaseItem):
         else:
             self._is_loaded = False
         self._address = address
-        self._on_status_update = []
         self._name_parts = {}
 
     def get_identifier(self) -> str:
         """Return the identifier of the entity."""
         if not self.is_sub_device():
-            return self.get_module_address()
+            return str(self.get_module_address())
         return f"{self.get_module_address()}-{self.get_channel_number()}"
 
     def get_module_address(self, chan_type: str = "") -> int:
