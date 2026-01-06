@@ -5,7 +5,7 @@ author: Maikel Punie <maikel.punie@gmail.com>
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 from collections.abc import Awaitable
 
 from velbusaio.baseItem import BaseItem
@@ -52,7 +52,7 @@ class PSUPower(Property):
     """PSU Power property."""
 
     def __init__(
-        self, module: Module, name: str, writer: callable[[Message], Awaitable[None]]
+        self, module: Module, name: str, writer: Callable[[Message], Awaitable[None]]
     ):
         """Initialize PSU power property with per-instance current value."""
         super().__init__(module, name, writer)
@@ -101,7 +101,7 @@ class SelectedProgram(Property):
     """A selected program property."""
 
     def __init__(
-        self, module: Module, name: str, writer: callable[[Message], Awaitable[None]]
+        self, module: Module, name: str, writer: Callable[[Message], Awaitable[None]]
     ):
         """Initialize PSU power property with per-instance current value."""
         super().__init__(module, name, writer)
@@ -137,7 +137,9 @@ class SelectedProgram(Property):
 class LightValue(Property):
     """Light value property."""
 
-    def __init__(self, module: Module, name: str, writer: callable[[object], object]):
+    def __init__(
+        self, module: Module, name: str, writer: Callable[[Message], Awaitable[None]]
+    ):
         """Initialize light value property with per-instance current value."""
         super().__init__(module, name, writer)
         self._cur: float = 0.0
