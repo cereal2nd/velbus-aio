@@ -1,4 +1,4 @@
-"""Velbusaio property classes.
+"""BaseItem base class for Velbusaio properties and channels.
 
 author: Maikel Punie <maikel.punie@gmail.com>
 """
