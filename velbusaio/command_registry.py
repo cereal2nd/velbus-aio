@@ -5,6 +5,11 @@
 
 from __future__ import annotations
 
+
+class CommandRegistryError(Exception):
+    """Custom exception for command registry errors."""
+
+
 MODULE_DIRECTORY = {
     0x01: "VMB8PB",
     0x02: "VMB1RY",
@@ -116,7 +121,7 @@ class CommandRegistry:
         if command_value < 0 or command_value > 255:
             raise ValueError("Command_value should be >=0 and <=255")
         if module_name and module_name not in self._module_directory.values():
-            raise Exception(f"Module name {module_name} not known")
+            raise CommandRegistryError(f"Module name {module_name} not known")
         if module_name:
             module_type = next(
                 (
@@ -139,7 +144,7 @@ class CommandRegistry:
         if command_value not in self._overrides[module_type]:
             self._overrides[module_type][command_value] = command_class
         else:
-            raise Exception(
+            raise CommandRegistryError(
                 f"double registration in command registry {command_value} {command_class}"
             )
 
@@ -148,7 +153,7 @@ class CommandRegistry:
         if command_value not in self._default_commands:
             self._default_commands[command_value] = command_class
         else:
-            raise Exception("double registration in command registry")
+            raise CommandRegistryError("double registration in command registry")
 
     def has_command(self, command_value: int, module_type: int = 0) -> bool:
         """Find a command."""

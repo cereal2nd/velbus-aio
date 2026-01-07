@@ -1,4 +1,7 @@
-""":author: Danny De Gaspari"""
+"""TempSensorSettingsPart3 message implementation.
+
+:author: Danny De Gaspari
+"""
 
 from __future__ import annotations
 
@@ -10,6 +13,8 @@ COMMAND_CODE = 0xC6
 
 @register(COMMAND_CODE)
 class TempSensorSettingsPart3(Message):
+    """TempSensorSettingsPart3 message class."""
+
     def populate(self, priority, address, rtr, data):
         """:return: None"""
         self.needs_low_priority(priority)

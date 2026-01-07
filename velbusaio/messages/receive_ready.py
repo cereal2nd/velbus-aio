@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Receive Ready Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,9 +13,7 @@ COMMAND_CODE = 0x0C
 
 @register(COMMAND_CODE)
 class ReceiveReadyMessage(Message):
-    """send by:
-    received by: VMB1USB
-    """
+    """Receive Ready Message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

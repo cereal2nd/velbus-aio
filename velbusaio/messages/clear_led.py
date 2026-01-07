@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Channel Clear LED message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xF5
 
 @register(COMMAND_CODE)
 class ClearLedMessage(Message):
-    """send by: VMB4RYLD
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Channel Clear LED message."""
 
     def __init__(self, address=None):
+        """Initialize Channel Clear LED message."""
         Message.__init__(self)
         self.leds = []
         self.set_defaults(address)

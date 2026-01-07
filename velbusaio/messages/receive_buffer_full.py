@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Receive Buffer Full Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0x0B
 
 @register(COMMAND_CODE)
 class ReceiveBufferFullMessage(Message):
-    """send by:
-    received by: VMB1USB
-    """
+    """Receive Buffer Full Message."""
 
     def set_defaults(self, address):
+        """Set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

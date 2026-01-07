@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Relay Status Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -24,11 +27,10 @@ LED_VERY_FAST_BLINKING = 1 << 4
 
 @register(COMMAND_CODE)
 class RelayStatusMessage(Message):
-    """send by: VMB4RYLD
-    received by:
-    """
+    """Relay Status Message."""
 
     def __init__(self, address=None):
+        """Initialize Relay Status Message Object."""
         Message.__init__(self)
         self.channel = 0
         self.disable_inhibit_forced = 0
@@ -91,6 +93,8 @@ class RelayStatusMessage(Message):
 
 @register(COMMAND_CODE, ["VMB4RY"])
 class RelayStatusMessage2(RelayStatusMessage):
+    """Relay Status Message."""
+
     def is_on(self):
         """:return: bool"""
         if (self.status >> (self.channel - 1)) & 1 != 0:
@@ -100,11 +104,10 @@ class RelayStatusMessage2(RelayStatusMessage):
 
 @register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20"])
 class RelayStatusMessage3(Message):
-    """send by: VMB4RYLD
-    received by:
-    """
+    """Relay Status Message."""
 
     def __init__(self, address=None):
+        """Initialize Relay Status Message Object."""
         Message.__init__(self)
         self.channels = []
         self.disable_inhibit_forced = 0

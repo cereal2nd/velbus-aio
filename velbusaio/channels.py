@@ -6,10 +6,10 @@ author: Maikel Punie <maikel.punie@gmail.com>
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
 import math
 import string
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry
@@ -76,6 +76,10 @@ class Channel(BaseItem):
         """Return channel number."""
         return self._num
 
+    def set_loaded(self, loaded: bool) -> None:
+        """Set if this channel is loaded."""
+        self._is_loaded = loaded
+
     def is_loaded(self) -> bool:
         """Is this channel loaded."""
         return self._is_loaded
@@ -87,6 +91,10 @@ class Channel(BaseItem):
     def is_temperature(self) -> bool:
         """Return if this channel is a temperature sensor."""
         return False
+
+    def set_sub_device(self, sub_device: bool) -> None:
+        """Set if this channel is a subdevice."""
+        self._subDevice = sub_device
 
     def is_sub_device(self) -> bool:
         """Return if this channel is a subdevice."""
@@ -429,6 +437,10 @@ class ButtonCounter(Button):
         if self._Unit == ENERGY_KILO_WATT_HOUR:
             return "W"
         return None
+
+    def set_unit(self, unit: str) -> None:
+        """Set the unit of the counter."""
+        self._Unit = unit
 
     def get_counter_state(self) -> int:
         """Return the current state of the counter."""

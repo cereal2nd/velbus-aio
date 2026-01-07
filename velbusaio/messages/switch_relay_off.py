@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Switch Relay Off Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0x01
 
 @register(COMMAND_CODE)
 class SwitchRelayOffMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Switch Relay Off Message."""
 
     def __init__(self, address=None):
+        """Initialize SwitchRelayOffMessage class."""
         Message.__init__(self)
         self.relay_channels = []
         self.set_defaults(address)
@@ -28,6 +30,7 @@ class SwitchRelayOffMessage(Message):
         self.relay_channels = self.byte_to_channels(data[0])
 
     def set_defaults(self, address):
+        """Set default values for the message."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

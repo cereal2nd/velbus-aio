@@ -5,8 +5,8 @@ author: Maikel Punie <maikel.punie@gmail.com>
 
 from __future__ import annotations
 
-from collections.abc import Awaitable
-from typing import TYPE_CHECKING, Callable
+from collections.abc import Awaitable, Callable
+from typing import TYPE_CHECKING
 
 from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry

@@ -1,4 +1,7 @@
-""":author: Tom Dupré <gitd8400@gmail.com>"""
+"""Blind Status message.
+
+:author: Tom Dupré <gitd8400@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -13,11 +16,10 @@ DSTATUS = {0: "off", 1: "up", 2: "down"}
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class BlindStatusNgMessage(Message):
-    """sent by: VMB2BLE
-    received by:
-    """
+    """Blind Status NG message."""
 
     def __init__(self, address=None):
+        """Initialize BlindStatusNgMessage class."""
         Message.__init__(self)
         self.channel = 0
         self.timeout = 0
@@ -26,7 +28,7 @@ class BlindStatusNgMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """:return: None"""
+        """Populate message fields."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -37,7 +39,7 @@ class BlindStatusNgMessage(Message):
         self.position = data[4]  # 0..255 (0=open, 255=closed)
 
     def to_json(self):
-        """:return: str"""
+        """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
         json_dict["timeout"] = self.timeout
@@ -46,16 +48,19 @@ class BlindStatusNgMessage(Message):
         return json.dumps(json_dict)
 
     def is_moving_up(self) -> bool:
+        """Is moving up."""
         return self.status == 0x01
 
     def is_moving_down(self) -> bool:
+        """Is moving down."""
         return self.status == 0x02
 
     def is_stopped(self) -> bool:
+        """Is stopped."""
         return self.status == 0x00
 
     def data_to_binary(self):
-        """:return: bytes"""
+        """To binary data."""
         return bytes(
             [
                 COMMAND_CODE,
@@ -72,11 +77,10 @@ class BlindStatusNgMessage(Message):
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class BlindStatusMessage(Message):
-    """sent by: VMB2BLE
-    received by:
-    """
+    """Blind Status message."""
 
     def __init__(self, address=None):
+        """Initialize BlindStatusMessage class."""
         Message.__init__(self)
         self.channel = 0
         self.timeout = 0
@@ -84,7 +88,7 @@ class BlindStatusMessage(Message):
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
-        """:return: None"""
+        """Populate message fields."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -99,7 +103,7 @@ class BlindStatusMessage(Message):
         self.status = (data[2] >> ((self.channel - 1) * 2)) & 0x03
 
     def to_json(self):
-        """:return: str"""
+        """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
         json_dict["timeout"] = self.timeout
@@ -107,10 +111,13 @@ class BlindStatusMessage(Message):
         return json.dumps(json_dict)
 
     def is_moving_up(self) -> bool:
+        """Is moving up."""
         return self.status == 0x01
 
     def is_moving_down(self) -> bool:
+        """Is moving down."""
         return self.status == 0x02
 
     def is_stopped(self) -> bool:
+        """Is stopped."""
         return self.status == 0x00

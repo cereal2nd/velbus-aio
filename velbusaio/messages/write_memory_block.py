@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Write Memory Block message class.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xCA
 
 @register(COMMAND_CODE)
 class WriteMemoryBlockMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Write Memory Block message class."""
 
     def __init__(self, address=None):
+        """WriteMemoryBlockMessage constructor."""
         Message.__init__(self)
         self.high_address = 0x00
         self.low_address = 0x00
@@ -33,4 +35,4 @@ class WriteMemoryBlockMessage(Message):
 
     def data_to_binary(self):
         """:return: bytes"""
-        return bytes([COMMAND_CODE, self.high_address, self.low_address] + self.data)
+        return bytes([COMMAND_CODE, self.high_address, self.low_address, *self.data])

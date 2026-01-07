@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Read Data Block From Memory Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xFD
 
 @register(COMMAND_CODE)
 class ReadDataFromMemoryMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Read Data From Memory Message."""
 
     def __init__(self, address=None):
+        """Initialize Read Data From Memory Message Object."""
         Message.__init__(self)
         self.high_address = 0x00
         self.low_address = 0x00

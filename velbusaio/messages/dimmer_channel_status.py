@@ -1,4 +1,7 @@
-""":author: Frank van Breugel"""
+"""Dimmer Channel Status message class.
+
+:author: Frank van Breugel
+"""
 
 from __future__ import annotations
 
@@ -25,11 +28,10 @@ LED_VERY_FAST_BLINKING = 1 << 4
     ["VMB4DC", "VMBDMI", "VMBDMI-R", "VMB8DC-20", "VMB4LEDPWM-20", "VMB2DC-20"],
 )
 class DimmerChannelStatusMessage(Message):
-    """sent by: VMB4DC
-    received by:
-    """
+    """Dimmer Channel Status message."""
 
     def __init__(self, address=None):
+        """Initialize Dimmer Channel Status message."""
         Message.__init__(self)
         self.channel = 1
         self.disable_inhibit_forced = 0

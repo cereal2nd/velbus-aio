@@ -8,10 +8,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from velbusaio.channels import Channel
-from velbusaio.const import (
-    NO_RTR,
-    PRIORITY_LOW,
-)
+from velbusaio.const import NO_RTR, PRIORITY_LOW
 from velbusaio.controller import Velbus
 from velbusaio.helpers import get_cache_dir
 from velbusaio.messages.module_status import (

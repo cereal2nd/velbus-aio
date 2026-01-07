@@ -1,4 +1,7 @@
-""":author: Maikel Punie"""
+"""PSU Values Message.
+
+:author: Maikel Punie
+"""
 
 from __future__ import annotations
 
@@ -12,7 +15,10 @@ COMMAND_CODE = 0xA3
 
 @register(COMMAND_CODE, ["VMBPSUMNGR-20"])
 class PsuValuesMessage(Message):
+    """PSU Values Message."""
+
     def __init__(self, address=None):
+        """Initialize PSU Values Message Object."""
         Message.__init__(self)
         self.channel = 0
         self.watt = 0

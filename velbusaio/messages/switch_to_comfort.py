@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Switch to comfort message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xDB
 
 @register(COMMAND_CODE)
 class SwitchToComfortMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Switch to comfort message."""
 
     def __init__(self, address=None, sleep=0):
+        """Initialize SwitchToComfortMessage instance."""
         Message.__init__(self)
         self.sleep = sleep
         self.set_defaults(address)

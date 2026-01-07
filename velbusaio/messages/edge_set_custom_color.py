@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Edge Set Custom Color message class.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xD4
 
 @register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO"])
 class EdgeSetCustomColor(Message):
-    """send by:
-    received by: VMBEL1, VMBEL2, VMBEL4, VMBELO
-    """
+    """Edge Set Custom Color message."""
 
     def __init__(self, address=None):
+        """Initialize Edge Set Custom Color message."""
         Message.__init__(self)
         self.set_defaults(address)
         self.pallet = 31

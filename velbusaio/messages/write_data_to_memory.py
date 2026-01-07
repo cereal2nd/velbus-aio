@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Write Data To Memory message class.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xFC
 
 @register(COMMAND_CODE)
 class WriteDataToMemoryMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Write Data To Memory message class."""
 
     def __init__(self, address=None):
+        """Initialize Write Data To Memory message object."""
         Message.__init__(self)
         self.high_address = 0x00
         self.low_address = 0x00

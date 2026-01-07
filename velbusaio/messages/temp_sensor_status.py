@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""TempSensorStatus message implementation.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -14,11 +17,10 @@ DMODE = {0: "safe", 16: "night", 32: "day", 64: "comfort"}
 
 @register(COMMAND_CODE)
 class TempSensorStatusMessage(Message):
-    """send by: VMBGPOD
-    received by:
-    """
+    """TempSensorStatus message class."""
 
     def __init__(self, address=None):
+        """Initialize TempSensorStatus message class."""
         Message.__init__(self)
         self.local_control = 0  # 0=unlocked, 1 =locked
         self.status_mode = 0  # DSTATUS
@@ -40,10 +42,13 @@ class TempSensorStatusMessage(Message):
         self.sleep_timer = None
 
     def getCurTemp(self):
+        """Get current temperature."""
         return self.current_temp
 
     def populate(self, priority, address, rtr, data):
-        """-DB1    last bit        = local_control
+        """Populate message attributes.
+
+        -DB1    last bit        = local_control
         -DB1    bit 2+3         = status_mode
         -DB1    bit 4           = auto send
         -DB1    bit 5+6+7       = mode

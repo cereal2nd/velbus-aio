@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Module SubType Message class.
+
+author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -16,13 +19,10 @@ COMMAND_CODE_3 = 0xA6
 @register(COMMAND_CODE_2)
 @register(COMMAND_CODE_3)
 class ModuleSubTypeMessage(Message):
-    """send by: VMB6IN, VMB4RYLD
-    received by:
-    """
-
-    # pylint: disable-msg=R0902
+    """Module SubType Message."""
 
     def __init__(self, address=None, sub_address_offset: int = 0) -> None:
+        """Initialize Module SubType Message object."""
         Message.__init__(self)
         self.module_type = 0x00
         self.sub_address_1 = 0xFF

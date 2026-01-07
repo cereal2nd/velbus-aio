@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Forced On message class.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,6 +13,8 @@ COMMAND_CODE = 0x14
 
 @register(COMMAND_CODE)
 class ForcedOn(Message):
+    """Forced On message."""
+
     def populate(self, priority, address, rtr, data):
         """:return: None"""
         self.needs_low_priority(priority)

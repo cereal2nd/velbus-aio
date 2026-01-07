@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Module Status Request Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -12,11 +15,10 @@ PROGRAM_SELECTION = {0: "none", 1: "summer", 2: "winter", 3: "holiday"}
 
 @register(COMMAND_CODE)
 class ModuleStatusMessage(Message):
-    """send by: VMB6IN
-    received by:
-    """
+    """Module Status Message."""
 
     def __init__(self, address=None):
+        """Initialize Module Status Message object."""
         Message.__init__(self)
         self.closed = []
         self.led_on = []
@@ -84,7 +86,10 @@ class ModuleStatusMessage(Message):
     ],
 )
 class ModuleStatusMessage2(Message):
+    """Module Status Message for specific modules."""
+
     def __init__(self, address=None):
+        """Initialize Module Status Message object."""
         Message.__init__(self)
         self.closed = []
         self.enabled = []
@@ -95,6 +100,7 @@ class ModuleStatusMessage2(Message):
         self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
 
     def populate(self, priority, address, rtr, data):
+        """Populate the message from binary data."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 6)
@@ -122,7 +128,10 @@ class ModuleStatusMessage2(Message):
 
 @register(COMMAND_CODE, ["VMBPIRO", "VMBPIRM", "VMBPIRC", "VMBELPIR"])
 class ModuleStatusPirMessage(Message):
+    """Module Status PIR Message."""
+
     def __init__(self, address=None):
+        """Initialize Module Status PIR Message object."""
         Message.__init__(self)
         # in data[0]
         self.dark: bool = False  # bit 1
@@ -140,6 +149,7 @@ class ModuleStatusPirMessage(Message):
         self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
 
     def populate(self, priority, address, rtr, data):
+        """Populate the message from binary data."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
@@ -163,7 +173,10 @@ class ModuleStatusPirMessage(Message):
 
 @register(COMMAND_CODE, ["VMBGP4PIR", "VMBGP4PIR-2"])
 class ModuleStatusGP4PirMessage(Message):
+    """Module Status GP4 PIR Message."""
+
     def __init__(self, address=None):
+        """Initialize Module Status GP4 PIR Message object."""
         Message.__init__(self)
         # in data[0]
         self.closed = []
@@ -183,6 +196,7 @@ class ModuleStatusGP4PirMessage(Message):
         self.light_value_send_interval = 0
 
     def populate(self, priority, address, rtr, data):
+        """Populate the message from binary data."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)

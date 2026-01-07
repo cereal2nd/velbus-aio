@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from velbusaio.properties import SelectedProgram
 from velbusaio.messages.module_status import PROGRAM_SELECTION
+from velbusaio.properties import SelectedProgram
 
 
 class TestSelectedProgram:

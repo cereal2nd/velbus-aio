@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Cover Position message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0x1C
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class CoverPosMessage(Message):
-    """sent by:
-    received by: VMB2BLE
-    """
+    """Cover Position message."""
 
     def __init__(self, address=None):
+        """Initialize Cover Position message."""
         Message.__init__(self)
         self.channel = 0
         self.position = 0
@@ -30,6 +32,7 @@ class CoverPosMessage(Message):
         self.position = data[1]
 
     def set_defaults(self, address):
+        """Logic to set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

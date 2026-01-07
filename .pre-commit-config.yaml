@@ -1,4 +1,13 @@
 repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.13.0
+    hooks:
+      - id: ruff-check
+        files: ^velbusaio/.+\.py?$
+        args:
+          - --fix
+      - id: ruff-format
+        files: ^velbusaio/.+\.py?$
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:

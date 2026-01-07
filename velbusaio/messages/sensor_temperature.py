@@ -1,4 +1,7 @@
-""":author: Maikel Punie <maikel.punie@gmail.com>"""
+"""Sensor Temperature Request Message.
+
+:author: Maikel Punie <maikel.punie@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -10,27 +13,31 @@ COMMAND_CODE = 0xE6
 
 @register(COMMAND_CODE)
 class SensorTemperatureMessage(Message):
-    """send by: VMBTS, vmbg*pd, ...
-    received by:
-    """
+    """Sensor Temperature Message."""
 
     def __init__(self, address=None):
+        """Initialize Sensor Temperature Message Object."""
         Message.__init__(self)
         self.cur = 0
         self.min = 0
         self.max = 0
 
     def getCurTemp(self):
+        """Get current temperature."""
         return self.cur
 
     def getMaxTemp(self):
+        """Get maximum temperature."""
         return self.max
 
     def getMinTemp(self):
+        """Get minimum temperature."""
         return self.min
 
     def populate(self, priority, address, rtr, data):
-        """Data bytes (high + low)
+        """POPULATE the message object with data.
+
+        Data bytes (high + low)
             1 + 2   = current temp
             3 + 4   = min temp
             5 + 6   = max temp

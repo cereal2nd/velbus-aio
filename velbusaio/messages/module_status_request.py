@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Module Status Request Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xFA
 
 @register(COMMAND_CODE)
 class ModuleStatusRequestMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Module Status Request Message."""
 
     def __init__(self, address=None):
+        """Initialize Module Status Request Message object."""
         Message.__init__(self)
         self.channels: list | str = []
         self.wait_after_send = 500

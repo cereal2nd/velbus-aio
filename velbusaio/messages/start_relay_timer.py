@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Start relay timer message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -12,17 +15,17 @@ COMMAND_CODE = 0x03
 
 @register(COMMAND_CODE)
 class StartRelayTimerMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Start relay timer message."""
 
     def __init__(self, address=None):
+        """Initialize StartRelayTimerMessage class."""
         Message.__init__(self)
         self.relay_channels = []
         self.delay_time = 0
         self.set_defaults(address)
 
     def set_defaults(self, address):
+        """Set the default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

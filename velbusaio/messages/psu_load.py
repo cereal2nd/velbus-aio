@@ -1,4 +1,7 @@
-""":author: Maikel Punie"""
+"""PSU Load Message.
+
+:author: Maikel Punie
+"""
 
 from __future__ import annotations
 
@@ -15,7 +18,10 @@ BACKUP = 0x03
 
 @register(COMMAND_CODE, ["VMBPSUMNGR-20"])
 class PsuLoadMessage(Message):
+    """PSU Load Message."""
+
     def __init__(self, address=None):
+        """Initialize PSU Load Message Object."""
         Message.__init__(self)
         self.mode = 0
         self.load_1 = 0

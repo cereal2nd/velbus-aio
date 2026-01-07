@@ -1,4 +1,7 @@
-""":author: Frank van Breugel"""
+"""Restore Dimmer Message.
+
+:author: Frank van Breugel
+"""
 
 from __future__ import annotations
 
@@ -23,16 +26,16 @@ COMMAND_CODE = 0x11
     ],
 )
 class RestoreDimmerMessage(Message):
-    """send by:
-    received by: VMBDME, VMB4DC
-    """
+    """Restore Dimmer Message."""
 
     def __init__(self, address=None):
+        """Initialize Restore Dimmer Message Object."""
         Message.__init__(self)
         self.dimmer_channels = []
         self.set_defaults(address)
 
     def set_defaults(self, address):
+        """Set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()
@@ -62,10 +65,14 @@ class RestoreDimmerMessage(Message):
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
 class RestoreDimmerMessage2(RestoreDimmerMessage):
+    """Restore Dimmer Message."""
+
     def byte_to_channels(self, byte: int) -> list[int]:
+        """Break down byte into list of channels."""
         return [byte]
 
     def channels_to_byte(self, channels: list[int]) -> int:
+        """Convert list of channels into byte."""
         if len(channels) != 1:
             raise ValueError("We should have exact one channel")
         return channels[0]

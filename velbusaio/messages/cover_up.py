@@ -1,4 +1,7 @@
-""":author: Tom Dupré <gitd8400@gmail.com>"""
+"""Cover Up message.
+
+:author: Tom Dupré <gitd8400@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -12,11 +15,10 @@ COMMAND_CODE = 0x05
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
 class CoverUpMessage(Message):
-    """sent by:
-    received by: VMB2BLE
-    """
+    """Cover Up message."""
 
     def __init__(self, address=None):
+        """Initialize Cover Up message."""
         Message.__init__(self)
         self.channel = 0
         self.delay_time = 0
@@ -32,6 +34,7 @@ class CoverUpMessage(Message):
         (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[1:])
 
     def set_defaults(self, address):
+        """Logic to set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()
@@ -47,11 +50,10 @@ class CoverUpMessage(Message):
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class CoverUpMessage2(Message):
-    """sent by:
-    received by: VMB1BL VMB2BL
-    """
+    """Cover Up message."""
 
     def __init__(self, address=None):
+        """Initialize Cover Up message."""
         Message.__init__(self)
         self.channel = 0
         self.delay_time = 0
@@ -71,6 +73,7 @@ class CoverUpMessage2(Message):
         (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[1:])
 
     def set_defaults(self, address):
+        """Logic to set default values."""
         if address is not None:
             self.set_address(address)
         self.set_high_priority()

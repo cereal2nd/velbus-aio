@@ -36,6 +36,16 @@ class BaseItem(ABC):
         return self._name
 
     @final
+    def set_name(self, name: str) -> None:
+        """Set the name of this item."""
+        self._name = name
+
+    @final
+    def set_writer(self, writer: Callable[[Message], Awaitable[None]]) -> None:
+        """Set the writer function for this item."""
+        self._writer = writer
+
+    @final
     def get_module(self) -> Module:
         """Get the module this property belongs to."""
         return self._module

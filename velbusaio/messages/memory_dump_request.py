@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Memory Dump Request Message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,9 +13,7 @@ COMMAND_CODE = 0xCB
 
 @register(COMMAND_CODE)
 class MemoryDumpRequestMessage(Message):
-    """send by:
-    received by: VMB6IN, VMB4RYLD
-    """
+    """Memory Dump Request Message."""
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

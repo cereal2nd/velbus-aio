@@ -1,4 +1,7 @@
-""":author: Thomas Delaet <thomas@delaet.org>"""
+"""Switch to night message.
+
+:author: Thomas Delaet <thomas@delaet.org>
+"""
 
 from __future__ import annotations
 
@@ -10,11 +13,10 @@ COMMAND_CODE = 0xDD
 
 @register(COMMAND_CODE)
 class SwitchToNightMessage(Message):
-    """send by:
-    received by: VMB4RYLD
-    """
+    """Switch to night message."""
 
     def __init__(self, address=None, sleep=0):
+        """Initialize SwitchToNightMessage instance."""
         Message.__init__(self)
         self.sleep = sleep
         self.set_defaults(address)

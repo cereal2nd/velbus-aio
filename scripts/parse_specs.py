@@ -14,8 +14,8 @@ robust (walks up from the script location to find the repo root).
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
+import sys
 from typing import Any
 
 # How many directory levels to walk up from this script to try to find the repo root

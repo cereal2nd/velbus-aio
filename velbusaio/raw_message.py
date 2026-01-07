@@ -1,6 +1,8 @@
+"""Raw message representation and parsing for Velbus messages."""
+
 import binascii
 import logging
-from typing import NamedTuple, Optional
+from typing import NamedTuple
 
 from velbusaio.const import (
     END_BYTE,
@@ -13,26 +15,31 @@ from velbusaio.const import (
     START_BYTE,
     TAIL_LENGTH,
 )
-from velbusaio.util import checksum
-from velbusaio.util import checksum as calculate_checksum
+from velbusaio.util import checksum, checksum as calculate_checksum
+
+logger = logging.getLogger(__name__)
 
 
 class RawMessage(NamedTuple):
+    """Raw Velbus message representation."""
+
     priority: int
     address: int
     rtr: bool
     data: bytes
 
     @property
-    def command(self) -> Optional[int]:
+    def command(self) -> int | None:
+        """Return the command byte of the message."""
         return self.data[0] if len(self.data) > 0 else None
 
     @property
-    def data_only(self) -> Optional[bytes]:
+    def data_only(self) -> bytes | None:
+        """Return the data bytes excluding the command byte."""
         return self.data[1:] if len(self.data) > 1 else None
 
     def to_bytes(self) -> bytes:
-        # create header:
+        """Convert the RawMessage back to bytes."""
         header_bytes = bytes(
             [
                 START_BYTE,
@@ -47,6 +54,7 @@ class RawMessage(NamedTuple):
         return header_bytes + self.data + tail_bytes
 
     def __repr__(self) -> str:
+        """Return string representation of the RawMessage."""
         return (
             f"RawMessage(priority={self.priority:02x}, address={self.address:02x},"
             f" rtr={self.rtr!r}, command={self.command},"
@@ -54,19 +62,21 @@ class RawMessage(NamedTuple):
         )
 
 
-def create(rawmessage: bytearray) -> tuple[Optional[RawMessage], bytearray]:
+def create(rawmessage: bytearray) -> tuple[RawMessage | None, bytearray]:
+    """Create a RawMessage from a bytearray buffer."""
+
     rawmessage = _trim_buffer_garbage(rawmessage)
 
     while True:
         if len(rawmessage) < MINIMUM_MESSAGE_SIZE:
-            logging.debug("Buffer does not yet contain a full message")
             return None, rawmessage
 
         try:
             return _parse(rawmessage)
         except ParseError:
-            logging.error(
-                f"Could not parse the message {binascii.hexlify(rawmessage)}. Truncating invalid data."
+            logger.error(
+                "Could not parse the message %s. Truncating invalid data.",
+                binascii.hexlify(rawmessage),
             )
             rawmessage = _trim_buffer_garbage(
                 rawmessage[1:]
@@ -74,10 +84,11 @@ def create(rawmessage: bytearray) -> tuple[Optional[RawMessage], bytearray]:
 
 
 class ParseError(Exception):
-    pass
+    """Exception raised for errors in the parsing of raw messages."""
 
 
-def _parse(rawmessage: bytearray) -> tuple[Optional[RawMessage], bytearray]:
+def _parse(rawmessage: bytearray) -> tuple[RawMessage | None, bytearray]:
+    """Parse a RawMessage from a bytearray buffer."""
     if len(rawmessage) < MINIMUM_MESSAGE_SIZE or len(rawmessage) > MAXIMUM_MESSAGE_SIZE:
         raise ValueError("Received a raw message with an illegal lemgth")
     if rawmessage[0] != START_BYTE:
@@ -135,8 +146,9 @@ def _trim_buffer_garbage(rawmessage: bytearray) -> bytearray:
             #                )
             #            )
             return rawmessage[start_index:]
-        logging.debug(
-            f"Trimming whole buffer as it does not contain the start byte: {binascii.hexlify(rawmessage)}"
+        logger.debug(
+            "Trimming whole buffer as it does not contain the start byte: %s",
+            binascii.hexlify(rawmessage),
         )
         return []
 
