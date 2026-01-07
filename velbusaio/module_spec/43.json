@@ -6,7 +6,6 @@
       "Type": "Button"
     }
   },
-  "Info": "One channel input module",
   "Type": "VMBIN",
   "Memory": {
     "Channels": {

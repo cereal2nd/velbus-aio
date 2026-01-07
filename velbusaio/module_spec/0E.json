@@ -1,24 +1,5 @@
 {
-  "Info": "TemperatureController Module",
   "Memory": {
-    "Address": {
-      "00F0": { "ModuleName": "0:Start" },
-      "00F1": { "ModuleName": "1" },
-      "00F2": { "ModuleName": "2" },
-      "00F3": { "ModuleName": "3" },
-      "00F4": { "ModuleName": "4" },
-      "00F5": { "ModuleName": "5" },
-      "00F6": { "ModuleName": "6" },
-      "00F7": { "ModuleName": "7" },
-      "00F8": { "ModuleName": "8" },
-      "00F9": { "ModuleName": "9" },
-      "00FA": { "ModuleName": "10" },
-      "00FB": { "ModuleName": "11" },
-      "00FC": { "ModuleName": "12" },
-      "00FD": { "ModuleName": "13" },
-      "00FE": { "ModuleName": "14" },
-      "00FF": { "ModuleName": "16:Save" }
-    },
     "ModuleName": "00F0-00FF"
   },
   "Type": "VMB1TC"

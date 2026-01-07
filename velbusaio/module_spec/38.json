@@ -83,7 +83,6 @@
       "Type": "Relay"
     }
   },
-  "Info": "Edge-lit Motion detector with one touch button module",
   "TemperatureChannel": "09",
   "ThermostatAddr": "0",
   "Type": "VMBELPIR",

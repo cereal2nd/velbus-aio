@@ -41,7 +41,6 @@
       "Type": "Button"
     }
   },
-  "Info": "8 channel RF receiver module",
   "Type": "VMBRFR8S",
   "Memory": {
     "Channels": {

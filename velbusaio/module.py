@@ -68,6 +68,7 @@ from velbusaio.messages.dimmer_channel_status import DimmerChannelStatusMessage
 from velbusaio.messages.dimmer_status import DimmerStatusMessage
 from velbusaio.messages.fast_blinking_led import FastBlinkingLedMessage
 from velbusaio.messages.memory_data import MemoryDataMessage
+from velbusaio.messages.memory_data_block import MemoryDataBlockMessage
 from velbusaio.messages.module_status import (
     ModuleStatusGP4PirMessage,
     ModuleStatusMessage,
@@ -80,6 +81,9 @@ from velbusaio.messages.psu_load import PsuLoadMessage
 from velbusaio.messages.psu_values import PsuValuesMessage
 from velbusaio.messages.push_button_status import PushButtonStatusMessage
 from velbusaio.messages.raw import MeteoRawMessage, SensorRawMessage
+from velbusaio.messages.read_data_block_from_memory import (
+    ReadDataBlockFromMemoryMessage,
+)
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
 from velbusaio.messages.relay_status import RelayStatusMessage, RelayStatusMessage2
 from velbusaio.messages.sensor_temperature import SensorTemperatureMessage
@@ -362,6 +366,8 @@ class Module:
             await self._cache()
         elif isinstance(message, MemoryDataMessage):
             await self._process_memory_data_message(message)
+        elif isinstance(message, MemoryDataBlockMessage):
+            await self._process_memory_data_block_message(message)
         elif isinstance(message, (RelayStatusMessage, RelayStatusMessage2)):
             await self._update_channel(
                 message.channel,
@@ -719,6 +725,49 @@ class Module:
             return
         await self._properties["memo_text"].set(txt)
 
+    async def _process_memory_data_block_message(
+        self, message: MemoryDataBlockMessage
+    ) -> None:
+        addr = f"{message.high_address:02X}{message.low_address:02X}"
+        if "Memory" not in self._data:
+            return
+        # TODO this can also be SensorName, implement that also
+        if "ModuleName" not in self._data["Memory"]:
+            return
+        addr_data = self._data["Memory"]["ModuleName"]
+        if not isinstance(self._name, dict):
+            # Already loaded as string, skip
+            return
+        # Parse address ranges: "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8"
+        ranges = []
+        byte_offset = 0
+        for block in addr_data.split(";"):
+            start_str, end_str = block.split("-")
+            start_addr = int("0x" + start_str, 0)
+            end_addr = int("0x" + end_str, 0)
+            ranges.append((start_addr, end_addr, byte_offset))
+            byte_offset += end_addr - start_addr + 1
+        # Check if incoming address falls within any range
+        incoming_addr = int("0x" + addr, 0)
+        for start_addr, end_addr, range_byte_offset in ranges:
+            if start_addr <= incoming_addr <= end_addr:
+                # Calculate the position within the overall module name
+                position_in_range = incoming_addr - start_addr
+                base_position = range_byte_offset + position_in_range
+                # Store each byte from the message data
+                for i, byte_val in enumerate(message.data):
+                    char_position = base_position + i
+                    self._name[char_position] = chr(byte_val)
+                # Check if we've received all bytes (check if all positions are filled)
+                total_bytes = ranges[-1][2] + (ranges[-1][1] - ranges[-1][0] + 1)
+                if len(self._name) >= total_bytes:
+                    # Convert to string, excluding 0xFF bytes
+                    self._name = "".join(
+                        str(x) for x in self._name.values() if x != chr(0xFF)
+                    )
+                    await self._cache()
+                break
+
     async def _process_memory_data_message(self, message: MemoryDataMessage) -> None:
         addr = f"{message.high_address:02X}{message.low_address:02X}"
         if "Memory" not in self._data:
@@ -726,32 +775,10 @@ class Module:
         if "Address" not in self._data["Memory"]:
             return
         mdata = self._data["Memory"]["Address"][addr]
-        if "ModuleName" in mdata and isinstance(self._name, dict):
-            # if self._name is a dict we are still loading
-            # if its a string it was already complete
-            char_and_save = mdata["ModuleName"].split(":")
-            char = char_and_save[0]
-            self._name[int(char)] = chr(message.data)
-            if len(char_and_save) > 1 and char_and_save[1] == "Save":
-                self._name = "".join(
-                    str(x) for x in self._name.values() if x != chr(0xFF)
-                )
-        elif "Match" in mdata:
+        if "Match" in mdata:
             for chan, chan_data in handle_match(mdata["Match"], message.data).items():
                 data = chan_data.copy()
                 await self._update_channel(chan, data)
-        elif "SensorName" in mdata:
-            # this is part of the channel names
-            # make sure we set the channel to loaded
-            # format of the value (in mdata)
-            #   channel:char:start/save
-            spl = mdata["SensorName"].split(":")
-            if len(spl) == 2:
-                [chan, pos] = spl
-            elif len(spl) == 3:
-                [chan, pos, _] = spl
-            chan = self._translate_channel_name(chan)
-            self._channels[chan].set_name_char(pos, message.data)
         else:
             self._log.debug(mdata)
 
@@ -853,6 +880,31 @@ class Module:
                     msg.high_address = addr[0]
                     msg.low_address = addr[1]
                     await self._writer(msg)
+            elif memory_key in {"ModuleName", "SensorName"}:
+                # example:
+                # "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8",
+                # request using MermoryDataBlock message, requests 4 bytes
+                for block in memory_part.split(";"):
+                    addr_start_str, addr_end_str = block.split("-")
+                    # Convert to integer addresses
+                    addr_start_int = int("0x" + addr_start_str, 0)
+                    addr_end_int = int("0x" + addr_end_str, 0)
+                    # Split into 4-byte blocks
+                    current_addr = addr_start_int
+                    while current_addr <= addr_end_int:
+                        block_end = min(
+                            current_addr + 3, addr_end_int
+                        )  # 4 bytes = current + 3
+                        # Convert back to high/low address bytes
+                        addr_start = struct.unpack(
+                            ">BB", struct.pack(">h", current_addr)
+                        )
+                        msg = ReadDataBlockFromMemoryMessage(self._address)
+                        msg.priority = PRIORITY_LOW
+                        msg.high_address = addr_start[0]
+                        msg.low_address = addr_start[1]
+                        await self._writer(msg)
+                        current_addr = block_end + 1
 
     async def _load_properties(self) -> None:
         """Method for per module type loading of properties."""

@@ -41,7 +41,6 @@
       "Type": "Button"
     }
   },
-  "Info": "8-Channel Push Button Module",
   "Type": "VMB8PB",
   "Memory": {
     "Channels": {
