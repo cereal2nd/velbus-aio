@@ -206,7 +206,9 @@ class vlpModule:
             return False
 
         # Check each bit position
-        for _i, (pattern_bit, data_bit) in enumerate(zip(binary_pattern, binary_data)):
+        for _i, (pattern_bit, data_bit) in enumerate(
+            zip(binary_pattern, binary_data, strict=True)
+        ):
             if pattern_bit == ".":
                 # Don't care bit, skip
                 continue
