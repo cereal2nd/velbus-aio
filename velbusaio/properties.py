@@ -5,8 +5,8 @@ author: Maikel Punie <maikel.punie@gmail.com>
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable
 from collections.abc import Awaitable
+from typing import TYPE_CHECKING, Callable
 
 from velbusaio.baseItem import BaseItem
 from velbusaio.command_registry import commandRegistry
@@ -103,7 +103,7 @@ class SelectedProgram(Property):
     def __init__(
         self, module: Module, name: str, writer: Callable[[Message], Awaitable[None]]
     ):
-        """Initialize PSU power property with per-instance current value."""
+        """Initialize Selected Program property with per-instance current value."""
         super().__init__(module, name, writer)
         self._selected_program_str = None
 
