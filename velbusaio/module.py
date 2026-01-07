@@ -162,7 +162,7 @@ class Module:
         """Wait for status messages to be received."""
         try:
             await asyncio.wait_for(self._got_status.wait(), 2)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             self._log.warning(f"Timeout waiting for status messages for: {self}")
 
     def get_initial_timeout(self) -> int:
