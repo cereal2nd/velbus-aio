@@ -6,7 +6,6 @@
       "Type": "Temperature"
     }
   },
-  "Info": "Temperature Sensor Module",
   "TemperatureChannel": "01",
   "Thermostat": "yes",
   "Type": "VMB1TS",

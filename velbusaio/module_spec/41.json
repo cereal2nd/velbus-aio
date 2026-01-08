@@ -31,10 +31,9 @@
       "Type": "Button"
     }
   },
-  "Info": "1 channel relay module",
   "Memory": {
     "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8",
-    "CHnanels": {
+    "Channels": {
       "01": "00F0-00FF",
       "02": "01F0-01FF",
       "03": "02F0-02FF",

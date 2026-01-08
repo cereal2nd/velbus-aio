@@ -51,7 +51,6 @@
       "Type": "Temperature"
     }
   },
-  "Info": "Four touch buttons with PIR detector module",
   "Memory": {
     "ModuleName": "03C0-03FF",
     "Channels": {

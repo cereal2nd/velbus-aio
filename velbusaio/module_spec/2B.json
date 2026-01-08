@@ -29,7 +29,6 @@
       "Type": "Sensor"
     }
   },
-  "Info": "Ceiling PIR detector module",
   "Memory": {
     "ModuleName": "00B0-00EF"
   },

@@ -50,7 +50,6 @@
     "ModuleName": "00B0-00EF"
   },
   "TemperatureChannel": "09",
-  "Info": "Outdoor PIR detector module",
   "Type": "VMBPIRO-10",
   "Properties": {
     "light_value": {

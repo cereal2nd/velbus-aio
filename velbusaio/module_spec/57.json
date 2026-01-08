@@ -209,7 +209,6 @@
   },
   "TemperatureChannel": "34",
   "ThermostatAddr": "3",
-  "Info": "Touch panel with Oled display",
   "Type": "VMBGPO-20",
   "Memory": {
     "ModuleName": "0FA8-0FE7",

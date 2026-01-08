@@ -89,7 +89,6 @@
       "Type": "Relay"
     }
   },
-  "Info": "VMBEL2-20 VMBEL4",
   "Memory": {
     "ModuleName": "06C0-06FF",
     "Channels": {

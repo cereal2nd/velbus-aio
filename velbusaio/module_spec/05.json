@@ -37,7 +37,6 @@
       "Subdevice": "yes"
     }
   },
-  "Info": "6-Channel Input Module",
   "Type": "VMB6IN",
   "Memory": {
     "Channels": {

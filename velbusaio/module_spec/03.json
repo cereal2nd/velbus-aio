@@ -13,7 +13,6 @@
       "Type": "Blind"
     }
   },
-  "Info": "Blind Control Module",
   "Type": "VMB1BL",
   "Memory": {
     "Channels": {

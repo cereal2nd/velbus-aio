@@ -209,7 +209,6 @@
       "Type": "Relay"
     }
   },
-  "Info": "VMBELO Edge-lit touch panel with Oled",
   "Memory": {
     "ModuleName": "0FA8-0FE7",
     "Channels": {

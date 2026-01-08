@@ -48,7 +48,6 @@
       "Type": "Button"
     }
   },
-  "Info": "7 channel input module",
   "Memory": {
     "Address": {
       "03FE": {

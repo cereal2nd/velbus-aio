@@ -33,7 +33,6 @@
   "Memory": {
     "ModuleName": "03BC-03FB"
   },
-  "Info": "Mini PIR detector module",
   "Type": "VMBPIR-20",
   "Properties": {
     "light_value": {

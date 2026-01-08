@@ -1,5 +1,4 @@
 {
-  "Info": "Wireless remote control receiver module",
   "Memory": {
     "ModuleName": "02C0-02FF",
     "Channels": {

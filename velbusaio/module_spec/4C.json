@@ -41,7 +41,6 @@
       "Type": "Button"
     }
   },
-  "Info": "6 button interface module",
   "Memory": {
     "ModuleName": "03BC-03FB",
     "Channels": {

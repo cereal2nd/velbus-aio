@@ -81,7 +81,6 @@
       "Type": "SensorNumber"
     }
   },
-  "Info": "Analog I/O module",
   "Memory": {
     "Address": {
       "02E0": {

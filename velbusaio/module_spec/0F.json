@@ -6,7 +6,6 @@
       "Type": "Dimmer"
     }
   },
-  "Info": "PWM LED strip dimmer module",
   "Type": "VMB1LED",
   "Memory": {
     "Channels": {

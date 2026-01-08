@@ -45,7 +45,6 @@
       "Type": "Relay"
     }
   },
-  "Info": "4 channel relay module with direct load connections",
   "Memory": {
     "ModuleName": "07BC-07FB",
     "Channels": {

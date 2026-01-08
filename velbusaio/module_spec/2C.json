@@ -46,7 +46,6 @@
       "Type": "Temperature"
     }
   },
-  "Info": "Outdoor PIR detector module",
   "Memory": {
     "ModuleName": "00B0-00EF"
   },

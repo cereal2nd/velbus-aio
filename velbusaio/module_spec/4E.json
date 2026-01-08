@@ -169,7 +169,6 @@
       "Type": "ThermostatChannel"
     }
   },
-  "Info": "8 channel input module",
   "Memory": {
     "Address": {
       "02EA": {

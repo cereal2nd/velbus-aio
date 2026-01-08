@@ -30,7 +30,6 @@
       "Type": "Relay"
     }
   },
-  "Info": "4 channel relay module with normal open contacts",
   "Memory": {
     "ModuleName": "00E3-00EF;01E3-01EF;02E3-02EF;03E3-03EF;04E3-04EE",
     "Channels": {

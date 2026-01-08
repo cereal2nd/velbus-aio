@@ -83,7 +83,6 @@
       "Type": "ThermostatChannel"
     }
   },
-  "Info": "Four touch buttons with PIR detector module  (ed2)",
   "Memory": {
     "ModuleName": "03C0-03FF",
     "Channels": {

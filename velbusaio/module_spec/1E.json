@@ -87,7 +87,6 @@
       "Type": "ThermostatChannel"
     }
   },
-  "Info": "One, two or four touch buttons module",
   "Memory": {
     "ModuleName": "03C0-03FF",
     "Channels": {

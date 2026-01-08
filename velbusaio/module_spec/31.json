@@ -60,7 +60,6 @@
       "Type": "SensorNumber"
     }
   },
-  "Info": "Meteo station",
   "Memory": {
     "Address": {
       "00C0": {

@@ -41,7 +41,6 @@
       "Type": "Button"
     }
   },
-  "Info": "Infrared remote control receiver module",
   "Type": "VMB8IR",
   "Memory": {
     "Channels": {

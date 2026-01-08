@@ -1,5 +1,4 @@
 {
-  "Info": "TemperatureController Module",
   "Memory": {
     "ModuleName": "00F0-00FF"
   },

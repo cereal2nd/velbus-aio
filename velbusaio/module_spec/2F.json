@@ -6,7 +6,6 @@
       "Type": "Dimmer"
     }
   },
-  "Info": "Velbus dimmer for resistive or inductive load",
   "Memory": {
     "ModuleName": "00B0-00EF",
     "Channels": {

@@ -6,7 +6,6 @@
       "Type": "Blind"
     }
   },
-  "Info": "1 channel blind module",
   "Memory": {
     "ModuleName": "004C-008B",
     "Channels": {

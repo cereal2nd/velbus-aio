@@ -239,7 +239,6 @@
       "Type": "ThermostatChannel"
     }
   },
-  "Info": "Touch panel with Oled display",
   "Memory": {
     "ModuleName": "09BE-09FD",
     "Channels": {

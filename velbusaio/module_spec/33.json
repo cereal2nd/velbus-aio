@@ -37,7 +37,6 @@
       "Type": "Button"
     }
   },
-  "Info": "Doorbird interface module",
   "Memory": {
     "ModuleName": "00B0-00EF",
     "Channels": {
