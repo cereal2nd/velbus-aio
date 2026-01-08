@@ -6,7 +6,6 @@
       "Type": "Dimmer"
     }
   },
-  "Info": "Dimmer module",
   "Type": "VMBDME",
   "Memory": {
     "Channels": {

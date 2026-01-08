@@ -25,7 +25,6 @@
       "Subdevice": "yes"
     }
   },
-  "Info": "4 channel relay module",
   "Type": "VMB4RY",
   "Memory": {
     "Channels": {
