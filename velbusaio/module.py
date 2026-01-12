@@ -30,6 +30,9 @@ from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
 from velbusaio.message import Message
 from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage
+from velbusaio.messages.cancel_forced_off import CancelForcedOff
+from velbusaio.messages.cancel_forced_on import CancelForcedOn
+from velbusaio.messages.cancel_inhibit import CancelInhibit
 from velbusaio.messages.channel_name_part1 import (
     ChannelNamePart1Message,
     ChannelNamePart1Message2,
@@ -67,6 +70,9 @@ from velbusaio.messages.dali_dim_value_status import DimValueStatus
 from velbusaio.messages.dimmer_channel_status import DimmerChannelStatusMessage
 from velbusaio.messages.dimmer_status import DimmerStatusMessage
 from velbusaio.messages.fast_blinking_led import FastBlinkingLedMessage
+from velbusaio.messages.forced_off import ForcedOff
+from velbusaio.messages.forced_on import ForcedOn
+from velbusaio.messages.inhibit import Inhibit
 from velbusaio.messages.memory_data import MemoryDataMessage
 from velbusaio.messages.memory_data_block import MemoryDataBlockMessage
 from velbusaio.messages.module_status import (
@@ -85,7 +91,11 @@ from velbusaio.messages.read_data_block_from_memory import (
     ReadDataBlockFromMemoryMessage,
 )
 from velbusaio.messages.read_data_from_memory import ReadDataFromMemoryMessage
-from velbusaio.messages.relay_status import RelayStatusMessage, RelayStatusMessage2
+from velbusaio.messages.relay_status import (
+    RelayStatusMessage,
+    RelayStatusMessage2,
+    RelayStatusMessage3,
+)
 from velbusaio.messages.sensor_temperature import SensorTemperatureMessage
 from velbusaio.messages.set_led import SetLedMessage
 from velbusaio.messages.slider_status import SliderStatusMessage
@@ -272,6 +282,26 @@ class Module:
         res.extend(self._sub_address.values())
         return res
 
+    def get_sub_address_dict(self) -> dict[int, int]:
+        """Return the sub addresses dict."""
+        return self._sub_address
+
+    def is_channel_active(self, channel_num: int) -> bool:
+        """Check if a channel is active based on sub-address configuration."""
+        # Channels 1-8 are always on the master address (active)
+        if channel_num <= 8:
+            return True
+
+        # Calculate sub-address index (1, 2, 3...)
+        # Block 1: 1-8 (index 0 / master)
+        # Block 2: 9-16 (index 1)
+        # Block 3: 17-24 (index 2)
+        # Block 4: 25-32 (index 3)
+        sub_idx = (channel_num - 1) // 8
+
+        # Check if this sub-index exists in the active sub-addresses
+        return sub_idx in self._sub_address
+
     def add_subaddress(self, num, addr) -> None:
         """Add a subaddress to this module."""
         self._sub_address[num] = addr
@@ -378,6 +408,38 @@ class Module:
                     "disabled": message.is_disabled(),
                 },
             )
+        elif isinstance(message, RelayStatusMessage3):
+            for channel in range(1, 9):
+                await self._update_channel(
+                    channel,
+                    {
+                        "on": message.is_on(channel),
+                        "inhibit": message.is_inhibited(channel),
+                        "forced_on": message.is_forced_on(channel),
+                        "forced_off": message.is_forced_off(channel),
+                        "disabled": message.is_program_disabled(channel),
+                    },
+                )
+        elif isinstance(message, ForcedOn):
+            await self._update_channel(
+                message.channel,
+                {"forced_on": True, "forced_off": False, "inhibit": False},
+            )
+        elif isinstance(message, ForcedOff):
+            await self._update_channel(
+                message.channel,
+                {"forced_on": False, "forced_off": True, "inhibit": False},
+            )
+        elif isinstance(message, Inhibit):
+            await self._update_channel(
+                message.channel,
+                {"forced_on": False, "forced_off": False, "inhibit": True},
+            )
+        elif isinstance(message, (CancelForcedOn, CancelForcedOff, CancelInhibit)):
+            await self._update_channel(
+                message.channel,
+                {"forced_on": False, "forced_off": False, "inhibit": False},
+            )
         elif isinstance(message, SensorTemperatureMessage):
             chan = self._translate_channel_name(self._data["TemperatureChannel"])
             await self._channels[chan].maybe_update_temperature(
@@ -410,13 +472,13 @@ class Module:
             # update the thermostat channels
             channel_name_to_msg_prop_map = {
                 "Heater": "heater",
-                "Boost": "boost",
+                "Boost heater/cooler": "boost",
                 "Pump": "pump",
                 "Cooler": "cooler",
-                "Alarm 1": "alarm1",
-                "Alarm 2": "alarm2",
-                "Alarm 3": "alarm3",
-                "Alarm 4": "alarm4",
+                "Temperature alarm 1": "alarm1",
+                "Temperature alarm 2": "alarm2",
+                "Temperature alarm 3": "alarm3",
+                "Temperature alarm 4": "alarm4",
             }
             for channel_str in self._data["Channels"]:
                 if keys_exists(self._data, "Channels", channel_str, "Type"):
@@ -426,7 +488,10 @@ class Module:
                     ):
                         channel = self._translate_channel_name(channel_str)
                         channel_name = self._data["Channels"][channel_str]["Name"]
-                        if channel in self._channels:
+                        if (
+                            channel in self._channels
+                            and channel_name in channel_name_to_msg_prop_map
+                        ):
                             await self._update_channel(
                                 channel,
                                 {
@@ -445,6 +510,7 @@ class Module:
                         or self._data["Channels"][channel_types]["Type"] == "Sensor"
                         or self._data["Channels"][channel_types]["Type"]
                         == "ButtonCounter"
+                        or self._data["Channels"][channel_types]["Type"] == "Relay"
                     ):
                         _update_buttons = True
                         break
@@ -452,12 +518,14 @@ class Module:
                 for channel_id in range(1, 9):
                     channel = self._translate_channel_name(channel_id + _channel_offset)
                     if channel_id in message.closed:
-                        await self._update_channel(channel, {"closed": True})
+                        await self._update_channel(
+                            channel, {"closed": True, "on": True}
+                        )
                     if channel_id in message.closed_long:
                         await self._update_channel(channel, {"long": True})
                     if channel_id in message.opened:
                         await self._update_channel(
-                            channel, {"closed": False, "long": False}
+                            channel, {"closed": False, "long": False, "on": False}
                         )
         elif isinstance(message, (ModuleStatusMessage)):
             for channel_id in range(1, 9):
@@ -769,6 +837,7 @@ class Module:
                 break
 
     async def _process_memory_data_message(self, message: MemoryDataMessage) -> None:
+        addr_int = (message.high_address << 8) + message.low_address
         addr = f"{message.high_address:02X}{message.low_address:02X}"
         if "Memory" not in self._data:
             return
@@ -778,9 +847,16 @@ class Module:
         if "Match" in mdata:
             for chan, chan_data in handle_match(mdata["Match"], message.data).items():
                 data = chan_data.copy()
+                # Special handling for 16-bit PulsePerUnits
+                if "PulsePerUnits" in data:
+                    current_pulses = getattr(self._channels[chan], "_pulses", 0) or 0
+                    # If this is the high byte (even address in VMB8IN)
+                    if addr_int % 4 == 0:  # 02E8, 02EC...
+                        new_pulses = (message.data << 8) + (current_pulses & 0xFF)
+                    else:  # 02E9, 02ED...
+                        new_pulses = (current_pulses & 0xFF00) + message.data
+                    data["pulses"] = new_pulses
                 await self._update_channel(chan, data)
-        else:
-            self._log.debug(mdata)
 
     def _process_channel_name_message(self, part: int, message: Message) -> None:
         channel = self._translate_channel_name(message.channel)
