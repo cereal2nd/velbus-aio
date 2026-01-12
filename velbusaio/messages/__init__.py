@@ -12,6 +12,9 @@ from velbusaio.messages.bus_error_counter_status_request import (
     BusErrorStatusRequestMessage,
 )
 from velbusaio.messages.bus_off import BusOffMessage
+from velbusaio.messages.cancel_forced_off import CancelForcedOff
+from velbusaio.messages.cancel_forced_on import CancelForcedOn
+from velbusaio.messages.cancel_inhibit import CancelInhibit
 from velbusaio.messages.channel_name_part1 import (
     ChannelNamePart1Message,
     ChannelNamePart1Message2,
@@ -45,6 +48,7 @@ from velbusaio.messages.dimmer_status import DimmerStatusMessage
 from velbusaio.messages.fast_blinking_led import FastBlinkingLedMessage
 from velbusaio.messages.forced_off import ForcedOff
 from velbusaio.messages.forced_on import ForcedOn
+from velbusaio.messages.inhibit import Inhibit
 from velbusaio.messages.interface_status_request import InterfaceStatusRequestMessage
 from velbusaio.messages.ir_receiver_status import IRReceiverStatusMessage
 from velbusaio.messages.kwh_status import KwhStatusMessage
@@ -84,8 +88,14 @@ from velbusaio.messages.slider_status import SliderStatusMessage
 from velbusaio.messages.slow_blinking_led import SlowBlinkingLedMessage
 from velbusaio.messages.start_relay_blinking_timer import StartRelayBlinkingTimerMessage
 from velbusaio.messages.start_relay_timer import StartRelayTimerMessage
-from velbusaio.messages.switch_relay_off import SwitchRelayOffMessage
-from velbusaio.messages.switch_relay_on import SwitchRelayOnMessage
+from velbusaio.messages.switch_relay_off import (
+    SwitchRelayOffMessage,
+    SwitchRelayOffMessage20,
+)
+from velbusaio.messages.switch_relay_on import (
+    SwitchRelayOnMessage,
+    SwitchRelayOnMessage20,
+)
 from velbusaio.messages.switch_to_comfort import SwitchToComfortMessage
 from velbusaio.messages.switch_to_day import SwitchToDayMessage
 from velbusaio.messages.switch_to_night import SwitchToNightMessage
@@ -113,6 +123,9 @@ __all__ = [
     "BusErrorCounterStatusMessage",
     "BusErrorStatusRequestMessage",
     "BusOffMessage",
+    "CancelForcedOff",
+    "CancelForcedOn",
+    "CancelInhibit",
     "ChannelNamePart1Message",
     "ChannelNamePart1Message2",
     "ChannelNamePart1Message3",
@@ -142,6 +155,7 @@ __all__ = [
     "ForcedOff",
     "ForcedOn",
     "IRReceiverStatusMessage",
+    "Inhibit",
     "InterfaceStatusRequestMessage",
     "KwhStatusMessage",
     "LightValueRequest",
@@ -182,7 +196,9 @@ __all__ = [
     "StartRelayBlinkingTimerMessage",
     "StartRelayTimerMessage",
     "SwitchRelayOffMessage",
+    "SwitchRelayOffMessage20",
     "SwitchRelayOnMessage",
+    "SwitchRelayOnMessage20",
     "SwitchToComfortMessage",
     "SwitchToDayMessage",
     "SwitchToNightMessage",

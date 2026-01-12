@@ -109,12 +109,12 @@ class RelayStatusMessage3(Message):
     def __init__(self, address=None):
         """Initialize Relay Status Message Object."""
         Message.__init__(self)
-        self.channels = []
-        self.disable_inhibit_forced = 0
-        self.status = 0
-        self.led_status = 0
-        self.delay_time = 0
-        self.set_defaults(address)
+        self.status_bits = 0
+        self.inhibited_bits = 0
+        self.forced_on_bits = 0
+        self.forced_off_bits = 0
+        self.program_disabled_bits = 0
+        self.interval_timer_bits = 0
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -122,32 +122,34 @@ class RelayStatusMessage3(Message):
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
         self.set_attributes(priority, address, rtr)
-        self.channel = self.byte_to_channels(data[0])
-        self.disable_inhibit_forced = data[1]
-        self.status = data[2]
-        self.led_status = data[3]
-        (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[4:])
+        self.status_bits = data[0]
+        self.inhibited_bits = data[1]
+        self.forced_on_bits = data[2]
+        self.forced_off_bits = data[3]
+        self.program_disabled_bits = data[4]
+        self.interval_timer_bits = data[5]
+        self.alarm_bits = data[6]
 
-    def is_normal(self):
+    def is_on(self, channel):
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_NORMAL
+        return (self.status_bits >> (channel - 1)) & 1 != 0
 
-    def is_inhibited(self):
+    def is_inhibited(self, channel):
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_INHIBITED
+        return (self.inhibited_bits >> (channel - 1)) & 1 != 0
 
-    def is_forced_on(self):
+    def is_forced_on(self, channel):
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_FORCED_ON
+        return (self.forced_on_bits >> (channel - 1)) & 1 != 0
 
-    def is_disabled(self):
+    def is_forced_off(self, channel):
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_DISABLED
+        return (self.forced_off_bits >> (channel - 1)) & 1 != 0
 
-    def is_on(self):
+    def is_program_disabled(self, channel):
         """:return: bool"""
-        return self.status == RELAY_ON
+        return (self.program_disabled_bits >> (channel - 1)) & 1 != 0
 
-    def has_interval_timer_on(self):
+    def has_interval_timer_on(self, channel):
         """:return: bool"""
-        return self.status == INTERVAL_TIMER_ON
+        return (self.interval_timer_bits >> (channel - 1)) & 1 != 0

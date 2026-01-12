@@ -25,21 +25,26 @@ class CounterValueMessage(Message):
     def populate(self, priority, address, rtr, data):
         """Parses the received data.
 
-        -DB0    bit 0-4      = channel
-        -DB0   bit 5-7      = Highest nibble (bits 19…16) of Power
-        -DB1                 = bits 15…8 of Power
-        -DB2                 = bits 7…0 of Power
-        -DB3    bit 0-7      = energy counter
-        -DB4    bit 0-7      = energy counter
-        -DB5    bit 0-7      = energy counter
+        Manual VMB8IN-20:
+        DATABYTE2 bits 7-4 = Counter channel 1 to 8 (0-7)
+        DATABYTE2 bits 3-0 = Highest nibble (bits 19…16) of Power
+        DATABYTE3 = high byte of power
+        DATABYTE4 = low byte of power
+        DATABYTE5 = MSB of energy counter
+        DATABYTE6 = upper byte of energy counter
+        DATABYTE7 = high byte of energy counter
+        DATABYTE8 = LSB of energy counter
         :return: None
         """
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
         self.set_attributes(priority, address, rtr)
-        self.channel = (data[0] & 0x0F0) + 1
-        self.power = (data[0] << 16) + (data[1] << 8) + data[2]
-        self.energy = (data[3] << 16) + (data[4] << 8) + data[5]
+        # Channel is in high nibble of data[0], value 0..7
+        self.channel = (data[0] >> 4) + 1
+        # Power is 20-bit: low nibble of data[0] + data[1] + data[2]
+        self.power = ((data[0] & 0x0F) << 16) + (data[1] << 8) + data[2]
+        # Energy is 32-bit: data[3] to data[6]
+        self.energy = (data[3] << 24) + (data[4] << 16) + (data[5] << 8) + data[6]
 
     def get_channels(self):
         """:return: list"""

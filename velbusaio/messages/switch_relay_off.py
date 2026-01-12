@@ -1,7 +1,4 @@
-"""Switch Relay Off Message.
-
-:author: Thomas Delaet <thomas@delaet.org>
-"""
+"""Switch Relay Off Message."""
 
 from __future__ import annotations
 
@@ -39,3 +36,17 @@ class SwitchRelayOffMessage(Message):
     def data_to_binary(self):
         """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte(self.relay_channels)])
+
+
+@register(
+    COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20", "VMB1RYS", "VMB1RYNO", "VMB1RYNOS"]
+)
+class SwitchRelayOffMessage20(SwitchRelayOffMessage):
+    """Switch Relay Off Message for -20 series."""
+
+    def data_to_binary(self):
+        """:return: bytes"""
+        # For these modules, we send the channel index (1-8), not a bitmask
+        if self.relay_channels:
+            return bytes([COMMAND_CODE, self.relay_channels[0]])
+        return bytes([COMMAND_CODE, 0])

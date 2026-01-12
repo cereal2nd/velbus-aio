@@ -11,7 +11,7 @@ from velbusaio.message import Message
 COMMAND_CODE = 0xBD
 
 
-@register(COMMAND_CODE, ["VMB7IN"])
+@register(COMMAND_CODE, ["VMB7IN", "VMB8IN-20"])
 class CounterStatusRequestMessage(Message):
     """Counter Status Request message."""
 
