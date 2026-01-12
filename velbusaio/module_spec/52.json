@@ -176,7 +176,7 @@
       "Type": "ThermostatChannel"
     },
     "35": {
-      "Name": "Boost",
+      "Name": "Boost heater/cooler",
       "Type": "ThermostatChannel"
     },
     "36": {
@@ -188,19 +188,19 @@
       "Type": "ThermostatChannel"
     },
     "38": {
-      "Name": "Alarm 1",
+      "Name": "Temperature alarm 1",
       "Type": "ThermostatChannel"
     },
     "39": {
-      "Name": "Alarm 2",
+      "Name": "Temperature alarm 2",
       "Type": "ThermostatChannel"
     },
     "40": {
-      "Name": "Alarm 3",
+      "Name": "Temperature alarm 3",
       "Type": "ThermostatChannel"
     },
     "41": {
-      "Name": "Alarm 4",
+      "Name": "Temperature alarm 4",
       "Type": "ThermostatChannel"
     },
     "42": {
