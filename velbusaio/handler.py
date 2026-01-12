@@ -51,6 +51,16 @@ class PacketHandler:
         self._scan_complete = False
         self._scan_delay_msec = 0
         self.__scan_found_addresses: dict[int, ModuleTypeMessage | None] | None = None
+        self._progress_callback = None
+
+    def set_progress_callback(self, callback):
+        """Set a callback for scan progress updates."""
+        self._progress_callback = callback
+
+    def _report_progress(self, progress_type: str, value: str):
+        """Report progress to the callback."""
+        if self._progress_callback:
+            self._progress_callback(progress_type, value)
 
     async def read_protocol_data(self):
         """Read the protocol data from the json files."""
@@ -138,11 +148,27 @@ class PacketHandler:
             self._log.info(
                 "Waiting for responses done. Going to check for responses..."
             )
+            found_modules = [
+                addr
+                for addr, msg in self.__scan_found_addresses.items()
+                if msg is not None
+            ]
+            total_found = len(found_modules)
+            current_loading = 0
+
             for address in range(start_address, max_address):
+                self._report_progress("scanning", str(address))
                 start_module_scan = time.perf_counter()
                 module_type_message: ModuleTypeMessage | None = (
                     self.__scan_found_addresses[address]
                 )
+                if module_type_message is not None:
+                    current_loading += 1
+                    m_name = module_type_message.module_type_name()
+                    self._report_progress(
+                        "loading", f"{current_loading}/{total_found} ({m_name})"
+                    )
+
                 module: Module | None = None
                 if module_type_message is None:
                     self._log.debug(
