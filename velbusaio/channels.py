@@ -21,7 +21,11 @@ from velbusaio.const import (
     VOLUME_LITERS_HOUR,
 )
 from velbusaio.message import Message
-from velbusaio.messages.edge_set_color import CustomColorPriority, SetEdgeColorMessage
+from velbusaio.messages.edge_set_color import (
+    CustomColorPriority,
+    SetCustomColorMessage,
+    SetEdgeColorMessage,
+)
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
@@ -380,8 +384,8 @@ class ButtonCounter(Button):
     """A ButtonCounter channel.
 
     This channel can act as a button and as a counter
-    => standard     this is the calculated value
-    => is_counter   this is the numeric value
+    => standard     this is the calculated power value
+    => is_counter   this is the numeric energy value
     """
 
     _Unit = None
@@ -645,12 +649,10 @@ class Temperature(Channel):
 
     async def set_mode(self, mode: str) -> None:
         """Set the heat/cool mode."""
-        # TODO: change function name, proposal = set_heat_cool_mode
-        if mode == "heat":
-            code = 0xE0
-        elif mode == "cool":
+        if mode == "cool":
             code = 0xDF
-        # TODO: else case
+        else:  # "heat"
+            code = 0xE0
         cls = commandRegistry.get_command(code, self._module.get_type())
         msg = cls(self._address)
         await self._writer(msg)
@@ -726,6 +728,7 @@ class Relay(Channel):
     _enabled = True
     _inhibit = False
     _forced_on = False
+    _forced_off = False
     _disabled = False
 
     def get_categories(self) -> list[str]:
@@ -746,6 +749,10 @@ class Relay(Channel):
         """Return if this relay is forced on."""
         return self._forced_on
 
+    def is_forced_off(self) -> bool:
+        """Return if this relay is forced off."""
+        return self._forced_off
+
     def is_disabled(self) -> bool:
         """Return if this relay is disabled."""
         return self._disabled
@@ -764,9 +771,43 @@ class Relay(Channel):
         msg.relay_channels = [self._num]
         await self._writer(msg)
 
+    async def set_forced_on(self, state: bool) -> None:
+        """Set or cancel forced on."""
+        code = 0x14 if state else 0x15
+        cls = commandRegistry.get_command(code, self._module.get_type())
+        msg = cls(self._address)
+        msg.channel = self._num
+        if state:
+            msg.delay_time = 0xFFFFFF  # Permanent
+        await self._writer(msg)
+
+    async def set_forced_off(self, state: bool) -> None:
+        """Set or cancel forced off."""
+        code = 0x12 if state else 0x13
+        cls = commandRegistry.get_command(code, self._module.get_type())
+        msg = cls(self._address)
+        msg.channel = self._num
+        if state:
+            msg.delay_time = 0xFFFFFF  # Permanent
+        await self._writer(msg)
+
+    async def set_inhibit(self, state: bool) -> None:
+        """Set or cancel inhibit."""
+        code = 0x16 if state else 0x17
+        cls = commandRegistry.get_command(code, self._module.get_type())
+        msg = cls(self._address)
+        msg.channel = self._num
+        if state:
+            msg.delay_time = 0xFFFFFF  # Permanent
+        await self._writer(msg)
+
 
 class EdgeLit(Channel):
     """An EdgeLit channel."""
+
+    def get_categories(self) -> list[str]:
+        """Return the categories for this channel."""
+        return ["light"]
 
     async def reset_color(self, left=True, top=True, right=True, bottom=True):
         """Send the edgelit color message."""
@@ -803,3 +844,65 @@ class EdgeLit(Channel):
         msg.apply_to_all_pages = True
         msg.custom_color_priority = priority
         await self._writer(msg)
+
+    async def set_rgbw(
+        self,
+        red: int,
+        green: int,
+        blue: int,
+        white: int,
+        left=False,
+        top=False,
+        right=False,
+        bottom=False,
+    ) -> None:
+        """Set RGBW color for specific edges using a dedicated palette index per side."""
+        # Mapping sides to palette indices
+        if left:
+            palette_idx = 1
+        elif top:
+            palette_idx = 2
+        elif right:
+            palette_idx = 3
+        elif bottom:
+            palette_idx = 4
+        else:
+            return  # No side specified
+
+        # If all components are 0, we turn the edge OFF by using the default black palette (Index 0)
+        if red == 0 and green == 0 and blue == 0 and white == 0:
+            msg_apply = SetEdgeColorMessage(self._address)
+            msg_apply.apply_background_color = True
+            msg_apply.custom_color_palette = False  # USE DEFAULT PALETTE
+            msg_apply.color_idx = 0  # BLACK
+            msg_apply.apply_to_left_edge = left
+            msg_apply.apply_to_top_edge = top
+            msg_apply.apply_to_right_edge = right
+            msg_apply.apply_to_bottom_edge = bottom
+            msg_apply.apply_to_all_pages = True
+            await self._writer(msg_apply)
+            return
+
+        # 1. Update the custom palette color
+        msg_palette = SetCustomColorMessage(self._address)
+        msg_palette.palette_idx = palette_idx
+        msg_palette.red = red
+        msg_palette.green = green
+        msg_palette.blue = blue
+        # If white is provided, we enable the official white_mode
+        # This tells the module to use its internal white settings
+        msg_palette.white_mode = white > 128
+        msg_palette.saturation = 127  # Max saturation
+        await self._writer(msg_palette)
+
+        # 2. Apply this custom palette index to the requested edge
+        msg_apply = SetEdgeColorMessage(self._address)
+        msg_apply.apply_background_color = True
+        msg_apply.custom_color_palette = True  # USE CUSTOM PALETTE
+        msg_apply.color_idx = palette_idx
+        msg_apply.apply_to_left_edge = left
+        msg_apply.apply_to_top_edge = top
+        msg_apply.apply_to_right_edge = right
+        msg_apply.apply_to_bottom_edge = bottom
+        msg_apply.apply_to_all_pages = True
+        await self._writer(msg_apply)
