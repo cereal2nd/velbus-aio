@@ -1,58 +1,73 @@
 {
-  "Type": "VMBGP4-20",
+  "AllChannelStatus": "FF",
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button"
-    },
-    "05": {
-      "Editable": "yes",
-      "Name": "Virtual button 5",
-      "Type": "Button"
-    },
-    "06": {
-      "Editable": "yes",
-      "Name": "Virtual button 6",
-      "Type": "Button"
-    },
-    "07": {
-      "Editable": "yes",
-      "Name": "Virtual button 7",
-      "Type": "Button"
-    },
-    "08": {
-      "Editable": "yes",
-      "Name": "Virtual button 8",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "09": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
+    },
+    "10": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "11": {
+      "Name": "Boost heater/cooler",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "12": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "13": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "14": {
+      "Name": "Temperature alarm 1",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "15": {
+      "Name": "Temperature alarm 2",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "16": {
+      "Name": "Temperature alarm 3",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "17": {
+      "Name": "Temperature alarm 4",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "18": {
       "Editable": "yes",
       "Name": "Output",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     }
   },
   "TemperatureChannel": "09",
+  "Type": "VMBGP4-20",
   "Memory": {
     "ModuleName": "06C0-06FF",
     "Channels": {
@@ -60,18 +75,8 @@
       "02": "0030-003F",
       "03": "0044-0053",
       "04": "0058-0067",
-      "05": "006C-007B",
-      "06": "0080-008F",
-      "07": "0094-00A3",
-      "08": "00A8-00B7",
       "09": "0398-03A7",
       "18": "03CC-03DB"
-    }
-  },
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
     }
   }
 }

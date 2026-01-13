@@ -2,131 +2,54 @@
   "Channels": {
     "01": {
       "Editable": "yes",
-      "Name": "Push button 1",
+      "Name": "Input 1",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
-      "Name": "Push button 2",
+      "Name": "Input 2",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
-      "Name": "Push button 3",
+      "Name": "Input 3",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
-      "Name": "Push button 4",
+      "Name": "Input 4",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
-      "Name": "Push button 5",
+      "Name": "Input 5",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "06": {
       "Editable": "yes",
-      "Name": "Push button 6",
+      "Name": "Input 6",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "07": {
       "Editable": "yes",
-      "Name": "Push button 7",
+      "Name": "Input 7",
       "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     }
   },
   "Memory": {
-    "Address": {
-      "03FE": {
-        "Match": {
-          "1": {
-            "%......00": {
-              "Value": "reserved"
-            },
-            "%......01": {
-              "Value": "liter"
-            },
-            "%......10": {
-              "Value": "m3"
-            },
-            "%......11": {
-              "Value": "kWh"
-            },
-            "%......[01][01]": {
-              "Channel": "01",
-              "SubName": "Unit"
-            }
-          },
-          "2": {
-            "%....00..": {
-              "Value": "reserved"
-            },
-            "%....01..": {
-              "Value": "liter"
-            },
-            "%....10..": {
-              "Value": "m3"
-            },
-            "%....11..": {
-              "Value": "kWh"
-            },
-            "%....[01][01]..": {
-              "Channel": "02",
-              "SubName": "Unit"
-            }
-          },
-          "3": {
-            "%..00....": {
-              "Value": "reserved"
-            },
-            "%..01....": {
-              "Value": "liter"
-            },
-            "%..10....": {
-              "Value": "m3"
-            },
-            "%..11....": {
-              "Value": "kWh"
-            },
-            "%..[01][01]....": {
-              "Channel": "03",
-              "SubName": "Unit"
-            }
-          },
-          "4": {
-            "%00......": {
-              "Value": "reserved"
-            },
-            "%01......": {
-              "Value": "liter"
-            },
-            "%10......": {
-              "Value": "m3"
-            },
-            "%11......": {
-              "Value": "kWh"
-            },
-            "%[01][01]......": {
-              "Channel": "04",
-              "SubName": "Unit"
-            }
-          }
-        }
-      }
-    },
     "ModuleName": "03AC-03EB",
     "Channels": {
       "01": "0000-000F",
@@ -137,99 +60,7 @@
       "06": "0050-005F",
       "07": "0060-006F",
       "08": "0070-007F"
-    },
-    "Extras": {
-      "03FE": {
-        "Translate": {
-          "%......00": {
-            "Value": "reserved",
-            "Channel": "01",
-            "SubName": "Unit"
-          },
-          "%......01": {
-            "Value": "liter",
-            "Channel": "01",
-            "SubName": "Unit"
-          },
-          "%......10": {
-            "Value": "m3",
-            "Channel": "01",
-            "SubName": "Unit"
-          },
-          "%......11": {
-            "Value": "kWh",
-            "Channel": "01",
-            "SubName": "Unit"
-          },
-          "%....00..": {
-            "Value": "reserved",
-            "Channel": "02",
-            "SubName": "Unit"
-          },
-          "%....01..": {
-            "Value": "liter",
-            "Channel": "02",
-            "SubName": "Unit"
-          },
-          "%....10..": {
-            "Value": "m3",
-            "Channel": "02",
-            "SubName": "Unit"
-          },
-          "%....11..": {
-            "Value": "kWh",
-            "Channel": "02",
-            "SubName": "Unit"
-          },
-          "%..00....": {
-            "Value": "reserved",
-            "Channel": "03",
-            "SubName": "Unit"
-          },
-          "%..01....": {
-            "Value": "liter",
-            "Channel": "03",
-            "SubName": "Unit"
-          },
-          "%..10....": {
-            "Value": "m3",
-            "Channel": "03",
-            "SubName": "Unit"
-          },
-          "%..11....": {
-            "Value": "kWh",
-            "Channel": "03",
-            "SubName": "Unit"
-          },
-          "%00......": {
-            "Value": "reserved",
-            "Channel": "04",
-            "SubName": "Unit"
-          },
-          "%01......": {
-            "Value": "liter",
-            "Channel": "04",
-            "SubName": "Unit"
-          },
-          "%10......": {
-            "Value": "m3",
-            "Channel": "04",
-            "SubName": "Unit"
-          },
-          "%11......": {
-            "Value": "kWh",
-            "Channel": "04",
-            "SubName": "Unit"
-          }
-        }
-      }
     }
   },
-  "Type": "VMB7IN",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMB7IN"
 }

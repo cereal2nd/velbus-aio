@@ -46,6 +46,38 @@
       "Name": "Temperature",
       "Type": "Temperature"
     },
+    "10": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "11": {
+      "Name": "Boost heater/cooler",
+      "Type": "ThermostatChannel"
+    },
+    "12": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "13": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "14": {
+      "Name": "Temperature alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "15": {
+      "Name": "Temperature alarm 2",
+      "Type": "ThermostatChannel"
+    },
+    "16": {
+      "Name": "Temperature alarm 3",
+      "Type": "ThermostatChannel"
+    },
+    "17": {
+      "Name": "Temperature alarm 4",
+      "Type": "ThermostatChannel"
+    },
     "18": {
       "Editable": "yes",
       "Name": "Output",

@@ -27,7 +27,7 @@
     }
   },
   "Memory": {
-    "ModuleName": "062C-32;064D-32",
+    "ModuleName": "062C-066B",
     "Channels": {
       "01": "0000-000F",
       "02": "0010-001F",

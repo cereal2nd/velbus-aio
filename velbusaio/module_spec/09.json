@@ -1,22 +1,16 @@
 {
-  "ChannelNumbers": {
-    "Name": {
-      "Map": {
-        "03": "01",
-        "0C": "02"
-      }
-    }
-  },
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Blind 1",
-      "Type": "Blind"
+      "Type": "Blind",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Blind 2",
-      "Type": "Blind"
+      "Type": "Blind",
+      "Subdevice": "yes"
     }
   },
   "Type": "VMB2BL",

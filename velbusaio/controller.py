@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
 import itertools
 import logging
 import pathlib
@@ -43,6 +44,42 @@ from velbusaio.raw_message import RawMessage
 from velbusaio.vlp_reader import VlpFile
 
 
+@dataclass
+class ScheduledTask:
+    """A scheduled task that runs at a specific interval."""
+
+    name: str
+    callback: Callable[[], Awaitable[None]]
+    interval_seconds: float
+    _task: asyncio.Task | None = None
+    _running: bool = False
+
+    async def _run_loop(self) -> None:
+        """Run the task in a loop."""
+        self._running = True
+        while self._running:
+            try:
+                await asyncio.sleep(self.interval_seconds)
+                await self.callback()
+            except asyncio.CancelledError:
+                break
+            except (RuntimeError, ValueError, TypeError, AttributeError) as e:
+                logging.getLogger("velbus-scheduler").error(
+                    "Error in scheduled task '%s': %s", self.name, e
+                )
+
+    def start(self) -> None:
+        """Start the scheduled task."""
+        if self._task is None or self._task.done():
+            self._task = asyncio.create_task(self._run_loop())
+
+    def stop(self) -> None:
+        """Stop the scheduled task."""
+        self._running = False
+        if self._task and not self._task.done():
+            self._task.cancel()
+
+
 class Velbus:
     """A velbus controller."""
 
@@ -73,7 +110,10 @@ class Velbus:
         self._is_connected: bool = False
         self._on_connect_callbacks: list[t.Callable[[], None]] = []
         self._on_disconnect_callbacks: list[t.Callable[[], None]] = []
+        self._on_module_found_callbacks: list[t.Callable[[Module], None]] = []
         self._background_tasks: set[asyncio.Task] = set()
+        self._scheduled_tasks: dict[str, ScheduledTask] = {}
+        self._scheduler_log = logging.getLogger("velbus-scheduler")
 
     def add_connect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
         """Register a coroutine to be called on connect."""
@@ -90,6 +130,26 @@ class Velbus:
     def remove_disconnect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
         """Remove a previously registered on disconnect coroutine."""
         self._on_disconnect_callbacks.remove(meth)
+
+    def add_module_found_callback(
+        self, meth: t.Callable[[Module], Awaitable[None]]
+    ) -> None:
+        """Register a coroutine to be called on module found.
+
+        This routine will be called when a new module finished its initialization.
+        """
+        self._on_module_found_callbacks.append(meth)
+
+    def remove_module_found_callback(
+        self, meth: t.Callable[[Module], Awaitable[None]]
+    ) -> None:
+        """Remove a previously registered on module found coroutine."""
+        self._on_module_found_callbacks.remove(meth)
+
+    async def _on_modules_loaded(self, module: Module) -> None:
+        """Called when all modules are loaded."""
+        for callback in self._on_module_found_callbacks:
+            await callback(module)
 
     @property
     def connected(self) -> bool:
@@ -137,6 +197,7 @@ class Velbus:
             build_week=build_week,
             memorymap=memorymap,
             cache_dir=self._cache_dir,
+            on_module_found=self._on_modules_loaded,
         )
         await module.initialize(self.send, self)
         self._modules[addr] = module
@@ -178,6 +239,9 @@ class Velbus:
         """Stop the controller."""
         self._closing = True
         self._auto_reconnect = False
+        # Stop all scheduled tasks
+        for task in self._scheduled_tasks.values():
+            task.stop()
         self._protocol.close()
 
     async def connect(self) -> None:
@@ -364,3 +428,50 @@ class Velbus:
     async def wait_on_all_messages_sent_async(self) -> None:
         """Wait for all messages to be sent."""
         await self._protocol.wait_on_all_messages_sent_async()
+
+    def add_scheduled_task(
+        self,
+        name: str,
+        callback: Callable[[], Awaitable[None]],
+        interval_seconds: float,
+    ) -> None:
+        """Add a scheduled task that runs at a specific interval.
+
+        Args:
+            name: Unique name for the task
+            callback: Async function to call at each interval
+            interval_seconds: Time in seconds between each execution
+        """
+        if name in self._scheduled_tasks:
+            self._scheduler_log.warning(f"Task '{name}' already exists, replacing it")
+            self.remove_scheduled_task(name)
+
+        task = ScheduledTask(
+            name=name,
+            callback=callback,
+            interval_seconds=interval_seconds,
+        )
+        self._scheduled_tasks[name] = task
+        task.start()
+        self._scheduler_log.info(
+            f"Scheduled task '{name}' added (interval: {interval_seconds}s)"
+        )
+
+    def remove_scheduled_task(self, name: str) -> None:
+        """Remove a scheduled task.
+
+        Args:
+            name: Name of the task to remove
+        """
+        if name in self._scheduled_tasks:
+            self._scheduled_tasks[name].stop()
+            del self._scheduled_tasks[name]
+            self._scheduler_log.info(f"Scheduled task '{name}' removed")
+
+    def get_scheduled_tasks(self) -> dict[str, ScheduledTask]:
+        """Get all scheduled tasks.
+
+        Returns:
+            Dictionary of task names to ScheduledTask objects
+        """
+        return self._scheduled_tasks.copy()

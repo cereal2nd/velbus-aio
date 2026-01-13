@@ -1,0 +1,26 @@
+{
+  "AllChannelStatus": "FF",
+  "Channels": {
+    "01": { "Name": "Dark output", "Type": "Sensor" },
+    "02": { "Name": "Light output", "Type": "Sensor" },
+    "03": { "Name": "Motion 1 output", "Type": "Sensor" },
+    "04": { "Name": "Light depending motion 1 output", "Type": "Sensor" },
+    "05": { "Name": "Motion 2 output", "Type": "Sensor" },
+    "06": { "Name": "Light depending motion 2 output", "Type": "Sensor" },
+    "07": { "Name": "Low temperature alarm", "Type": "Sensor" },
+    "08": { "Name": "High temperature alarm", "Type": "Sensor" },
+    "09": { "Editable": "yes", "Name": "Temperature", "Type": "Temperature" }
+  },
+  "Memory": {
+    "ModuleName": "03BC-03FB"
+  },
+  "TemperatureChannel": "09",
+  "Type": "VMBPIRO-20",
+  "Properties": {
+    "light_value": { "Type": "LightValue", "Name": "Light value" },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
+}

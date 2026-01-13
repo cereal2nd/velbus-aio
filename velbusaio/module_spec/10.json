@@ -27,7 +27,8 @@
     "05": {
       "Editable": "yes",
       "Name": "Virtual relay",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     }
   },
   "Memory": {

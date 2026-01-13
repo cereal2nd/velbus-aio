@@ -3,32 +3,38 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Virtual relay 1",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual relay 2",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual relay 3",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual relay 4",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "06": {
       "Editable": "yes",
       "Name": "Input button",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     }
   },
   "Memory": {

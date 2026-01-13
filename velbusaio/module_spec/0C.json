@@ -3,7 +3,8 @@
     "01": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
     }
   },
   "TemperatureChannel": "01",

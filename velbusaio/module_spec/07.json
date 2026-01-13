@@ -3,7 +3,8 @@
     "01": {
       "Editable": "yes",
       "Name": "Dimmer",
-      "Type": "Dimmer"
+      "Type": "Dimmer",
+      "Subdevice": "yes"
     }
   },
   "Type": "VMB1DM",

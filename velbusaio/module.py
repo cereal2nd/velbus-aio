@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Awaitable, Callable
 import importlib.resources
+import inspect
 import json
 import logging
 import pathlib
@@ -119,6 +120,7 @@ class Module:
         build_year: int | None = None,
         build_week: int | None = None,
         cache_dir: str | None = None,
+        on_module_found: Callable[[Module], Awaitable[None]] | None = None,
     ) -> Module:
         """Module factory method."""
         if module_type in {0x45, 0x5A}:
@@ -130,6 +132,7 @@ class Module:
                 build_year,
                 build_week,
                 cache_dir,
+                on_module_found,
             )
 
         return Module(
@@ -140,6 +143,7 @@ class Module:
             build_year,
             build_week,
             cache_dir,
+            on_module_found,
         )
 
     def __init__(
@@ -151,6 +155,7 @@ class Module:
         build_year: int | None = None,
         build_week: int | None = None,
         cache_dir: str | None = None,
+        on_module_found: Callable[[Module], Awaitable[None]] | None = None,
     ) -> None:
         """Initialize Module object."""
         self._address = module_address
@@ -172,6 +177,9 @@ class Module:
         self.loaded = False
         self._use_cache = True
         self._loaded_cache = {}
+        self._on_module_found: Callable[[Module], Awaitable[None]] | None = (
+            on_module_found
+        )
 
     async def wait_for_status_messages(self) -> None:
         """Wait for status messages to be received."""
@@ -190,6 +198,10 @@ class Module:
         """Initialize the module."""
         self._controller = controller
         self._log = logging.getLogger("velbus-module")
+
+        # Build message handler dispatch table
+        self._message_handlers = self._build_message_handlers()
+
         # load the protocol data
         try:
             # Load global.json first
@@ -387,219 +399,292 @@ class Module:
         """Remove a previously registered on disconnect coroutine."""
         self._controller.remove_disconnect_callback(meth)
 
+    async def _trigger_load_finished_callbacks(self) -> None:
+        """Trigger all registered on load finished callbacks."""
+        if self._on_module_found:
+            try:
+                await self._on_module_found(self)
+            except (RuntimeError, ValueError, TypeError, AttributeError) as e:
+                self._log.error(f"Error in on_module_found callback: {e}")
+
     @property
     def is_connected(self) -> bool:
         """Return if the module is connected."""
         return self._controller.connected
 
-    async def on_message(self, message: Message) -> None:  # noqa: C901
-        """Process received message."""
-        self._log.debug(f"RX: {message}")
-        _channel_offset = self.calc_channel_offset(message.address)
+    def _build_message_handlers(self) -> dict:
+        """Build dispatch table for message handlers."""
+        return {
+            # Channel name messages
+            ChannelNamePart1Message: self._handle_channel_name_part1,
+            ChannelNamePart1Message2: self._handle_channel_name_part1,
+            ChannelNamePart1Message3: self._handle_channel_name_part1,
+            ChannelNamePart2Message: self._handle_channel_name_part2,
+            ChannelNamePart2Message2: self._handle_channel_name_part2,
+            ChannelNamePart2Message3: self._handle_channel_name_part2,
+            ChannelNamePart3Message: self._handle_channel_name_part3,
+            ChannelNamePart3Message2: self._handle_channel_name_part3,
+            ChannelNamePart3Message3: self._handle_channel_name_part3,
+            # Memory messages
+            MemoryDataMessage: self._process_memory_data_message,
+            MemoryDataBlockMessage: self._process_memory_data_block_message,
+            # Status messages
+            BusErrorCounterStatusMessage: self._handle_bus_error_counter,
+            RelayStatusMessage: self._handle_relay_status,
+            RelayStatusMessage2: self._handle_relay_status,
+            RelayStatusMessage3: self._handle_relay_status3,
+            ForcedOn: self._handle_forced_on,
+            ForcedOff: self._handle_forced_off,
+            Inhibit: self._handle_inhibit,
+            CancelForcedOn: self._handle_cancel_forced,
+            CancelForcedOff: self._handle_cancel_forced,
+            CancelInhibit: self._handle_cancel_forced,
+            # Temperature messages
+            SensorTemperatureMessage: self._handle_sensor_temperature,
+            TempSensorStatusMessage: self._handle_temp_sensor_status,
+            # Button and module status messages
+            PushButtonStatusMessage: self._handle_push_button_status,
+            ModuleStatusMessage: self._handle_module_status,
+            ModuleStatusMessage2: self._handle_module_status2,
+            CounterStatusMessage: self._handle_counter_status,
+            ModuleStatusPirMessage: self._handle_module_status_pir,
+            ModuleStatusGP4PirMessage: self._handle_module_status_gp4_pir,
+            # LED messages
+            UpdateLedStatusMessage: self._handle_led_status,
+            SetLedMessage: self._handle_set_led,
+            ClearLedMessage: self._handle_clear_led,
+            SlowBlinkingLedMessage: self._handle_slow_blinking_led,
+            FastBlinkingLedMessage: self._handle_fast_blinking_led,
+            # Dimmer and blind messages
+            DimmerChannelStatusMessage: self._handle_dimmer_status,
+            DimmerStatusMessage: self._handle_dimmer_status,
+            SliderStatusMessage: self._handle_slider_status,
+            BlindStatusNgMessage: self._handle_blind_status_ng,
+            BlindStatusMessage: self._handle_blind_status,
+            # Sensor messages
+            MeteoRawMessage: self._handle_meteo_raw,
+            SensorRawMessage: self._handle_sensor_raw,
+            CounterValueMessage: self._handle_counter_value,
+            DimValueStatus: self._handle_dim_value_status,
+            # PSU messages
+            PsuLoadMessage: self._handle_psu_load,
+            PsuValuesMessage: self._handle_psu_values,
+        }
 
-        if isinstance(
-            message,
-            (
-                ChannelNamePart1Message,
-                ChannelNamePart1Message2,
-                ChannelNamePart1Message3,
-            ),
-        ):
-            self._process_channel_name_message(1, message)
-            await self._cache()
-        elif isinstance(
-            message,
-            (
-                ChannelNamePart2Message,
-                ChannelNamePart2Message2,
-                ChannelNamePart2Message3,
-            ),
-        ):
-            self._process_channel_name_message(2, message)
-            await self._cache()
-        elif isinstance(
-            message,
-            (
-                ChannelNamePart3Message,
-                ChannelNamePart3Message2,
-                ChannelNamePart3Message3,
-            ),
-        ):
-            self._process_channel_name_message(3, message)
-            await self._cache()
-        elif isinstance(message, MemoryDataMessage):
-            await self._process_memory_data_message(message)
-        elif isinstance(message, MemoryDataBlockMessage):
-            await self._process_memory_data_block_message(message)
-        elif isinstance(message, BusErrorCounterStatusMessage):
-            await self._update_property(
-                "BusErrorTx", {"_cur": message.transmit_error_counter}
-            )
-            await self._update_property(
-                "BusErrorRx", {"_cur": message.receive_error_counter}
-            )
-            await self._update_property(
-                "BusOffCounter", {"_cur": message.bus_off_counter}
-            )
-        elif isinstance(message, (RelayStatusMessage, RelayStatusMessage2)):
+    async def _handle_channel_name_part1(self, message: Message) -> None:
+        """Handle channel name part 1 messages."""
+        self._process_channel_name_message(1, message)
+        await self._cache()
+
+    async def _handle_channel_name_part2(self, message: Message) -> None:
+        """Handle channel name part 2 messages."""
+        self._process_channel_name_message(2, message)
+        await self._cache()
+
+    async def _handle_channel_name_part3(self, message: Message) -> None:
+        """Handle channel name part 3 messages."""
+        self._process_channel_name_message(3, message)
+        await self._cache()
+
+    async def _handle_bus_error_counter(
+        self, message: BusErrorCounterStatusMessage
+    ) -> None:
+        """Handle bus error counter status messages."""
+        await self._update_property(
+            "BusErrorTx", {"_cur": message.transmit_error_counter}
+        )
+        await self._update_property(
+            "BusErrorRx", {"_cur": message.receive_error_counter}
+        )
+        await self._update_property("BusOffCounter", {"_cur": message.bus_off_counter})
+
+    async def _handle_relay_status(
+        self, message: RelayStatusMessage | RelayStatusMessage2
+    ) -> None:
+        """Handle relay status messages."""
+        await self._update_channel(
+            message.channel,
+            {
+                "on": message.is_on(),
+                "inhibit": message.is_inhibited(),
+                "forced_on": message.is_forced_on(),
+                "disabled": message.is_disabled(),
+            },
+        )
+
+    async def _handle_relay_status3(self, message: RelayStatusMessage3) -> None:
+        """Handle relay status 3 messages."""
+        for channel in range(1, 9):
             await self._update_channel(
-                message.channel,
+                channel,
                 {
-                    "on": message.is_on(),
-                    "inhibit": message.is_inhibited(),
-                    "forced_on": message.is_forced_on(),
-                    "disabled": message.is_disabled(),
+                    "on": message.is_on(channel),
+                    "inhibit": message.is_inhibited(channel),
+                    "forced_on": message.is_forced_on(channel),
+                    "forced_off": message.is_forced_off(channel),
+                    "disabled": message.is_program_disabled(channel),
                 },
             )
-        elif isinstance(message, RelayStatusMessage3):
-            for channel in range(1, 9):
-                await self._update_channel(
-                    channel,
-                    {
-                        "on": message.is_on(channel),
-                        "inhibit": message.is_inhibited(channel),
-                        "forced_on": message.is_forced_on(channel),
-                        "forced_off": message.is_forced_off(channel),
-                        "disabled": message.is_program_disabled(channel),
-                    },
-                )
-        elif isinstance(message, ForcedOn):
-            await self._update_channel(
-                message.channel,
-                {"forced_on": True, "forced_off": False, "inhibit": False},
-            )
-        elif isinstance(message, ForcedOff):
-            await self._update_channel(
-                message.channel,
-                {"forced_on": False, "forced_off": True, "inhibit": False},
-            )
-        elif isinstance(message, Inhibit):
-            await self._update_channel(
-                message.channel,
-                {"forced_on": False, "forced_off": False, "inhibit": True},
-            )
-        elif isinstance(message, (CancelForcedOn, CancelForcedOff, CancelInhibit)):
-            await self._update_channel(
-                message.channel,
-                {"forced_on": False, "forced_off": False, "inhibit": False},
-            )
-        elif isinstance(message, SensorTemperatureMessage):
-            chan = self._translate_channel_name(self._data["TemperatureChannel"])
-            await self._channels[chan].maybe_update_temperature(
-                message.getCurTemp(), 1 / 64
-            )
+
+    async def _handle_forced_on(self, message: ForcedOn) -> None:
+        """Handle forced on messages."""
+        await self._update_channel(
+            message.channel,
+            {"forced_on": True, "forced_off": False, "inhibit": False},
+        )
+
+    async def _handle_forced_off(self, message: ForcedOff) -> None:
+        """Handle forced off messages."""
+        await self._update_channel(
+            message.channel,
+            {"forced_on": False, "forced_off": True, "inhibit": False},
+        )
+
+    async def _handle_inhibit(self, message: Inhibit) -> None:
+        """Handle inhibit messages."""
+        await self._update_channel(
+            message.channel,
+            {"forced_on": False, "forced_off": False, "inhibit": True},
+        )
+
+    async def _handle_cancel_forced(
+        self, message: CancelForcedOn | CancelForcedOff | CancelInhibit
+    ) -> None:
+        """Handle cancel forced/inhibit messages."""
+        await self._update_channel(
+            message.channel,
+            {"forced_on": False, "forced_off": False, "inhibit": False},
+        )
+
+    async def _handle_sensor_temperature(
+        self, message: SensorTemperatureMessage
+    ) -> None:
+        """Handle sensor temperature messages."""
+        chan = self._translate_channel_name(self._data["TemperatureChannel"])
+        await self._channels[chan].maybe_update_temperature(
+            message.getCurTemp(), 1 / 64
+        )
+        await self._update_channel(
+            chan,
+            {
+                "min": message.getMinTemp(),
+                "max": message.getMaxTemp(),
+            },
+        )
+
+    async def _handle_temp_sensor_status(
+        self, message: TempSensorStatusMessage
+    ) -> None:
+        """Handle temperature sensor status messages."""
+        chan = self._translate_channel_name(self._data["TemperatureChannel"])
+        if chan in self._channels:
             await self._update_channel(
                 chan,
                 {
-                    "min": message.getMinTemp(),
-                    "max": message.getMaxTemp(),
+                    "target": message.target_temp,
+                    "cmode": message.mode_str,
+                    "cstatus": message.status_str,
+                    "sleep_timer": message.sleep_timer,
+                    "cool_mode": message.cool_mode,
                 },
             )
-        elif isinstance(message, TempSensorStatusMessage):
-            # update the current temp
-            chan = self._translate_channel_name(self._data["TemperatureChannel"])
-            if chan in self._channels:
-                await self._update_channel(
-                    chan,
-                    {
-                        "target": message.target_temp,
-                        "cmode": message.mode_str,
-                        "cstatus": message.status_str,
-                        "sleep_timer": message.sleep_timer,
-                        "cool_mode": message.cool_mode,
-                    },
-                )
-                await self._channels[chan].maybe_update_temperature(
-                    message.current_temp, 1 / 2
-                )
-            # update the thermostat channels
-            channel_name_to_msg_prop_map = {
-                "Heater": "heater",
-                "Boost heater/cooler": "boost",
-                "Pump": "pump",
-                "Cooler": "cooler",
-                "Temperature alarm 1": "alarm1",
-                "Temperature alarm 2": "alarm2",
-                "Temperature alarm 3": "alarm3",
-                "Temperature alarm 4": "alarm4",
-            }
-            for channel_str in self._data["Channels"]:
-                if keys_exists(self._data, "Channels", channel_str, "Type"):
-                    if (
-                        self._data["Channels"][channel_str]["Type"]
-                        == "ThermostatChannel"
-                    ):
-                        channel = self._translate_channel_name(channel_str)
-                        channel_name = self._data["Channels"][channel_str]["Name"]
-                        if (
-                            channel in self._channels
-                            and channel_name in channel_name_to_msg_prop_map
-                        ):
-                            await self._update_channel(
-                                channel,
-                                {
-                                    "closed": getattr(
-                                        message,
-                                        channel_name_to_msg_prop_map[channel_name],
-                                    )
-                                },
-                            )
-        elif isinstance(message, PushButtonStatusMessage):
-            _update_buttons = False
-            for channel_types in self._data["Channels"]:
-                if keys_exists(self._data, "Channels", channel_types, "Type"):
-                    if (
-                        self._data["Channels"][channel_types]["Type"] == "Button"
-                        or self._data["Channels"][channel_types]["Type"] == "Sensor"
-                        or self._data["Channels"][channel_types]["Type"]
-                        == "ButtonCounter"
-                        or self._data["Channels"][channel_types]["Type"] == "Relay"
-                    ):
-                        _update_buttons = True
-                        break
-            if _update_buttons:
-                for channel_id in range(1, 9):
-                    channel = self._translate_channel_name(channel_id + _channel_offset)
-                    if channel_id in message.closed:
-                        await self._update_channel(
-                            channel, {"closed": True, "on": True}
-                        )
-                    if channel_id in message.closed_long:
-                        await self._update_channel(channel, {"long": True})
-                    if channel_id in message.opened:
-                        await self._update_channel(
-                            channel, {"closed": False, "long": False, "on": False}
-                        )
-        elif isinstance(message, (ModuleStatusMessage)):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.closed:
-                    await self._update_channel(channel, {"closed": True})
-                elif channel in self._channels and isinstance(
-                    self._channels[channel], (Button, ButtonCounter)
-                ):
-                    await self._update_channel(channel, {"closed": False})
-        elif isinstance(message, (ModuleStatusMessage2)):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.closed:
-                    await self._update_channel(channel, {"closed": True})
-                elif isinstance(self._channels[channel], (Button, ButtonCounter)):
-                    await self._update_channel(channel, {"closed": False})
-                if channel_id in message.enabled:
-                    await self._update_channel(channel, {"enabled": True})
-                elif channel in self._channels and isinstance(
-                    self._channels[channel], (Button, ButtonCounter)
-                ):
-                    await self._update_channel(channel, {"enabled": False})
-            # self.selected_program_str = message.selected_program_str
-            await self._update_property(
-                "selected_program",
-                {"selected_program_str": message.selected_program_str},
+            await self._channels[chan].maybe_update_temperature(
+                message.current_temp, 1 / 2
             )
-        elif isinstance(message, CounterStatusMessage) and isinstance(
-            self._channels[message.channel], ButtonCounter
-        ):
+
+        # Update thermostat channels
+        channel_name_to_msg_prop_map = {
+            "Heater": "heater",
+            "Boost heater/cooler": "boost",
+            "Pump": "pump",
+            "Cooler": "cooler",
+            "Temperature alarm 1": "alarm1",
+            "Temperature alarm 2": "alarm2",
+            "Temperature alarm 3": "alarm3",
+            "Temperature alarm 4": "alarm4",
+        }
+        for channel_str in self._data["Channels"]:
+            if keys_exists(self._data, "Channels", channel_str, "Type"):
+                if self._data["Channels"][channel_str]["Type"] == "ThermostatChannel":
+                    channel = self._translate_channel_name(channel_str)
+                    channel_name = self._data["Channels"][channel_str]["Name"]
+                    if (
+                        channel in self._channels
+                        and channel_name in channel_name_to_msg_prop_map
+                    ):
+                        await self._update_channel(
+                            channel,
+                            {
+                                "closed": getattr(
+                                    message, channel_name_to_msg_prop_map[channel_name]
+                                )
+                            },
+                        )
+
+    async def _handle_push_button_status(
+        self, message: PushButtonStatusMessage, channel_offset: int
+    ) -> None:
+        """Handle push button status messages."""
+        _update_buttons = False
+        for channel_types in self._data["Channels"]:
+            if keys_exists(self._data, "Channels", channel_types, "Type"):
+                if self._data["Channels"][channel_types]["Type"] in (
+                    "Button",
+                    "Sensor",
+                    "ButtonCounter",
+                    "Relay",
+                ):
+                    _update_buttons = True
+                    break
+        if _update_buttons:
+            for channel_id in range(1, 9):
+                channel = self._translate_channel_name(channel_id + channel_offset)
+                if channel_id in message.closed:
+                    await self._update_channel(channel, {"closed": True, "on": True})
+                if channel_id in message.closed_long:
+                    await self._update_channel(channel, {"long": True})
+                if channel_id in message.opened:
+                    await self._update_channel(
+                        channel, {"closed": False, "long": False, "on": False}
+                    )
+
+    async def _handle_module_status(
+        self, message: ModuleStatusMessage, channel_offset: int
+    ) -> None:
+        """Handle module status messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.closed:
+                await self._update_channel(channel, {"closed": True})
+            elif channel in self._channels and isinstance(
+                self._channels[channel], (Button, ButtonCounter)
+            ):
+                await self._update_channel(channel, {"closed": False})
+
+    async def _handle_module_status2(
+        self, message: ModuleStatusMessage2, channel_offset: int
+    ) -> None:
+        """Handle module status 2 messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.closed:
+                await self._update_channel(channel, {"closed": True})
+            elif isinstance(self._channels[channel], (Button, ButtonCounter)):
+                await self._update_channel(channel, {"closed": False})
+            if channel_id in message.enabled:
+                await self._update_channel(channel, {"enabled": True})
+            elif channel in self._channels and isinstance(
+                self._channels[channel], (Button, ButtonCounter)
+            ):
+                await self._update_channel(channel, {"enabled": False})
+        await self._update_property(
+            "selected_program",
+            {"selected_program_str": message.selected_program_str},
+        )
+
+    async def _handle_counter_status(self, message: CounterStatusMessage) -> None:
+        """Handle counter status messages."""
+        if isinstance(self._channels.get(message.channel), ButtonCounter):
             channel = self._translate_channel_name(message.channel)
             await self._update_channel(
                 channel,
@@ -609,118 +694,172 @@ class Module:
                     "delay": message.delay,
                 },
             )
-        elif isinstance(message, ModuleStatusPirMessage):
-            await self._update_property("light_value", {"cur": message.light_value})
-            await self._update_channel(1, {"closed": message.dark})
-            await self._update_channel(2, {"closed": message.light})
-            await self._update_channel(3, {"closed": message.motion1})
-            await self._update_channel(4, {"closed": message.light_motion1})
-            await self._update_channel(5, {"closed": message.motion2})
-            await self._update_channel(6, {"closed": message.light_motion2})
-            if 7 in self._channels:
-                await self._update_channel(7, {"closed": message.low_temp_alarm})
-            if 8 in self._channels:
-                await self._update_channel(8, {"closed": message.high_temp_alarm})
-            # self.selected_program_str = message.selected_program_str
-            await self._update_property(
-                "selected_program",
-                {"selected_program_str": message.selected_program_str},
+
+    async def _handle_module_status_pir(self, message: ModuleStatusPirMessage) -> None:
+        """Handle PIR module status messages."""
+        await self._update_property("light_value", {"cur": message.light_value})
+        await self._update_channel(1, {"closed": message.dark})
+        await self._update_channel(2, {"closed": message.light})
+        await self._update_channel(3, {"closed": message.motion1})
+        await self._update_channel(4, {"closed": message.light_motion1})
+        await self._update_channel(5, {"closed": message.motion2})
+        await self._update_channel(6, {"closed": message.light_motion2})
+        if 7 in self._channels:
+            await self._update_channel(7, {"closed": message.low_temp_alarm})
+        if 8 in self._channels:
+            await self._update_channel(8, {"closed": message.high_temp_alarm})
+        await self._update_property(
+            "selected_program",
+            {"selected_program_str": message.selected_program_str},
+        )
+
+    async def _handle_module_status_gp4_pir(
+        self, message: ModuleStatusGP4PirMessage, channel_offset: int
+    ) -> None:
+        """Handle GP4 PIR module status messages."""
+        await self._update_property("light_value", {"cur": message.light_value})
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            await self._update_channel(
+                channel, {"closed": channel_id in message.closed}
             )
-        elif isinstance(message, ModuleStatusGP4PirMessage):
-            await self._update_property("light_value", {"cur": message.light_value})
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
+            if type(self._channels[channel]) is Button:
                 await self._update_channel(
-                    channel, {"closed": channel_id in message.closed}
+                    channel, {"enabled": channel_id in message.enabled}
                 )
-                if type(self._channels[channel]) is Button:
-                    # only treat 'enabled' if the channel is a Button
-                    await self._update_channel(
-                        channel, {"enabled": channel_id in message.enabled}
-                    )
-            # self.selected_program_str = message.selected_program_str
-            await self._update_property(
-                "selected_program",
-                {"selected_program_str": message.selected_program_str},
-            )
-        elif isinstance(message, UpdateLedStatusMessage):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.led_slow_blinking:
-                    await self._update_channel(channel, {"led_state": "slow"})
-                if channel_id in message.led_fast_blinking:
-                    await self._update_channel(channel, {"led_state": "fast"})
-                if channel_id in message.led_on:
-                    await self._update_channel(channel, {"led_state": "on"})
-                if (
-                    channel_id not in message.led_slow_blinking
-                    and channel_id not in message.led_fast_blinking
-                    and channel_id not in message.led_on
-                ):
-                    await self._update_channel(channel, {"led_state": "off"})
-        elif isinstance(message, SetLedMessage):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.leds:
-                    await self._update_channel(channel, {"led_state": "on"})
-        elif isinstance(message, ClearLedMessage):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.leds:
-                    await self._update_channel(channel, {"led_state": "off"})
-        elif isinstance(message, SlowBlinkingLedMessage):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.leds:
-                    await self._update_channel(channel, {"led_state": "slow"})
-        elif isinstance(message, FastBlinkingLedMessage):
-            for channel_id in range(1, 9):
-                channel = self._translate_channel_name(channel_id + _channel_offset)
-                if channel_id in message.leds:
-                    await self._update_channel(channel, {"led_state": "fast"})
-        elif isinstance(message, (DimmerChannelStatusMessage, DimmerStatusMessage)):
-            channel = self._translate_channel_name(message.channel)
-            await self._update_channel(channel, {"state": message.cur_dimmer_state()})
-        elif isinstance(message, SliderStatusMessage):
-            channel = self._translate_channel_name(message.channel)
-            await self._update_channel(channel, {"state": message.cur_slider_state()})
-        elif isinstance(message, BlindStatusNgMessage):
-            channel = self._translate_channel_name(message.channel)
-            await self._update_channel(
-                channel, {"state": message.status, "position": message.position}
-            )
-        elif isinstance(message, BlindStatusMessage):
-            channel = self._translate_channel_name(message.channel)
-            await self._update_channel(channel, {"state": message.status})
-        elif isinstance(message, MeteoRawMessage):
-            await self._update_channel(11, {"cur": message.rain})
-            await self._update_channel(12, {"cur": message.light})
-            await self._update_channel(13, {"cur": message.wind})
-        elif isinstance(message, SensorRawMessage):
-            await self._update_channel(
-                message.sensor, {"cur": message.value, "unit": message.unit}
-            )
-        elif isinstance(message, CounterValueMessage):
-            await self._update_channel(
-                message.channel, {"power": message.power, "energy": message.energy}
-            )
-        elif isinstance(message, DimValueStatus):
-            for offset, dim_value in enumerate(message.dim_values):
-                channel = message.channel + offset
-                await self._update_channel(channel, {"state": dim_value})
-        elif isinstance(message, PsuLoadMessage):
-            await self._update_property("psu_load_out", {"cur": message.out})
-            await self._update_property("psu_load_1", {"cur": message.load_1})
-            await self._update_property("psu_load_2", {"cur": message.load_2})
-        elif isinstance(message, PsuValuesMessage):
-            if message.channel == 3:
-                suffix = "out"
+        await self._update_property(
+            "selected_program",
+            {"selected_program_str": message.selected_program_str},
+        )
+
+    async def _handle_led_status(
+        self, message: UpdateLedStatusMessage, channel_offset: int
+    ) -> None:
+        """Handle LED status update messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.led_slow_blinking:
+                await self._update_channel(channel, {"led_state": "slow"})
+            elif channel_id in message.led_fast_blinking:
+                await self._update_channel(channel, {"led_state": "fast"})
+            elif channel_id in message.led_on:
+                await self._update_channel(channel, {"led_state": "on"})
             else:
-                suffix = f"{message.channel}"
-            await self._update_property(f"psu_power_{suffix}", {"cur": message.watt})
-            await self._update_property(f"psu_voltage_{suffix}", {"cur": message.volt})
-            await self._update_property(f"psu_current_{suffix}", {"cur": message.amp})
-        # notify status
+                await self._update_channel(channel, {"led_state": "off"})
+
+    async def _handle_set_led(
+        self, message: SetLedMessage, channel_offset: int
+    ) -> None:
+        """Handle set LED messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.leds:
+                await self._update_channel(channel, {"led_state": "on"})
+
+    async def _handle_clear_led(
+        self, message: ClearLedMessage, channel_offset: int
+    ) -> None:
+        """Handle clear LED messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.leds:
+                await self._update_channel(channel, {"led_state": "off"})
+
+    async def _handle_slow_blinking_led(
+        self, message: SlowBlinkingLedMessage, channel_offset: int
+    ) -> None:
+        """Handle slow blinking LED messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.leds:
+                await self._update_channel(channel, {"led_state": "slow"})
+
+    async def _handle_fast_blinking_led(
+        self, message: FastBlinkingLedMessage, channel_offset: int
+    ) -> None:
+        """Handle fast blinking LED messages."""
+        for channel_id in range(1, 9):
+            channel = self._translate_channel_name(channel_id + channel_offset)
+            if channel_id in message.leds:
+                await self._update_channel(channel, {"led_state": "fast"})
+
+    async def _handle_dimmer_status(
+        self, message: DimmerChannelStatusMessage | DimmerStatusMessage
+    ) -> None:
+        """Handle dimmer status messages."""
+        channel = self._translate_channel_name(message.channel)
+        await self._update_channel(channel, {"state": message.cur_dimmer_state()})
+
+    async def _handle_slider_status(self, message: SliderStatusMessage) -> None:
+        """Handle slider status messages."""
+        channel = self._translate_channel_name(message.channel)
+        await self._update_channel(channel, {"state": message.cur_slider_state()})
+
+    async def _handle_blind_status_ng(self, message: BlindStatusNgMessage) -> None:
+        """Handle blind status NG messages."""
+        channel = self._translate_channel_name(message.channel)
+        await self._update_channel(
+            channel, {"state": message.status, "position": message.position}
+        )
+
+    async def _handle_blind_status(self, message: BlindStatusMessage) -> None:
+        """Handle blind status messages."""
+        channel = self._translate_channel_name(message.channel)
+        await self._update_channel(channel, {"state": message.status})
+
+    async def _handle_meteo_raw(self, message: MeteoRawMessage) -> None:
+        """Handle meteo raw messages."""
+        await self._update_channel(11, {"cur": message.rain})
+        await self._update_channel(12, {"cur": message.light})
+        await self._update_channel(13, {"cur": message.wind})
+
+    async def _handle_sensor_raw(self, message: SensorRawMessage) -> None:
+        """Handle sensor raw messages."""
+        await self._update_channel(
+            message.sensor, {"cur": message.value, "unit": message.unit}
+        )
+
+    async def _handle_counter_value(self, message: CounterValueMessage) -> None:
+        """Handle counter value messages."""
+        await self._update_channel(
+            message.channel, {"power": message.power, "energy": message.energy}
+        )
+
+    async def _handle_dim_value_status(self, message: DimValueStatus) -> None:
+        """Handle dim value status messages."""
+        for offset, dim_value in enumerate(message.dim_values):
+            channel = message.channel + offset
+            await self._update_channel(channel, {"state": dim_value})
+
+    async def _handle_psu_load(self, message: PsuLoadMessage) -> None:
+        """Handle PSU load messages."""
+        await self._update_property("psu_load_out", {"cur": message.out})
+        await self._update_property("psu_load_1", {"cur": message.load_1})
+        await self._update_property("psu_load_2", {"cur": message.load_2})
+
+    async def _handle_psu_values(self, message: PsuValuesMessage) -> None:
+        """Handle PSU values messages."""
+        suffix = "out" if message.channel == 3 else f"{message.channel}"
+        await self._update_property(f"psu_power_{suffix}", {"cur": message.watt})
+        await self._update_property(f"psu_voltage_{suffix}", {"cur": message.volt})
+        await self._update_property(f"psu_current_{suffix}", {"cur": message.amp})
+
+    async def on_message(self, message: Message) -> None:
+        """Process received message."""
+        self._log.debug(f"RX: {message}")
+        _channel_offset = self.calc_channel_offset(message.address)
+
+        # Use dispatch table for message handling
+        handler = self._message_handlers.get(type(message))
+        if handler:
+            # Check if handler needs channel_offset parameter
+            sig = inspect.signature(handler)
+            if "channel_offset" in sig.parameters:
+                await handler(message, _channel_offset)
+            else:
+                await handler(message)
+
+        # Notify status
         self._got_status.set()
 
     async def _update_channel(self, channel: int, updates: dict):
@@ -760,6 +899,7 @@ class Module:
         self.loaded = True
         self._is_loading = False
         await self._request_module_status()
+        await self._trigger_load_finished_callbacks()
 
     async def load(self, from_cache: bool = False) -> None:
         """Initialize the module."""
@@ -808,6 +948,7 @@ class Module:
         # stop the loading
         self._is_loading = False
         await self._request_module_status()
+        await self._trigger_load_finished_callbacks()
 
     async def _get_cache(self):
         try:

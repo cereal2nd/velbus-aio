@@ -3,12 +3,14 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind 1",
-      "Type": "Blind"
+      "Type": "Blind",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Blind 2",
-      "Type": "Blind"
+      "Type": "Blind",
+      "Subdevice": "yes"
     }
   },
   "Memory": {

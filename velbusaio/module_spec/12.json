@@ -1,4 +1,5 @@
 {
+  "sliderScale": 100,
   "Channels": {
     "01": {
       "Editable": "yes",
@@ -26,7 +27,7 @@
     }
   },
   "Memory": {
-    "ModuleName": "00E0-00EF;01E0-01EF",
+    "ModuleName": "00E0-16;01E0-16;02E0-16;03E0-16",
     "Channels": {
       "01": "00F0-00FF",
       "02": "01F0-01FF",

@@ -1,246 +1,74 @@
 {
   "AllChannelStatus": "FF",
   "ChannelNumbers": {
-    "Name": {
-      "Convert": "hex",
-      "Map": {
-        "21": "34"
-      }
-    }
+    "Name": { "Convert": "hex", "Map": { "09": "10" } }
   },
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
-      "Name": "Push button 5",
+      "Name": "Virtual button 5",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "06": {
       "Editable": "yes",
-      "Name": "Push button 6",
+      "Name": "Virtual button 6",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "07": {
       "Editable": "yes",
-      "Name": "Push button 7",
+      "Name": "Virtual button 7",
       "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "08": {
       "Editable": "yes",
-      "Name": "Push button 8",
+      "Name": "Virtual button 8",
       "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "09": {
-      "Editable": "yes",
-      "Name": "Push button 9",
-      "Type": "Button",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     },
     "10": {
       "Editable": "yes",
-      "Name": "Push button 10",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "11": {
-      "Editable": "yes",
-      "Name": "Push button 11",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "12": {
-      "Editable": "yes",
-      "Name": "Push button 12",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "13": {
-      "Editable": "yes",
-      "Name": "Push button 13",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "14": {
-      "Editable": "yes",
-      "Name": "Push button 14",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "15": {
-      "Editable": "yes",
-      "Name": "Push button 15",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "16": {
-      "Editable": "yes",
-      "Name": "Push button 16",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "17": {
-      "Editable": "yes",
-      "Name": "Push button 17",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "18": {
-      "Editable": "yes",
-      "Name": "Push button 18",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "19": {
-      "Editable": "yes",
-      "Name": "Push button 19",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "20": {
-      "Editable": "yes",
-      "Name": "Push button 10",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "21": {
-      "Editable": "yes",
-      "Name": "Push button 21",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "22": {
-      "Editable": "yes",
-      "Name": "Push button 22",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "23": {
-      "Editable": "yes",
-      "Name": "Push button 23",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "24": {
-      "Editable": "yes",
-      "Name": "Push button 24",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "25": {
-      "Editable": "yes",
-      "Name": "Push button 25",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "26": {
-      "Editable": "yes",
-      "Name": "Push button 26",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "27": {
-      "Editable": "yes",
-      "Name": "Push button 27",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "28": {
-      "Editable": "yes",
-      "Name": "Push button 28",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "29": {
-      "Editable": "yes",
-      "Name": "Push button 29",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "30": {
-      "Editable": "yes",
-      "Name": "Push button 30",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "31": {
-      "Editable": "yes",
-      "Name": "Push button 31",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "32": {
-      "Editable": "yes",
-      "Name": "Push button 32",
-      "Type": "Button",
-      "Subdevice": "yes"
-    },
-    "34": {
-      "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
     },
-    "35": {
-      "Name": "Heater",
-      "Type": "ThermostatChannel"
-    },
-    "36": {
-      "Name": "Boost",
-      "Type": "ThermostatChannel"
-    },
-    "37": {
-      "Name": "Pump",
-      "Type": "ThermostatChannel"
-    },
-    "38": {
-      "Name": "Cooler",
-      "Type": "ThermostatChannel"
-    },
-    "39": {
-      "Name": "Alarm 1",
-      "Type": "ThermostatChannel"
-    },
-    "40": {
-      "Name": "Alarm 2",
-      "Type": "ThermostatChannel"
-    },
-    "41": {
-      "Name": "Alarm 3",
-      "Type": "ThermostatChannel"
-    },
-    "42": {
-      "Name": "Alarm 4",
-      "Type": "ThermostatChannel"
-    }
+    "11": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "12": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "13": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "14": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "15": { "Name": "Alarm 1", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "16": { "Name": "Alarm 2", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "17": { "Name": "Alarm 3", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "18": { "Name": "Alarm 4", "Type": "ThermostatChannel", "Subdevice": "no" }
   },
   "Memory": {
-    "ModuleName": "09BE-09FD",
+    "ModuleName": "03C0-03FF",
     "Channels": {
       "01": "0000-000F",
       "02": "0014-0023",
@@ -250,44 +78,10 @@
       "06": "0064-0073",
       "07": "0078-0087",
       "08": "008C-009B",
-      "09": "00A0-00AF",
-      "10": "00B4-00C3",
-      "11": "00C8-00D7",
-      "12": "00DC-00EB",
-      "13": "00F0-00FF",
-      "14": "0104-0113",
-      "15": "0118-0127",
-      "16": "012C-013B",
-      "17": "0140-014F",
-      "18": "0154-0163",
-      "19": "0168-0177",
-      "20": "017C-018B",
-      "21": "0190-019F",
-      "22": "01A4-01B3",
-      "23": "01B8-01C7",
-      "24": "01CC-01DB",
-      "25": "01E0-01EF",
-      "26": "01F4-0203",
-      "27": "0208-0217",
-      "28": "021C-022B",
-      "29": "0230-023F",
-      "30": "0244-0253",
-      "31": "0258-0267",
-      "32": "026C-027B",
-      "34": "02C1-02D0"
+      "10": "00E1-00F0"
     }
   },
-  "TemperatureChannel": "34",
-  "ThermostatAddr": "3",
-  "Type": "VMBGPO",
-  "Properties": {
-    "memo_text": {
-      "Type": "MemoText",
-      "Name": "Memo Text"
-    },
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "TemperatureChannel": "10",
+  "ThermostatAddr": "0",
+  "Type": "VMBGP4"
 }

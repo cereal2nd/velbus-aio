@@ -1,40 +1,32 @@
 {
   "Channels": {
-    "01": {
-      "Name": "Motion 1",
-      "Type": "Sensor"
-    },
-    "02": {
-      "Name": "Motion 2",
-      "Type": "Sensor"
-    },
+    "01": { "Name": "Motion 1", "Type": "Sensor", "Subdevice": "no" },
+    "02": { "Name": "Motion 2", "Type": "Sensor", "Subdevice": "no" },
     "03": {
       "Editable": "no",
       "Name": "Bell 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "no",
       "Name": "Bell 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
-    "05": {
-      "Name": "Door 1",
-      "Type": "Sensor"
-    },
-    "06": {
-      "Name": "Door 2",
-      "Type": "Sensor"
-    },
+    "05": { "Name": "Door 1", "Type": "Sensor", "Subdevice": "no" },
+    "06": { "Name": "Door 2", "Type": "Sensor", "Subdevice": "no" },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     }
   },
   "Memory": {
@@ -46,11 +38,5 @@
       "08": "0010-001F"
     }
   },
-  "Type": "VMBVP1",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMBVP1"
 }
