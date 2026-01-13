@@ -1,0 +1,64 @@
+{
+  "Type": "VMB8DC-20",
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "Name": {
+      "Convert": "hex"
+    }
+  },
+  "Channels": {
+    "1": {
+      "Editable": "yes",
+      "Name": "Dimmer 1",
+      "Type": "Dimmer"
+    },
+    "2": {
+      "Editable": "yes",
+      "Name": "Dimmer 2",
+      "Type": "Dimmer"
+    },
+    "3": {
+      "Editable": "yes",
+      "Name": "Dimmer 3",
+      "Type": "Dimmer"
+    },
+    "4": {
+      "Editable": "yes",
+      "Name": "Dimmer 4",
+      "Type": "Dimmer"
+    },
+    "5": {
+      "Editable": "yes",
+      "Name": "Dimmer 5",
+      "Type": "Dimmer"
+    },
+    "6": {
+      "Editable": "yes",
+      "Name": "Dimmer 6",
+      "Type": "Dimmer"
+    },
+    "7": {
+      "Editable": "yes",
+      "Name": "Dimmer 7",
+      "Type": "Dimmer"
+    },
+    "8": {
+      "Editable": "yes",
+      "Name": "Dimmer 8",
+      "Type": "Dimmer"
+    }
+  },
+  "Memory": {
+    "ModuleName": "07BC-07FB",
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0010-001F",
+      "03": "0020-002F",
+      "04": "0030-003F",
+      "05": "0040-004F",
+      "06": "0050-005F",
+      "07": "0060-006F",
+      "08": "0070-007F"
+    }
+  }
+}
