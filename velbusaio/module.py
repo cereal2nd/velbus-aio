@@ -30,6 +30,7 @@ from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
 from velbusaio.message import Message
 from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage
+from velbusaio.messages.bus_error_counter_status import BusErrorCounterStatusMessage
 from velbusaio.messages.cancel_forced_off import CancelForcedOff
 from velbusaio.messages.cancel_forced_on import CancelForcedOn
 from velbusaio.messages.cancel_inhibit import CancelInhibit
@@ -191,6 +192,29 @@ class Module:
         self._log = logging.getLogger("velbus-module")
         # load the protocol data
         try:
+            # Load global.json first
+            global_data = {}
+            try:
+                if sys.version_info >= (3, 13):
+                    with importlib.resources.path(
+                        __name__, "module_spec/global.json"
+                    ) as fspath:
+                        async with async_open(fspath) as global_file:
+                            global_data = json.loads(await global_file.read())
+                else:
+                    async with async_open(
+                        str(
+                            importlib.resources.files(__name__.split(".")[0]).joinpath(
+                                "module_spec/global.json"
+                            )
+                        )
+                    ) as global_file:
+                        global_data = json.loads(await global_file.read())
+                self._log.debug("Global module spec loaded")
+            except FileNotFoundError:
+                self._log.debug("No global module spec found")
+
+            # Load module-specific data
             if sys.version_info >= (3, 13):
                 with importlib.resources.path(
                     __name__, f"module_spec/{h2(self._type)}.json"
@@ -206,6 +230,15 @@ class Module:
                     )
                 ) as protocol_file:
                     self._data = json.loads(await protocol_file.read())
+
+            # Merge global data into module data (module-specific takes precedence)
+            for key, value in global_data.items():
+                if key not in self._data:
+                    self._data[key] = value
+                elif isinstance(value, dict) and isinstance(self._data[key], dict):
+                    # Deep merge for nested dictionaries
+                    self._data[key] = {**value, **self._data[key]}
+
             self._log.debug(f"Module spec {h2(self._type)} loaded")
         except FileNotFoundError:
             self._log.warning(f"No module spec for {h2(self._type)}")
@@ -398,6 +431,16 @@ class Module:
             await self._process_memory_data_message(message)
         elif isinstance(message, MemoryDataBlockMessage):
             await self._process_memory_data_block_message(message)
+        elif isinstance(message, BusErrorCounterStatusMessage):
+            await self._update_property(
+                "BusErrorTx", {"_cur": message.transmit_error_counter}
+            )
+            await self._update_property(
+                "BusErrorRx", {"_cur": message.receive_error_counter}
+            )
+            await self._update_property(
+                "BusOffCounter", {"_cur": message.bus_off_counter}
+            )
         elif isinstance(message, (RelayStatusMessage, RelayStatusMessage2)):
             await self._update_channel(
                 message.channel,

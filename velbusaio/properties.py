@@ -147,3 +147,26 @@ class LightValue(Property):
     def get_state(self) -> float:
         """Return the current light sensor value."""
         return round(self._cur, 2)
+
+
+class BusErrorTx(Property):
+    """Bus Error Transmit property."""
+
+    def __init__(
+        self, module: Module, name: str, writer: Callable[[Message], Awaitable[None]]
+    ):
+        """Initialize Bus Error Transmit property with per-instance current value."""
+        super().__init__(module, name, writer)
+        self._cur: int = 0
+
+    def get_state(self) -> float:
+        """Return the current Bus Error Transmit count."""
+        return float(self._cur)
+
+
+class BusErrorRx(BusErrorTx):
+    """Bus Error Receive property."""
+
+
+class BusErrorOff(BusErrorTx):
+    """Bus Error OFF property."""
