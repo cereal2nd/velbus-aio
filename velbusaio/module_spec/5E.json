@@ -1,4 +1,5 @@
 {
+  "Type": "VMBGP2PIR-20",
   "Channels": {
     "01": {
       "Editable": "yes",
@@ -12,18 +13,14 @@
       "Type": "Button",
       "Subdevice": "no"
     },
-    "03": {
-      "Editable": "yes",
-      "Name": "Push button 3",
-      "Type": "Button",
+    "05": { "Name": "Dark/Light output", "Type": "Sensor", "Subdevice": "no" },
+    "06": { "Name": "Motion output", "Type": "Sensor", "Subdevice": "no" },
+    "07": {
+      "Name": "Light Depending motion",
+      "Type": "Sensor",
       "Subdevice": "no"
     },
-    "04": {
-      "Editable": "yes",
-      "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
-    },
+    "08": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" },
     "09": {
       "Editable": "yes",
       "Name": "Temperature",
@@ -66,14 +63,11 @@
     }
   },
   "TemperatureChannel": "09",
-  "Type": "VMBEL4-20",
   "Memory": {
     "ModuleName": "06C0-06FF",
     "Channels": {
       "01": "001C-002B",
       "02": "0030-003F",
-      "03": "0044-0053",
-      "04": "0058-0067",
       "09": "0398-03A7",
       "18": "03CC-03DB"
     }
