@@ -3,7 +3,8 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     }
   },
   "Type": "VMB1RY",

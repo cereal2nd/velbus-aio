@@ -1,43 +1,28 @@
 {
+  "AllChannelStatus": "FF",
   "Channels": {
-    "01": {
-      "Name": "Dark output",
-      "Type": "Sensor"
-    },
-    "02": {
-      "Name": "Light output",
-      "Type": "Sensor"
-    },
-    "03": {
-      "Name": "Motion output 1",
-      "Type": "Sensor"
-    },
+    "01": { "Name": "Dark output", "Type": "Sensor", "Subdevice": "no" },
+    "02": { "Name": "Light output", "Type": "Sensor", "Subdevice": "no" },
+    "03": { "Name": "Motion output 1", "Type": "Sensor", "Subdevice": "no" },
     "04": {
       "Name": "Motion output 1 (LD)",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "no"
     },
-    "05": {
-      "Name": "Motion output 2",
-      "Type": "Sensor"
-    },
+    "05": { "Name": "Motion output 2", "Type": "Sensor", "Subdevice": "no" },
     "06": {
       "Name": "Motion output 2 (LD)",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "no"
     },
-    "07": {
-      "Name": "Absence output",
-      "Type": "Sensor"
-    }
+    "07": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" }
   },
   "Memory": {
     "ModuleName": "00B0-00EF"
   },
   "Type": "VMBPIRC",
   "Properties": {
-    "light_value": {
-      "Type": "LightValue",
-      "Name": "Light value"
-    },
+    "light_value": { "Type": "LightValue", "Name": "Light value" },
     "selected_program": {
       "Type": "SelectedProgram",
       "Name": "Selected program"
