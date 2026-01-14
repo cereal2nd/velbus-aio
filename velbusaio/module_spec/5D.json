@@ -1,24 +1,58 @@
 {
   "AllChannelStatus": "FF",
   "Channels": {
-    "01": { "Editable": "yes", "Name": "Push button 1", "Type": "Button" },
-    "02": { "Editable": "yes", "Name": "Push button 2", "Type": "Button" },
-    "03": { "Editable": "yes", "Name": "Push button 3", "Type": "Button" },
-    "04": { "Editable": "yes", "Name": "Push button 4", "Type": "Button" },
-    "05": { "Name": "Dark/Light output", "Type": "Sensor" },
-    "06": { "Name": "Motion output", "Type": "Sensor" },
-    "07": { "Name": "Light Depending motion", "Type": "Sensor" },
-    "08": { "Name": "Absence output", "Type": "Sensor" },
-    "09": { "Editable": "yes", "Name": "Temperature", "Type": "Temperature" },
-    "10": { "Name": "Heater", "Type": "ThermostatChannel" },
-    "11": { "Name": "Boost", "Type": "ThermostatChannel" },
-    "12": { "Name": "Pump", "Type": "ThermostatChannel" },
-    "13": { "Name": "Cooler", "Type": "ThermostatChannel" },
-    "14": { "Name": "Alarm 1", "Type": "ThermostatChannel" },
-    "15": { "Name": "Alarm 2", "Type": "ThermostatChannel" },
-    "16": { "Name": "Alarm 3", "Type": "ThermostatChannel" },
-    "17": { "Name": "Alarm 4", "Type": "ThermostatChannel" },
-    "18": { "Editable": "yes", "Name": "Output", "Type": "Relay" }
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "05": { "Name": "Dark/Light output", "Type": "Sensor", "Subdevice": "no" },
+    "06": { "Name": "Motion output", "Type": "Sensor", "Subdevice": "no" },
+    "07": {
+      "Name": "Light Depending motion",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "08": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" },
+    "09": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature",
+      "Subdevice": "no"
+    },
+    "10": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "11": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "12": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "13": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "14": { "Name": "Alarm 1", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "15": { "Name": "Alarm 2", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "16": { "Name": "Alarm 3", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "17": { "Name": "Alarm 4", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "18": {
+      "Editable": "yes",
+      "Name": "Output",
+      "Type": "Relay",
+      "Subdevice": "no"
+    }
   },
   "TemperatureChannel": "09",
   "Type": "VMBEL4PIR-20",

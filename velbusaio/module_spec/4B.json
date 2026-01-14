@@ -1,4 +1,5 @@
 {
+  "Type": "VMB8DC-20",
   "sliderScale": 254,
   "Channels": {
     "01": {
@@ -27,7 +28,7 @@
     },
     "05": {
       "Editable": "yes",
-      "Name": "Dimmer 4",
+      "Name": "Dimmer 5",
       "Type": "Dimmer",
       "Subdevice": "yes"
     },
@@ -63,7 +64,6 @@
       "08": "0070-007F"
     }
   },
-  "Type": "VMB8DC-20",
   "Properties": {
     "selected_program": {
       "Type": "SelectedProgram",

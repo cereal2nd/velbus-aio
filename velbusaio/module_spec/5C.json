@@ -1,92 +1,62 @@
 {
   "AllChannelStatus": "FF",
-  "ChannelNumbers": {
-    "Name": {
-      "Convert": "hex",
-      "Map": {
-        "09": "10"
-      }
-    }
-  },
   "Channels": {
     "01": {
+      "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "02": {
+      "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "03": {
+      "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
+      "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
-    "05": {
-      "Name": "Dark/Light output",
-      "Type": "Sensor"
-    },
-    "06": {
-      "Name": "Motion output",
-      "Type": "Sensor"
-    },
-    "07": {
-      "Name": "Light Depending motion",
-      "Type": "Sensor"
-    },
-    "08": {
-      "Name": "Absence output",
-      "Type": "Sensor"
-    },
-    "10": {
+    "09": {
+      "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
     },
-    "11": {
-      "Name": "Heater",
-      "Type": "ThermostatChannel"
-    },
-    "12": {
-      "Name": "Boost",
-      "Type": "ThermostatChannel"
-    },
-    "13": {
-      "Name": "Pump",
-      "Type": "ThermostatChannel"
-    },
-    "14": {
-      "Name": "Cooler",
-      "Type": "ThermostatChannel"
-    },
-    "15": {
-      "Name": "Alarm 1",
-      "Type": "ThermostatChannel"
-    },
-    "16": {
-      "Name": "Alarm 2",
-      "Type": "ThermostatChannel"
-    },
-    "17": {
-      "Name": "Alarm 3",
-      "Type": "ThermostatChannel"
-    },
+    "10": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "11": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "12": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "13": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "14": { "Name": "Alarm 1", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "15": { "Name": "Alarm 2", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "16": { "Name": "Alarm 3", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "17": { "Name": "Alarm 4", "Type": "ThermostatChannel", "Subdevice": "no" },
     "18": {
-      "Name": "Alarm 4",
-      "Type": "ThermostatChannel"
+      "Editable": "yes",
+      "Name": "Output",
+      "Type": "Relay",
+      "Subdevice": "no"
     }
   },
-  "TemperatureChannel": "10",
-  "ThermostatAddr": "0",
+  "TemperatureChannel": "09",
+  "Type": "VMBEL4-20",
   "Memory": {
-    "ModuleName": "03BC-03FB"
-  },
-  "Properties": {
-    "light_value": {
-      "Type": "LightValue",
-      "Name": "Light value"
+    "ModuleName": "06C0-06FF",
+    "Channels": {
+      "01": "001C-002B",
+      "02": "0030-003F",
+      "03": "0044-0053",
+      "04": "0058-0067",
+      "09": "0398-03A7",
+      "18": "03CC-03DB"
     }
   }
 }

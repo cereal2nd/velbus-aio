@@ -3,42 +3,50 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
       "Name": "Push button 5",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "06": {
       "Editable": "yes",
       "Name": "Push button 6",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     }
   },
   "Memory": {
@@ -54,11 +62,5 @@
       "08": "008C-009B"
     }
   },
-  "Type": "VMB6PB-20",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMB6PB-20"
 }

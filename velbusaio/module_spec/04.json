@@ -3,136 +3,125 @@
     "01": {
       "Editable": "yes",
       "Name": "Alarm 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
       "Name": "Alarm 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Alarm 3",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Alarm 4",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
       "Name": "Alarm 5",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "06": {
       "Editable": "yes",
       "Name": "Alarm 6",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "07": {
       "Editable": "yes",
       "Name": "Alarm 7",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "08": {
       "Editable": "yes",
       "Name": "Alarm 8",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "09": {
       "Editable": "yes",
       "Name": "Alarm 9",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "10": {
       "Editable": "yes",
       "Name": "Alarm 10",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "11": {
       "Editable": "yes",
       "Name": "Alarm 11",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "12": {
       "Editable": "yes",
       "Name": "Alarm 12",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "13": {
       "Editable": "yes",
       "Name": "Alarm 13",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "14": {
       "Editable": "yes",
       "Name": "Alarm 14",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "15": {
       "Editable": "yes",
       "Name": "Alarm 15",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "16": {
       "Editable": "yes",
       "Name": "Alarm 16",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     }
   },
   "Memory": {
     "ModuleName": "07BC-07FB"
   },
   "Properties": {
-    "psu_power_1": {
-      "Type": "PSUPower",
-      "Name": "Power Supply 1 Power"
-    },
-    "psu_power_2": {
-      "Type": "PSUPower",
-      "Name": "Power Supply 2 Power"
-    },
+    "psu_power_1": { "Type": "PSUPower", "Name": "Power Supply 1 Power" },
+    "psu_power_2": { "Type": "PSUPower", "Name": "Power Supply 2 Power" },
     "psu_power_out": {
       "Type": "PSUPower",
       "Name": "Power Supply Output Power"
     },
-    "psu_voltage_1": {
-      "Type": "PSUVoltage",
-      "Name": "Power Supply 1 Voltage"
-    },
-    "psu_voltage_2": {
-      "Type": "PSUVoltage",
-      "Name": "Power Supply 2 Voltage"
-    },
+    "psu_voltage_1": { "Type": "PSUVoltage", "Name": "Power Supply 1 Voltage" },
+    "psu_voltage_2": { "Type": "PSUVoltage", "Name": "Power Supply 2 Voltage" },
     "psu_voltage_out": {
       "Type": "PSUVoltage",
       "Name": "Power Supply Output Voltage"
     },
-    "psu_current_1": {
-      "Type": "PSUCurrent",
-      "Name": "Power Supply 1 Current"
-    },
-    "psu_current_2": {
-      "Type": "PSUCurrent",
-      "Name": "Power Supply 2 Current"
-    },
+    "psu_current_1": { "Type": "PSUCurrent", "Name": "Power Supply 1 Current" },
+    "psu_current_2": { "Type": "PSUCurrent", "Name": "Power Supply 2 Current" },
     "psu_current_out": {
       "Type": "PSUCurrent",
       "Name": "Power Supply Output Current"
     },
-    "psu_load_1": {
-      "Type": "PSULoad",
-      "Name": "Power Supply 1 Load"
-    },
-    "psu_load_2": {
-      "Type": "PSULoad",
-      "Name": "Power Supply 2 Load"
-    },
-    "psu_load_out": {
-      "Type": "PSULoad",
-      "Name": "Power Supply Output Load"
-    }
+    "psu_load_1": { "Type": "PSULoad", "Name": "Power Supply 1 Load" },
+    "psu_load_2": { "Type": "PSULoad", "Name": "Power Supply 2 Load" },
+    "psu_load_out": { "Type": "PSULoad", "Name": "Power Supply Output Load" }
   },
   "Type": "VMBPSUMNGR-20"
 }

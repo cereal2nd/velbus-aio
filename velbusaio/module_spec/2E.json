@@ -4,7 +4,7 @@
       "Editable": "yes",
       "Name": "Blind",
       "Type": "Blind",
-      "Subdevice": "yes"
+      "Subdevice": "no"
     }
   },
   "Memory": {
