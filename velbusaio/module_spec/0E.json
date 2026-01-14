@@ -2,10 +2,10 @@
   "AllChannelStatus": "FF",
   "Channels": {
     "01": {
+      "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature",
-      "Subdevice": "no",
-      "Editable": "yes"
+      "Subdevice": "no"
     },
     "02": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
     "03": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },

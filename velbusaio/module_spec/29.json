@@ -31,7 +31,7 @@
       "Subdevice": "no"
     },
     "06": {
-      "Editable": "no",
+      "Editable": "yes",
       "Name": "Input button",
       "Type": "Button",
       "Subdevice": "no"
@@ -44,8 +44,15 @@
       "02": "01F0-01FF",
       "03": "02F0-02FF",
       "04": "03F0-03FF",
-      "05": "04F0-04FF"
+      "05": "04F0-04FF",
+      "06": "00EA-00EF;01EA-01EF;02EA-02ED"
     }
   },
-  "Type": "VMB1RYNOS"
+  "Type": "VMB1RYNOS",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }
