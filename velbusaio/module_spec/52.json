@@ -204,7 +204,7 @@
   "ThermostatAddr": "3",
   "Type": "VMBELO-20",
   "Memory": {
-    "ModuleName": "0FA8-0FE7",
+    "ModuleName": "0F44-0F83",
     "Channels": {
       "01": "001C-002B",
       "02": "0030-003F",

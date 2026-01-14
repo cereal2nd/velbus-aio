@@ -1,3 +1,6 @@
 {
-  "Type": "VMBSIG"
+  "Type": "VMBSIG",
+  "Memory": {
+    "ModuleName": "0000-003F"
+  }
 }
