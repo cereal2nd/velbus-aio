@@ -62,11 +62,5 @@
       "08": "0070-007F"
     }
   },
-  "Type": "VMB2PBN",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMB2PBN"
 }

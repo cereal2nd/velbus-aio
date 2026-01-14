@@ -83,5 +83,11 @@
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",
-  "Type": "VMBGP4"
+  "Type": "VMBGP4",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }
