@@ -4,7 +4,7 @@
       "Editable": "yes",
       "Name": "Relay",
       "Type": "Relay",
-      "Subdevice": "no"
+      "Subdevice": "yes"
     }
   },
   "Type": "VMB1RY",

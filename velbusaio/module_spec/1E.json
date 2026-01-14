@@ -52,39 +52,48 @@
     "10": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
     },
     "11": {
       "Name": "Heater",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "12": {
       "Name": "Boost",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "13": {
       "Name": "Pump",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "14": {
       "Name": "Cooler",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "15": {
       "Name": "Alarm 1",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "16": {
       "Name": "Alarm 2",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "17": {
       "Name": "Alarm 3",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "18": {
       "Name": "Alarm 4",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     }
   },
   "Memory": {

@@ -10,7 +10,8 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind",
-      "Type": "Blind"
+      "Type": "Blind",
+      "Subdevice": "no"
     }
   },
   "Type": "VMB1BL",

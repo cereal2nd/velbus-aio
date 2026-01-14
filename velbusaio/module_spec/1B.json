@@ -3,27 +3,32 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "yes"
     },
     "02": {
       "Editable": "yes",
       "Name": "Virtual relay 1",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual relay 2",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual relay 3",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual relay 4",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     }
   },
   "Memory": {
@@ -36,5 +41,11 @@
       "05": "04F0-04FF"
     }
   },
-  "Type": "VMB1RYNO"
+  "Type": "VMB1RYNO",
+  "Properties": {
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }

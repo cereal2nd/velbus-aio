@@ -1,4 +1,30 @@
 {
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "RF Channel 1",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "RF Channel 2",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "RF Channel 3",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "RF Channel 4",
+      "Type": "Button",
+      "Subdevice": "no"
+    }
+  },
   "Memory": {
     "ModuleName": "02C0-02FF",
     "Channels": {

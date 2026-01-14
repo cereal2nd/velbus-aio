@@ -1,54 +1,46 @@
 {
   "AllChannelStatus": "FF",
   "ChannelNumbers": {
-    "Name": {
-      "Convert": "hex",
-      "Map": {
-        "09": "10"
-      }
-    }
+    "Name": { "Convert": "hex", "Map": { "09": "10" } }
   },
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
-    "05": {
-      "Name": "Dark/Light output",
-      "Type": "Sensor"
-    },
-    "06": {
-      "Name": "Motion output",
-      "Type": "Sensor"
-    },
+    "05": { "Name": "Dark/Light output", "Type": "Sensor", "Subdevice": "no" },
+    "06": { "Name": "Motion output", "Type": "Sensor", "Subdevice": "no" },
     "07": {
       "Name": "Light Depending motion",
-      "Type": "Sensor"
+      "Type": "Sensor",
+      "Subdevice": "no"
     },
-    "08": {
-      "Name": "Absence output",
-      "Type": "Sensor"
-    },
+    "08": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" },
     "09": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
     }
   },
   "Memory": {
@@ -65,10 +57,7 @@
   "ThermostatAddr": "0",
   "Type": "VMBGP4PIR",
   "Properties": {
-    "light_value": {
-      "Type": "LightValue",
-      "Name": "Light value"
-    },
+    "light_value": { "Type": "LightValue", "Name": "Light value" },
     "selected_program": {
       "Type": "SelectedProgram",
       "Name": "Selected program"
