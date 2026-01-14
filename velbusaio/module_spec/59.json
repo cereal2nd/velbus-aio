@@ -1,15 +1,36 @@
 {
   "AllChannelStatus": "FF",
   "Channels": {
-    "01": { "Name": "Dark output", "Type": "Sensor" },
-    "02": { "Name": "Light output", "Type": "Sensor" },
-    "03": { "Name": "Motion 1 output", "Type": "Sensor" },
-    "04": { "Name": "Light depending motion 1 output", "Type": "Sensor" },
-    "05": { "Name": "Motion 2 output", "Type": "Sensor" },
-    "06": { "Name": "Light depending motion 2 output", "Type": "Sensor" },
-    "07": { "Name": "Low temperature alarm", "Type": "Sensor" },
-    "08": { "Name": "High temperature alarm", "Type": "Sensor" },
-    "09": { "Editable": "yes", "Name": "Temperature", "Type": "Temperature" }
+    "01": { "Name": "Dark output", "Type": "Sensor", "Subdevice": "no" },
+    "02": { "Name": "Light output", "Type": "Sensor", "Subdevice": "no" },
+    "03": { "Name": "Motion 1 output", "Type": "Sensor", "Subdevice": "no" },
+    "04": {
+      "Name": "Light depending motion 1 output",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "05": { "Name": "Motion 2 output", "Type": "Sensor", "Subdevice": "no" },
+    "06": {
+      "Name": "Light depending motion 2 output",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "07": {
+      "Name": "Low temperature alarm",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "08": {
+      "Name": "High temperature alarm",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "09": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature",
+      "Subdevice": "no"
+    }
   },
   "Memory": {
     "ModuleName": "03BC-03FB"

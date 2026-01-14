@@ -24,10 +24,30 @@
       "Type": "Relay",
       "Subdevice": "yes"
     },
-    "05": { "Editable": "yes", "Name": "Virtual relay 5", "Type": "Relay" },
-    "06": { "Editable": "yes", "Name": "Virtual relay 6", "Type": "Relay" },
-    "07": { "Editable": "yes", "Name": "Virtual relay 7", "Type": "Relay" },
-    "08": { "Editable": "yes", "Name": "Virtual relay 8", "Type": "Relay" }
+    "05": {
+      "Editable": "yes",
+      "Name": "Virtual relay 5",
+      "Type": "Relay",
+      "Subdevice": "no"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Virtual relay 6",
+      "Type": "Relay",
+      "Subdevice": "no"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Virtual relay 7",
+      "Type": "Relay",
+      "Subdevice": "no"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Virtual relay 8",
+      "Type": "Relay",
+      "Subdevice": "no"
+    }
   },
   "Memory": {
     "ModuleName": "07BC-07FB",
