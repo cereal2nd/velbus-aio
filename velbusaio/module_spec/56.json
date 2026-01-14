@@ -25,6 +25,30 @@
       "Type": "Button",
       "Subdevice": "no"
     },
+    "05": {
+      "Editable": "yes",
+      "Name": "Virtual button 5",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Virtual button 6",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Virtual button 7",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Virtual button 8",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
     "09": {
       "Editable": "yes",
       "Name": "Temperature",
@@ -75,6 +99,10 @@
       "02": "0030-003F",
       "03": "0044-0053",
       "04": "0058-0067",
+      "05": "006C-007B",
+      "06": "0080-008F",
+      "07": "0094-00A3",
+      "08": "00A8-00B7",
       "09": "0398-03A7",
       "18": "03CC-03DB"
     }

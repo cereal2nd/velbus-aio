@@ -1,90 +1,97 @@
 {
-  "Type": "VMBGP2-20",
+  "AllChannelStatus": "FF",
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual button 3",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual button 4",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual button 5",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual button 6",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 7",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 8",
-      "Type": "Button"
+      "Type": "Button",
+      "Subdevice": "no"
     },
     "09": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature"
+      "Type": "Temperature",
+      "Subdevice": "no"
     },
-    "10": {
-      "Name": "Heater",
-      "Type": "ThermostatChannel"
-    },
+    "10": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
     "11": {
       "Name": "Boost heater/cooler",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
-    "12": {
-      "Name": "Pump",
-      "Type": "ThermostatChannel"
-    },
-    "13": {
-      "Name": "Cooler",
-      "Type": "ThermostatChannel"
-    },
+    "12": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
+    "13": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
     "14": {
       "Name": "Temperature alarm 1",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "15": {
       "Name": "Temperature alarm 2",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "16": {
       "Name": "Temperature alarm 3",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "17": {
       "Name": "Temperature alarm 4",
-      "Type": "ThermostatChannel"
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
     },
     "18": {
       "Editable": "yes",
       "Name": "Output",
-      "Type": "Relay"
+      "Type": "Relay",
+      "Subdevice": "no"
     }
   },
   "TemperatureChannel": "09",
+  "Type": "VMBGP2-20",
   "Memory": {
     "ModuleName": "06C0-06FF",
     "Channels": {
@@ -98,12 +105,6 @@
       "08": "00A8-00B7",
       "09": "0398-03A7",
       "18": "03CC-03DB"
-    }
-  },
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
     }
   }
 }
