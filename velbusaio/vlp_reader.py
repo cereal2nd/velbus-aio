@@ -279,6 +279,12 @@ class vlpModule:
 
     def _read_from_memory(self, address_range) -> str | None:
         """Read a range of bytes from the module memory."""
+        # Check if there are multiple ranges separated by semicolons
+        if ";" in address_range:
+            result = ""
+            for range_part in address_range.split(";"):
+                result += self._read_from_memory(range_part)
+            return result
         # its a single address
         if "-" not in address_range:
             start = int(address_range, 16) * 2
