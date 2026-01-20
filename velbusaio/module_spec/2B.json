@@ -1,65 +1,46 @@
 {
   "Channels": {
     "01": {
-      "Editable": "yes",
-      "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Dark output",
+      "Type": "Sensor"
     },
     "02": {
-      "Editable": "yes",
-      "Name": "Push button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Light output",
+      "Type": "Sensor"
     },
     "03": {
-      "Editable": "yes",
-      "Name": "Push button 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Motion output 1",
+      "Type": "Sensor"
     },
     "04": {
-      "Editable": "yes",
-      "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Motion output 1 (LD)",
+      "Type": "Sensor"
     },
     "05": {
-      "Editable": "yes",
-      "Name": "Push button 5",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Motion output 2",
+      "Type": "Sensor"
     },
     "06": {
-      "Editable": "yes",
-      "Name": "Push button 6",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Motion output 2 (LD)",
+      "Type": "Sensor"
     },
     "07": {
-      "Editable": "yes",
-      "Name": "Push button 7",
-      "Type": "Button",
-      "Subdevice": "no"
-    },
-    "08": {
-      "Editable": "yes",
-      "Name": "Push button 8",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Name": "Absence output",
+      "Type": "Sensor"
     }
   },
-  "Type": "VMBRFR8S",
   "Memory": {
-    "Channels": {
-      "01": "0000-000F",
-      "02": "0010-001F",
-      "03": "0020-002F",
-      "04": "0030-003F",
-      "05": "0040-004F",
-      "06": "0050-005F",
-      "07": "0060-006F",
-      "08": "0070-007F"
+    "ModuleName": "00B0-00EF"
+  },
+  "Type": "VMBPIRC",
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
     }
   }
 }
