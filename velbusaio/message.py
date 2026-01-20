@@ -153,6 +153,8 @@ class Message:
 
     def needs_no_data(self, data: bytes) -> None:
         """Check if no data is included."""
+        if not data:
+            return
         length = len(data)
         if length != 0:
             self.parser_error("has data included")
