@@ -197,8 +197,7 @@
       "Name": "Temperature",
       "Type": "Temperature",
       "Subdevice": "no"
-    },
-    "43": { "Name": "Edge-lit", "Type": "EdgeLit", "Subdevice": "no" }
+    }
   },
   "TemperatureChannel": "33",
   "ThermostatAddr": "3",
