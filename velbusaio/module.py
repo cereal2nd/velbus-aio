@@ -1248,6 +1248,7 @@ class VmbDali(Module):
         build_year: int | None = None,
         build_week: int | None = None,
         cache_dir: str | None = None,
+        on_load_finished: Callable[[Module], Awaitable[None]] | None = None,
     ) -> None:
         """Initialize DALI module."""
         super().__init__(
@@ -1258,6 +1259,7 @@ class VmbDali(Module):
             build_year,
             build_week,
             cache_dir,
+            on_load_finished,
         )
         self.group_members: dict[int, set[int]] = {}
 
