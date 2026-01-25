@@ -162,3 +162,23 @@ class BaseItem(ABC):
     def remove_on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
         """Remove a method from the status update callbacks."""
         self._on_status_update.remove(meth)
+
+    def get_unit(self) -> str | None:
+        """Return the unit of the counter."""
+        return None
+
+    def get_counter_state(self) -> int:
+        """Return the current state of the counter."""
+        return 0
+
+    def get_counter_unit(self) -> str:
+        """Return the unit of the counter."""
+        return ""
+
+    def is_temperature(self) -> bool:
+        """Return if this item is a temperature sensor."""
+        return False
+
+    def is_counter_channel(self) -> bool:
+        """Return if this item is a counter channel."""
+        return False
