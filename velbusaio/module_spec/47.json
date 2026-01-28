@@ -1,3 +1,121 @@
 {
-  "Type": "VMBEL2PIR"
+  "AllChannelStatus": "FF",
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button",
+      "Subdevice": "no"
+    },
+    "03": {
+      "Name": "Dark output",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "04": {
+      "Name": "Light output",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "05": {
+      "Name": "Motion output",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "06": {
+      "Name": "Motion output 1 (LD)",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "07": {
+      "Name": "Motion output 2 (LD)",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "08": {
+      "Name": "Absence output",
+      "Type": "Sensor",
+      "Subdevice": "no"
+    },
+    "09": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature",
+      "Subdevice": "no"
+    },
+    "10": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "11": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "12": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "13": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "14": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "15": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "16": {
+      "Name": "Alarm 3",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "17": {
+      "Name": "Alarm 4",
+      "Type": "ThermostatChannel",
+      "Subdevice": "no"
+    },
+    "18": {
+      "Editable": "yes",
+      "Name": "Output 1",
+      "Type": "Relay",
+      "Subdevice": "no"
+    }
+  },
+  "TemperatureChannel": "09",
+  "ThermostatAddr": "0",
+  "Type": "VMBEL2PIR",
+  "Memory": {
+    "ModuleName": "0678-06B7",
+    "Channels": {
+      "01": "001C-002B",
+      "02": "002C-0043",
+      "09": "0350-035F",
+      "18": "0384-0393"
+    }
+  },
+  "Properties": {
+    "light_value": {
+      "Type": "LightValue",
+      "Name": "Light value"
+    },
+    "selected_program": {
+      "Type": "SelectedProgram",
+      "Name": "Selected program"
+    }
+  }
 }
