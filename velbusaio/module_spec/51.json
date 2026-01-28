@@ -20,7 +20,7 @@
   "Memory": {
     "ModuleName": "03BC-03FB"
   },
-  "Type": "VMBPIR-20",
+  "Type": "VMBEL4-20",
   "Properties": {
     "light_value": { "Type": "LightValue", "Name": "Light value" },
     "selected_program": {
