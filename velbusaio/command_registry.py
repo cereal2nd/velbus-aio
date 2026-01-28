@@ -80,6 +80,8 @@ MODULE_DIRECTORY = {
     0x43: "VMBIN",
     0x44: "VMB4PB",
     0x45: "VMBDALI",
+    # 0x46
+    0x47: "VMBEL2PIR",
     0x48: "VMB4RYLD-10",
     0x49: "VMB4RYNO-10",
     0x4A: "VMB2BLE-10",
@@ -91,14 +93,18 @@ MODULE_DIRECTORY = {
     0x50: "VMBEL2-20",
     0x51: "VMBEL4-20",
     0x52: "VMBELO-20",
+    0x53: "VMBEL1PIR-20",
     0x54: "VMBGP1-20",
     0x55: "VMBGP2-20",
     0x56: "VMBGP4-20",
     0x57: "VMBGPO-20",
+    # 0x58
     0x59: "VMBPIRO-20",
     0x5A: "VMBDALI-20",
     0x5B: "VMBSIG-20",
-    0x5C: "VMBEL4PIR-20",
+    0x5C: "VMBEL2PIR-20",
+    0x5D: "VMBEL4PIR-20",
+    # 0x5E
     0x5F: "VMBGP4PIR-20",
     0x60: "VMBSIG-21",
     0x61: "VMB2BLE-20",

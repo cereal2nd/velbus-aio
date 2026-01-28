@@ -1,5 +1,5 @@
 {
-  "Type": "VMBSIG",
+  "Type": "VMBUSBIP",
   "Memory": {
     "ModuleName": "0000-003F"
   }

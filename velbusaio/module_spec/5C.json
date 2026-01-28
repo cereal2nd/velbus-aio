@@ -1,62 +1,10 @@
 {
-  "AllChannelStatus": "FF",
-  "Channels": {
-    "01": {
-      "Editable": "yes",
-      "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
-    },
-    "02": {
-      "Editable": "yes",
-      "Name": "Push button 2",
-      "Type": "Button",
-      "Subdevice": "no"
-    },
-    "03": {
-      "Editable": "yes",
-      "Name": "Push button 3",
-      "Type": "Button",
-      "Subdevice": "no"
-    },
-    "04": {
-      "Editable": "yes",
-      "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
-    },
-    "09": {
-      "Editable": "yes",
-      "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
-    },
-    "10": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "11": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "12": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "13": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "14": { "Name": "Alarm 1", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "15": { "Name": "Alarm 2", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "16": { "Name": "Alarm 3", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "17": { "Name": "Alarm 4", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "18": {
-      "Editable": "yes",
-      "Name": "Output",
-      "Type": "Relay",
-      "Subdevice": "no"
-    }
-  },
-  "TemperatureChannel": "09",
-  "Type": "VMBEL4-20",
+  "Type": "VMBEL2PIR-20",
   "Memory": {
     "ModuleName": "06C0-06FF",
     "Channels": {
       "01": "001C-002B",
-      "02": "0030-003F",
-      "03": "0044-0053",
-      "04": "0058-0067",
-      "09": "0398-03A7",
-      "18": "03CC-03DB"
+      "02": "0030-003F"
     }
   }
 }

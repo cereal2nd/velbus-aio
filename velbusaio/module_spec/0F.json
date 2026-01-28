@@ -7,7 +7,7 @@
       "Subdevice": "yes"
     }
   },
-  "Type": "VMB1RS",
+  "Type": "VMB1LED",
   "Memory": {
     "Channels": {
       "01": "0070-007F"
