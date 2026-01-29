@@ -15,9 +15,11 @@ COMMAND_CODE = 0xFA
 class ModuleStatusRequestMessage(Message):
     """Module Status Request Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Module Status Request Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.channels: list | str = []
         self.wait_after_send = 500
         self.set_defaults(address)

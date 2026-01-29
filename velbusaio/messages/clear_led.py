@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF5
 class ClearLedMessage(Message):
     """Channel Clear LED message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Channel Clear LED message."""
-        Message.__init__(self)
+        super().__init__()
         self.leds = []
         self.set_defaults(address)
 

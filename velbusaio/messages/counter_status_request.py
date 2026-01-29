@@ -15,9 +15,11 @@ COMMAND_CODE = 0xBD
 class CounterStatusRequestMessage(Message):
     """Counter Status Request message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Counter Status Request message."""
-        Message.__init__(self)
+        super().__init__()
         self.channels = []
         self.wait_after_send = 500
         self.set_defaults(address)

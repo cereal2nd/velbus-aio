@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x01
@@ -12,9 +13,12 @@ COMMAND_CODE = 0x01
 class SwitchRelayOffMessage(Message):
     """Switch Relay Off Message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize SwitchRelayOffMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.relay_channels = []
         self.set_defaults(address)
 
@@ -25,13 +29,6 @@ class SwitchRelayOffMessage(Message):
         self.needs_data(data, 1)
         self.set_attributes(priority, address, rtr)
         self.relay_channels = self.byte_to_channels(data[0])
-
-    def set_defaults(self, address):
-        """Set default values for the message."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
 
     def data_to_binary(self):
         """:return: bytes"""

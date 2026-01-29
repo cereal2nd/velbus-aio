@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.const import PRIORITY_HIGH
+from velbusaio.message import FieldSpec, Message
 
 COMMAND_CODE = 0x02
 
@@ -12,18 +13,14 @@ COMMAND_CODE = 0x02
 class SwitchRelayOnMessage(Message):
     """Switch Relay On Message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize SwitchRelayOnMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.relay_channels = []
         self.set_defaults(address)
-
-    def set_defaults(self, address):
-        """Set default values for the message."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

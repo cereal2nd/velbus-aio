@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x0A
@@ -15,20 +16,16 @@ COMMAND_CODE = 0x0A
 class BusActiveMessage(Message):
     """Bus Active message."""
 
-    def set_defaults(self, address):
-        """Set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
+    command_code = COMMAND_CODE
+    fields = []
+    default_priority = PRIORITY_HIGH
 
-    def populate(self, priority, address, rtr, data):
-        """Populate message fields."""
-        self.needs_high_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.needs_no_data(data)
+    validators = [
+        lambda self: self.needs_high_priority(self.priority),
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
 
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE])
+    def __init__(self, address=None):
+        """Initialize Bus Active message."""
+        super().__init__()
+        self.set_defaults(address)

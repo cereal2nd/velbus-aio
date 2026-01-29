@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF7
 class SlowBlinkingLedMessage(Message):
     """Set Slow Blinking LED Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Set Slow Blinking LED Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.leds = []
         self.set_defaults(address)
 
