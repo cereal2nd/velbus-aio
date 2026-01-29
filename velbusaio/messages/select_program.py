@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message import FieldSpec, Message
 
 COMMAND_CODE = 0xB3
 
@@ -15,21 +15,18 @@ COMMAND_CODE = 0xB3
 class SelectProgramMessage(Message):
     """Select Program Message."""
 
+    command_code = COMMAND_CODE
+    fields = [
+        FieldSpec("select_program", "B", decode=lambda x: x & 0x03),
+    ]
+
+    validators = [
+        lambda self: self.needs_low_priority(self.priority),
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
+
     def __init__(self, address=None, program=0):
         """Initialize Select Program Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.select_program = program
         self.set_defaults(address)
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 1)
-        self.set_attributes(priority, address, rtr)
-
-        self.select_program = data[0] & 0x03
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE, self.select_program])

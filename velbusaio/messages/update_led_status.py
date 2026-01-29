@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF4
 class UpdateLedStatusMessage(Message):
     """Update LED Status Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize UpdateLedStatusMessage instance."""
-        Message.__init__(self)
+        super().__init__()
         self.led_on = []
         self.led_slow_blinking = []
         self.led_fast_blinking = []

@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x11
@@ -28,18 +29,14 @@ COMMAND_CODE = 0x11
 class RestoreDimmerMessage(Message):
     """Restore Dimmer Message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Restore Dimmer Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.dimmer_channels = []
         self.set_defaults(address)
-
-    def set_defaults(self, address):
-        """Set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

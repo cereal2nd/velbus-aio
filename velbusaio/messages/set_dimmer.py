@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x07
@@ -21,20 +22,16 @@ class SetDimmerMessage(Message):
     with this message the channel numbering is a bitnumber
     """
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Set Dimmer Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.dimmer_channels = []
         self.dimmer_state = 0
         self.dimmer_transitiontime = 0
         self.set_defaults(address)
-
-    def set_defaults(self, address):
-        """Set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

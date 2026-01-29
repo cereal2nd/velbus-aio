@@ -15,9 +15,15 @@ COMMAND_CODE = 0xDE
 class SwitchToSafeMessage(Message):
     """Switch to safe message."""
 
+    command_code = COMMAND_CODE
+
+    validators = [
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
+
     def __init__(self, address=None, sleep=0):
         """Initialize SwitchToSafeMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.sleep = sleep
         self.set_defaults(address)
 
