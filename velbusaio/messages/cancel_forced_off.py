@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from velbusaio.command_registry import register
 from velbusaio.const import PRIORITY_HIGH
-from velbusaio.message import Message
+from velbusaio.message import FieldSpec, Message
 
 COMMAND_CODE = 0x13
 
@@ -13,18 +13,18 @@ COMMAND_CODE = 0x13
 class CancelForcedOff(Message):
     """Cancel Forced Off message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
+    fields = [
+        FieldSpec("channel", "B"),
+    ]
+
+    validators = [
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
+
     def __init__(self, address=None):
         """Iniatialize Cancel Forced Off message object."""
-        Message.__init__(self, address)
-        self.priority = PRIORITY_HIGH
+        super().__init__(address)
         self.channel = 0
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.channel = data[0]
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE, self.channel])

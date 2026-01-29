@@ -15,12 +15,15 @@ COMMAND_CODE = 0xAA
 class LightValueRequest(Message):
     """Light Value Request message."""
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
+    command_code = COMMAND_CODE
+    fields = []
 
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE])
+    validators = [
+        lambda self: self.needs_low_priority(self.priority),
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
+
+    def __init__(self, address=None):
+        """Initialize Light Value Request message."""
+        super().__init__()
+        self.set_defaults(address)
