@@ -40,8 +40,12 @@ class Message:
 
     # Class-level declarative schema hooks
     command_code: int | None = None  # Command code for this message type
-    fields: list[FieldSpec] | None = None  # Field specifications for declarative parsing
-    validators: list[Callable[[Message], None]] | None = None  # Message-level validators
+    fields: list[FieldSpec] | None = (
+        None  # Field specifications for declarative parsing
+    )
+    validators: list[Callable[[Message], None]] | None = (
+        None  # Message-level validators
+    )
     byte_order: str = ">"  # Struct byte order (default: big-endian)
     default_priority: int = PRIORITY_LOW  # Default priority for this message type
     default_rtr: bool = False  # Default RTR flag for this message type

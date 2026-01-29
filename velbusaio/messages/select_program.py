@@ -17,7 +17,9 @@ class SelectProgramMessage(Message):
 
     command_code = COMMAND_CODE
     fields = [
-        FieldSpec("select_program", "B", decode=lambda x: x & 0x03, encode=lambda x: x & 0x03),
+        FieldSpec(
+            "select_program", "B", decode=lambda x: x & 0x03, encode=lambda x: x & 0x03
+        ),
     ]
 
     validators = [

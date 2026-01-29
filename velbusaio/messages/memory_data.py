@@ -35,4 +35,3 @@ class MemoryDataMessage(Message):
         self.low_address = 0x00
         self.data = 0
         self.set_defaults(address)
-

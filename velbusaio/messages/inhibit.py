@@ -18,7 +18,12 @@ class Inhibit(Message):
 
     fields = [
         FieldSpec("channel", "B"),
-        FieldSpec("delay_time", "3s", decode=lambda x: int.from_bytes(x, "big"), encode=lambda x: x.to_bytes(3, "big")),
+        FieldSpec(
+            "delay_time",
+            "3s",
+            decode=lambda x: int.from_bytes(x, "big"),
+            encode=lambda x: x.to_bytes(3, "big"),
+        ),
     ]
 
     validators = [
