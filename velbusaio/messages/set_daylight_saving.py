@@ -15,9 +15,11 @@ COMMAND_CODE = 0xAF
 class SetDaylightSaving(Message):
     """Set Daylight Saving Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=0x00, ds=None) -> None:
         """Initialize Set Daylight Saving Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self._ds = ds
         self.set_defaults(address)
 

@@ -15,9 +15,11 @@ COMMAND_CODE = 0xCC
 class MemoryDataBlockMessage(Message):
     """Memory Data Block Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Memory Data Block Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.high_address = 0x00
         self.low_address = 0x00
         self.data = bytes([])

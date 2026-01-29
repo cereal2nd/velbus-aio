@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x04
@@ -15,9 +16,12 @@ COMMAND_CODE = 0x04
 class CoverOffMessage(Message):
     """Cover Off message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Cover Off message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.set_defaults(address)
 
@@ -29,13 +33,6 @@ class CoverOffMessage(Message):
         self.set_attributes(priority, address, rtr)
         self.channel = self.byte_to_channel(data[0])
 
-    def set_defaults(self, address):
-        """Logic to set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
-
     def data_to_binary(self):
         """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte([self.channel])])
@@ -45,9 +42,12 @@ class CoverOffMessage(Message):
 class CoverOffMessage2(Message):
     """Cover Off message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Cover Off message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.delay_time = 0
         self.set_defaults(address)
@@ -63,13 +63,6 @@ class CoverOffMessage2(Message):
         # so shift 1 bit to the right + and with 03
         tmp = (data[0] >> 1) & 0x03
         self.channel = self.byte_to_channel(tmp)
-
-    def set_defaults(self, address):
-        """Logic to set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
 
     def data_to_binary(self):
         """:return: bytes"""

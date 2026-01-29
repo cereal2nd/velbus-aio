@@ -15,9 +15,11 @@ COMMAND_CODE = 0xA9
 class MeteoRawMessage(Message):
     """Meteo Raw Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Meteo Raw Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.rain = 0
         self.light = 0
         self.wind = 0
@@ -45,7 +47,7 @@ class SensorRawMessage(Message):
 
     def __init__(self, address=None):
         """Initialize Sensor Raw Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.sensor = 0
         self.mode = 0
         self.value = 0

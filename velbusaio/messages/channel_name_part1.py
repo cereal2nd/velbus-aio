@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF0
 class ChannelNamePart1Message(Message):
     """Channel Name Part 1 message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Channel Name Part 1 message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.name = ""
         self.set_defaults(address)

@@ -15,9 +15,11 @@ COMMAND_CODE = 0xC9
 class ReadDataBlockFromMemoryMessage(Message):
     """Read Data Block From Memory Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Read Data Block From Memory Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.high_address = 0x00
         self.low_address = 0x00
         self.set_defaults(address)

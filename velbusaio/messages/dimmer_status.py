@@ -41,9 +41,11 @@ LED_VERY_FAST_BLINKING = 1 << 4
 class DimmerStatusMessage(Message):
     """Dimmer Status message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Dimmer Status message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 1
         self.disable_inhibit_forced = 0
         self.dimmer_mode = 0

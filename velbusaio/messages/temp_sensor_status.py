@@ -19,9 +19,11 @@ DMODE = {0: "safe", 16: "night", 32: "day", 64: "comfort"}
 class TempSensorStatusMessage(Message):
     """TempSensorStatus message class."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize TempSensorStatus message class."""
-        Message.__init__(self)
+        super().__init__()
         self.local_control = 0  # 0=unlocked, 1 =locked
         self.status_mode = 0  # DSTATUS
         self.status_str = "run"

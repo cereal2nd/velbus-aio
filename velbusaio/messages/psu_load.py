@@ -20,9 +20,11 @@ BACKUP = 0x03
 class PsuLoadMessage(Message):
     """PSU Load Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize PSU Load Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.mode = 0
         self.load_1 = 0
         self.load_2 = 0

@@ -8,6 +8,7 @@ from __future__ import annotations
 import struct
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x06
@@ -17,9 +18,12 @@ COMMAND_CODE = 0x06
 class CoverDownMessage(Message):
     """Cover Down message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Cover Down message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.delay_time = 0
         self.set_defaults(address)
@@ -33,13 +37,6 @@ class CoverDownMessage(Message):
         self.channel = self.byte_to_channel(data[0])
         (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[1:])
 
-    def set_defaults(self, address):
-        """Logic to set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
-
     def data_to_binary(self):
         """:return: bytes"""
         return (
@@ -52,9 +49,12 @@ class CoverDownMessage(Message):
 class CoverDownMessage2(Message):
     """Cover Down message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Cover Down message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.delay_time = 0
         self.set_defaults(address)
@@ -71,13 +71,6 @@ class CoverDownMessage2(Message):
         tmp = (data[0] >> 1) & 0x03
         self.channel = self.byte_to_channel(tmp)
         (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[1:])
-
-    def set_defaults(self, address):
-        """Logic to set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
 
     def data_to_binary(self):
         """:return: bytes"""

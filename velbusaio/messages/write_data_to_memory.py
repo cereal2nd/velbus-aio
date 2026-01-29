@@ -15,9 +15,11 @@ COMMAND_CODE = 0xFC
 class WriteDataToMemoryMessage(Message):
     """Write Data To Memory message class."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Write Data To Memory message object."""
-        Message.__init__(self)
+        super().__init__()
         self.high_address = 0x00
         self.low_address = 0x00
         self.data = ""

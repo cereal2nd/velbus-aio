@@ -28,9 +28,11 @@ COMMAND_CODE = 0x0F
 class SliderStatusMessage(Message):
     """Slider Status Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Slider Status Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.slider_state = 0
         self.slider_long_pressed = 0

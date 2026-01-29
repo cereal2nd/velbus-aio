@@ -15,9 +15,11 @@ COMMAND_CODE = 0xD4
 class EdgeSetCustomColor(Message):
     """Edge Set Custom Color message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Edge Set Custom Color message."""
-        Message.__init__(self)
+        super().__init__()
         self.set_defaults(address)
         self.pallet = 31
         self.rgb = False

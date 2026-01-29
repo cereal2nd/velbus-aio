@@ -17,9 +17,11 @@ COMMAND_CODE = 0xA3
 class PsuValuesMessage(Message):
     """PSU Values Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize PSU Values Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.watt = 0
         self.volt = 0

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from velbusaio.command_registry import register
 from velbusaio.const import PRIORITY_HIGH
-from velbusaio.message import FieldSpec, Message
+from velbusaio.message import Message
 
 COMMAND_CODE = 0x02
 

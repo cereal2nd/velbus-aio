@@ -94,9 +94,11 @@ MODULES_WITHOUT_SERIAL = {
 class ModuleTypeMessage(Message):
     """Module Type Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None) -> None:
         """Initialize Module Type Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.module_type = 0x00
         self.led_on = []
         self.led_slow_blinking = []
@@ -152,7 +154,7 @@ class ModuleType2Message(Message):
 
     def __init__(self, address=None) -> None:
         """Initialize Module Type Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.module_type = 0x00
         self.led_on = []
         self.led_slow_blinking = []
