@@ -18,7 +18,7 @@ class SetTemperatureMessage(Message):
     command_code = COMMAND_CODE
     fields = [
         FieldSpec("temp_type", "B"),
-        FieldSpec("temp", "B", decode=lambda x: x * 2),
+        FieldSpec("temp", "B"),
     ]
 
     validators = [
@@ -32,6 +32,15 @@ class SetTemperatureMessage(Message):
         self.temp_type = 0x00
         self.temp = 0x00
         self.set_defaults(address)
+
+    def populate(self, priority, address, rtr, data):
+        """:return: None"""
+        self.needs_low_priority(priority)
+        self.needs_no_rtr(rtr)
+        self.needs_data(data, 2)
+        self.set_attributes(priority, address, rtr)
+        self.temp_type = data[0]
+        self.temp = data[1] * 2
 
     def data_to_binary(self):
         """:return: bytes"""

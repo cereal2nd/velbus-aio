@@ -15,6 +15,7 @@ COMMAND_CODE = 0xE7
 class SensorSettingsRequestMessage(Message):
     """Sensor Settings Request Message."""
 
+    command_code = COMMAND_CODE
     default_rtr = True
 
     validators = [
