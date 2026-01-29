@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF9
 class VeryFastBlinkingLedMessage(Message):
     """Very Fast Blinking LED message class."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize VeryFastBlinkingLedMessage instance."""
-        Message.__init__(self)
+        super().__init__()
         self.leds = []
         self.set_defaults(address)
 

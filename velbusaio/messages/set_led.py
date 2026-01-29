@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF6
 class SetLedMessage(Message):
     """Set led Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Set led Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.leds = []
         self.set_defaults(address)
 
