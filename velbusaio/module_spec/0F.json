@@ -2,9 +2,9 @@
   "Channels": {
     "01": {
       "Editable": "yes",
-      "Name": "Relay",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Name": "Dimmer",
+      "Type": "Dimmer",
+      "Subdevice": "no"
     }
   },
   "Type": "VMB1LED",
