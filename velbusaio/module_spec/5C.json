@@ -98,7 +98,7 @@
   },
   "TemperatureChannel": "09",
   "ThermostatAddr": "0",
-  "Type": "VMBEL4PIR-20",
+  "Type": "VMBEL2PIR-20",
   "Memory": {
     "ModuleName": "0678-06B7",
     "Channels": {
