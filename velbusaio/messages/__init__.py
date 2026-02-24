@@ -122,8 +122,8 @@ from velbusaio.messages.write_module_address_and_serial_number import (
 
 __all__ = [
     "BlindStatusMessage",
-    "BlindStatusNgMessage",
     "BlindStatusNg20Message",
+    "BlindStatusNgMessage",
     "BusActiveMessage",
     "BusErrorCounterStatusMessage",
     "BusErrorStatusRequestMessage",
