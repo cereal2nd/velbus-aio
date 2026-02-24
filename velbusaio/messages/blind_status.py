@@ -73,6 +73,7 @@ class BlindStatusNgMessage(Message):
             ]
         )
 
+
 @register(COMMAND_CODE, ["VMB2BLE-20"])
 class BlindStatusNg20Message(BlindStatusNgMessage):
     """Blind Status NG2 message."""
@@ -89,12 +90,13 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         if data[0] == 0x00:
             self.channel = (1, 2)
             self.status = 0x00
-            self.position = (data[1], data[2])  # 0 .. 100 (0=open, 100=closed)
+            self.position = (data[1], data[2])  # 0..100 (0=open, 100=closed)
         else:
             channel = 1 if data[0] & 0x0F else 2
             self.channel = channel
             self.status = (data[0] >> ((channel - 1) * 4)) & 0x03
-            self.position = data[channel]  # 0 .. 100 (0=open, 100=closed)
+            self.position = data[channel]  # 0..100 (0=open, 100=closed)
+
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class BlindStatusMessage(Message):
