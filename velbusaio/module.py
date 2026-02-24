@@ -30,7 +30,7 @@ from velbusaio.command_registry import commandRegistry
 from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
 from velbusaio.message import Message
-from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage
+from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage, BlindStatusNg20Message
 from velbusaio.messages.bus_error_counter_status import BusErrorCounterStatusMessage
 from velbusaio.messages.cancel_forced_off import CancelForcedOff
 from velbusaio.messages.cancel_forced_on import CancelForcedOn
@@ -460,6 +460,7 @@ class Module:
             DimmerStatusMessage: self._handle_dimmer_status,
             SliderStatusMessage: self._handle_slider_status,
             BlindStatusNgMessage: self._handle_blind_status_ng,
+            BlindStatusNg20Message: self._handle_blind_status_ng20,
             BlindStatusMessage: self._handle_blind_status,
             # Sensor messages
             MeteoRawMessage: self._handle_meteo_raw,
@@ -801,6 +802,21 @@ class Module:
         await self._update_channel(
             channel, {"state": message.status, "position": message.position}
         )
+
+    async def _handle_blind_status_ng20(self, message: BlindStatusNg20Message) -> None:
+        """Handle blind status NG20 messages."""
+        if(message.status == 0):
+            # stopped messages contain the position for both channels, so we need to update both channels
+            for i in range(2):
+                channel = self._translate_channel_name(message.channel[i])
+                await self._update_channel(
+                    channel, {"state": message.status, "position": message.position[i]}
+                )
+        else:
+            channel = self._translate_channel_name(message.channel)
+            await self._update_channel(
+                channel, {"state": message.status, "position": message.position}
+            )
 
     async def _handle_blind_status(self, message: BlindStatusMessage) -> None:
         """Handle blind status messages."""

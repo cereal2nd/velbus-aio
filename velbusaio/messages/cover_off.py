@@ -11,7 +11,7 @@ from velbusaio.message import Message
 COMMAND_CODE = 0x04
 
 
-@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
+@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10", "VMB2BLE-20"])
 class CoverOffMessage(Message):
     """Cover Off message."""
 

@@ -130,6 +130,7 @@ class ModuleTypeMessage(Message):
         "VMB4RYLD-10",
         "VMB4RYNO-10",
         "VMB2BLE-10",
+        "VMB2BLE-20",
         "VMB6PB-20",
         "VMBEL1-20",
         "VMBEL2-20",

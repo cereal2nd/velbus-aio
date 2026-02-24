@@ -42,7 +42,6 @@ class BlindStatusNgMessage(Message):
         """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
-        json_dict["timeout"] = self.timeout
         json_dict["position"] = self.position
         json_dict["status"] = DSTATUS[self.status]
         return json.dumps(json_dict)
@@ -74,6 +73,27 @@ class BlindStatusNgMessage(Message):
             ]
         )
 
+@register(COMMAND_CODE, ["VMB2BLE-20"])
+class BlindStatusNg20Message(BlindStatusNgMessage):
+    """Blind Status NG2 message."""
+
+    def populate(self, priority, address, rtr, data):
+        """Populate message fields."""
+        self.needs_low_priority(priority)
+        self.needs_no_rtr(rtr)
+        self.needs_data(data, 7)
+        self.set_attributes(priority, address, rtr)
+
+        # Determine channel and action
+        if data[0] == 0x00:  # stopped, message for position of both channels
+            self.channel = (1, 2)
+            self.status = 0x00
+            self.position = (data[1], data[2])  # 0 .. 100 (0=open, 100=closed)
+        else:
+            channel = 1 if data[0] & 0x0F else 2
+            self.channel = channel
+            self.status = (data[0] >> ((channel - 1) * 4)) & 0x03
+            self.position = data[channel]  # 0 .. 100 (0=open, 100=closed)
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class BlindStatusMessage(Message):
