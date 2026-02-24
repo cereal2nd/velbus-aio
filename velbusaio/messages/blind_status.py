@@ -85,7 +85,8 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         self.set_attributes(priority, address, rtr)
 
         # Determine channel and action
-        if data[0] == 0x00:  # stopped, message for position of both channels
+        # Each message contains the position of both channels. The "stopped" message doesn't specify the channel so both channels are updated. The "moving" messages specify the channel and we can update only that channel.
+        if data[0] == 0x00:
             self.channel = (1, 2)
             self.status = 0x00
             self.position = (data[1], data[2])  # 0 .. 100 (0=open, 100=closed)
