@@ -30,7 +30,11 @@ from velbusaio.command_registry import commandRegistry
 from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
 from velbusaio.message import Message
-from velbusaio.messages.blind_status import BlindStatusMessage, BlindStatusNgMessage, BlindStatusNg20Message
+from velbusaio.messages.blind_status import (
+    BlindStatusMessage, 
+    BlindStatusNg20Message, 
+    BlindStatusNgMessage
+)
 from velbusaio.messages.bus_error_counter_status import BusErrorCounterStatusMessage
 from velbusaio.messages.cancel_forced_off import CancelForcedOff
 from velbusaio.messages.cancel_forced_on import CancelForcedOn
@@ -805,7 +809,7 @@ class Module:
 
     async def _handle_blind_status_ng20(self, message: BlindStatusNg20Message) -> None:
         """Handle blind status NG20 messages."""
-        if(message.status == 0):
+        if message.status == 0:
             # stopped messages contain the position for both channels, so we need to update both channels
             for i in range(2):
                 channel = self._translate_channel_name(message.channel[i])
