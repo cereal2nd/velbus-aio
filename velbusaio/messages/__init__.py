@@ -6,9 +6,9 @@
 from __future__ import annotations
 
 from velbusaio.messages.blind_status import (
-    BlindStatusMessage, 
-    BlindStatusNg20Message, 
-    BlindStatusNgMessage
+    BlindStatusMessage,
+    BlindStatusNg20Message,
+    BlindStatusNgMessage,
 )
 from velbusaio.messages.bus_active import BusActiveMessage
 from velbusaio.messages.bus_error_counter_status import BusErrorCounterStatusMessage

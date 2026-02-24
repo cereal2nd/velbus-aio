@@ -31,9 +31,9 @@ from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
 from velbusaio.message import Message
 from velbusaio.messages.blind_status import (
-    BlindStatusMessage, 
-    BlindStatusNg20Message, 
-    BlindStatusNgMessage
+    BlindStatusMessage,
+    BlindStatusNg20Message,
+    BlindStatusNgMessage,
 )
 from velbusaio.messages.bus_error_counter_status import BusErrorCounterStatusMessage
 from velbusaio.messages.cancel_forced_off import CancelForcedOff
