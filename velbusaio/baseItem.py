@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING, final
+from typing import TYPE_CHECKING, Any, final
 
 from velbusaio.message import Message
 
@@ -162,6 +162,16 @@ class BaseItem(ABC):
     def remove_on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
         """Remove a method from the status update callbacks."""
         self._on_status_update.remove(meth)
+
+    @final
+    def get_info(self) -> dict[str, Any]:
+        """Get the channel info as a dictionary."""
+        data = {}
+        for key, value in self.__dict__.items():
+            data["type"] = self.__class__.__name__
+            if key not in ["_module", "_writer", "_name_parts", "_on_status_update"]:
+                data[key.replace("_", "", 1)] = value
+        return data
 
     def get_unit(self) -> str | None:
         """Return the unit of the counter."""
