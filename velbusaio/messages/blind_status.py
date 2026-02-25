@@ -75,6 +75,30 @@ class BlindStatusNgMessage(Message):
         )
 
 
+@register(COMMAND_CODE, ["VMB2BLE-20"])
+class BlindStatusNg20Message(BlindStatusNgMessage):
+    """Blind Status NG20 message."""
+
+    def populate(self, priority, address, rtr, data):
+        """Populate message fields."""
+        self.needs_low_priority(priority)
+        self.needs_no_rtr(rtr)
+        self.needs_data(data, 7)
+        self.set_attributes(priority, address, rtr)
+
+        # Determine channel and action
+        # Each message contains the position of both channels. The "stopped" message doesn't specify the channel so both channels are updated. The "moving" messages specify the channel and we can update only that channel.
+        if data[0] == 0x00:
+            self.channel = (1, 2)
+            self.status = 0x00
+            self.position = (data[1], data[2])  # 0..100 (0=open, 100=closed)
+        else:
+            channel = 1 if data[0] & 0x0F else 2
+            self.channel = channel
+            self.status = (data[0] >> ((channel - 1) * 4)) & 0x03
+            self.position = data[channel]  # 0..100 (0=open, 100=closed)
+
+
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
 class BlindStatusMessage(Message):
     """Blind Status message."""
