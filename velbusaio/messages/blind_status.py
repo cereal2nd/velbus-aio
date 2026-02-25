@@ -76,7 +76,7 @@ class BlindStatusNgMessage(Message):
 
 @register(COMMAND_CODE, ["VMB2BLE-20"])
 class BlindStatusNg20Message(BlindStatusNgMessage):
-    """Blind Status NG2 message."""
+    """Blind Status NG20 message."""
 
     def populate(self, priority, address, rtr, data):
         """Populate message fields."""
