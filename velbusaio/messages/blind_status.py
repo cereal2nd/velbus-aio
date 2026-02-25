@@ -42,6 +42,7 @@ class BlindStatusNgMessage(Message):
         """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
+        json_dict["timeout"] = self.timeout
         json_dict["position"] = self.position
         json_dict["status"] = DSTATUS[self.status]
         return json.dumps(json_dict)
