@@ -15,9 +15,11 @@ COMMAND_CODE = 0xDF
 class TempSetCoolingMessage(Message):
     """Temp Set Cooling Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize TempSetCoolingMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):

@@ -15,9 +15,11 @@ COMMAND_CODE = 0xD8
 class SetRealtimeClock(Message):
     """Set realtime Clock Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=0x00, wday=None, hour=None, min=None) -> None:
         """Initialize Set realtime Clock Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self._wday = wday
         self._hour = hour
         self._min = min

@@ -11,19 +11,24 @@ from velbusaio.message import Message
 class ModuleTypeRequestMessage(Message):
     """Module Type Request Message."""
 
+    default_rtr = True
+
+    validators = [
+        lambda self: self.needs_low_priority(self.priority),
+        lambda self: self.needs_rtr(self.rtr),
+    ]
+
+    def __init__(self, address=None):
+        """Initialize Module Type Request message."""
+        super().__init__()
+        self.set_defaults(address)
+
     def populate(self, priority, address, rtr, data):
         """:return: None"""
         self.needs_low_priority(priority)
         self.needs_rtr(rtr)
         self.needs_no_data(data)
         self.set_attributes(priority, address, rtr)
-
-    def set_defaults(self, address):
-        """Set defaults."""
-        if address is not None:
-            self.set_address(address)
-        self.set_low_priority()
-        self.set_rtr()
 
     def data_to_binary(self):
         """:return: bytes"""

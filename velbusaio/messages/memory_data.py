@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message import FieldSpec, Message
 
 COMMAND_CODE = 0xFE
 
@@ -15,24 +15,23 @@ COMMAND_CODE = 0xFE
 class MemoryDataMessage(Message):
     """Memory Data Message."""
 
+    command_code = COMMAND_CODE
+    fields = [
+        FieldSpec("high_address", "B"),
+        FieldSpec("low_address", "B"),
+        FieldSpec("data", "B"),
+    ]
+
+    # Message-level validators for priority/rtr
+    validators = [
+        lambda self: self.needs_low_priority(self.priority),
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
+
     def __init__(self, address=None):
         """Initialize Memory Data Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.high_address = 0x00
         self.low_address = 0x00
         self.data = 0
         self.set_defaults(address)
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 3)
-        self.set_attributes(priority, address, rtr)
-        self.high_address = data[0]
-        self.low_address = data[1]
-        self.data = data[2]
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE, self.high_address, self.low_address, self.data])

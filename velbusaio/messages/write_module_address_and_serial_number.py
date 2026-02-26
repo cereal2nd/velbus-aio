@@ -17,9 +17,11 @@ COMMAND_CODE = 0x6A
 class WriteModuleAddressAndSerialNumberMessage(Message):
     """Write Module Address And Serial Number Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize WriteModuleAddressAndSerialNumberMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.module_type = 0x00
         self.current_serial = 0
         self.module_address = 0x00

@@ -29,9 +29,11 @@ LED_VERY_FAST_BLINKING = 1 << 4
 class RelayStatusMessage(Message):
     """Relay Status Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Relay Status Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.disable_inhibit_forced = 0
         self.status = 0
@@ -108,7 +110,7 @@ class RelayStatusMessage3(Message):
 
     def __init__(self, address=None):
         """Initialize Relay Status Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.status_bits = 0
         self.inhibited_bits = 0
         self.forced_on_bits = 0

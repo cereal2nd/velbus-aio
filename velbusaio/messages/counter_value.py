@@ -15,9 +15,11 @@ COMMAND_CODE = 0xA4
 class CounterValueMessage(Message):
     """Counter Value message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Counter Value message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.power = 0
         self.energy = 0

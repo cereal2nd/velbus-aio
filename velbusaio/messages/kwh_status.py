@@ -15,9 +15,11 @@ COMMAND_CODE = 0xBE
 class KwhStatusMessage(Message):
     """Kwh Status message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Kwh Status message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.pulses = 0
         self.counter = 0

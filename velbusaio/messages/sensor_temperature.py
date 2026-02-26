@@ -15,9 +15,11 @@ COMMAND_CODE = 0xE6
 class SensorTemperatureMessage(Message):
     """Sensor Temperature Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Sensor Temperature Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.cur = 0
         self.min = 0
         self.max = 0

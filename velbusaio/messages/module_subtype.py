@@ -21,9 +21,11 @@ COMMAND_CODE_3 = 0xA6
 class ModuleSubTypeMessage(Message):
     """Module SubType Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None, sub_address_offset: int = 0) -> None:
         """Initialize Module SubType Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.module_type = 0x00
         self.sub_address_1 = 0xFF
         self.sub_address_2 = 0xFF

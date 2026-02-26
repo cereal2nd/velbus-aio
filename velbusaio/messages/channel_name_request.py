@@ -15,9 +15,11 @@ COMMAND_CODE = 0xEF
 class ChannelNameRequestMessage(Message):
     """Channel Name Request message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Channel Name Request message."""
-        Message.__init__(self)
+        super().__init__()
         self.channels = []
         self.set_defaults(address)
 

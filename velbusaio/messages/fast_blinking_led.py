@@ -15,9 +15,11 @@ COMMAND_CODE = 0xF8
 class FastBlinkingLedMessage(Message):
     """Fast Blinking LED message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Fast Blinking LED message."""
-        Message.__init__(self)
+        super().__init__()
         self.leds = []
         self.set_defaults(address)
 

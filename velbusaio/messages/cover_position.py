@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x1C
@@ -15,9 +16,12 @@ COMMAND_CODE = 0x1C
 class CoverPosMessage(Message):
     """Cover Position message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Cover Position message."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.position = 0
         self.set_defaults(address)

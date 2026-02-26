@@ -22,9 +22,11 @@ class CustomColorPriority(IntEnum):
 class SetEdgeColorMessage(Message):
     """Set Edge Color message (DLC=4 variant)."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Iniatialize Set Edge Color message object."""
-        Message.__init__(self)
+        super().__init__()
         self.apply_background_color = False
         self.apply_continuous_feedback_color = False
         self.apply_slow_blinking_feedback_color = False
@@ -84,7 +86,7 @@ class SetCustomColorMessage(Message):
 
     def __init__(self, address=None):
         """Iniatialize Set Custom Color message object."""
-        Message.__init__(self)
+        super().__init__()
         self.palette_idx = 0
         self.white_mode = False
         self.saturation = 127

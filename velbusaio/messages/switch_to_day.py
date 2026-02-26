@@ -15,9 +15,15 @@ COMMAND_CODE = 0xDC
 class SwitchToDayMessage(Message):
     """Switch to day message class."""
 
+    command_code = COMMAND_CODE
+
+    validators = [
+        lambda self: self.needs_no_rtr(self.rtr),
+    ]
+
     def __init__(self, address=None, sleep=0):
         """Initialize SwitchToDayMessage instance."""
-        Message.__init__(self)
+        super().__init__()
         self.sleep = sleep
         self.set_defaults(address)
 

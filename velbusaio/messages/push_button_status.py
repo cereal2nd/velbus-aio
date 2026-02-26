@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
+from velbusaio.const import PRIORITY_HIGH
 from velbusaio.message import Message
 
 COMMAND_CODE = 0x00
@@ -15,9 +16,12 @@ COMMAND_CODE = 0x00
 class PushButtonStatusMessage(Message):
     """Push Button Status Message."""
 
+    command_code = COMMAND_CODE
+    default_priority = PRIORITY_HIGH
+
     def __init__(self, address=None):
         """Initialize Push Button Status Message Object."""
-        Message.__init__(self)
+        super().__init__()
         self.closed = []
         self.opened = []
         self.closed_long = []

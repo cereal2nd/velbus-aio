@@ -15,9 +15,11 @@ COMMAND_CODE = 0xAC
 class MemoTextMessage(Message):
     """Memo Text Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Memo Text Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.start = 0x00
         self.memo_text = ""
         self.set_defaults(address)

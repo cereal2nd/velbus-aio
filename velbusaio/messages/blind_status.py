@@ -18,9 +18,11 @@ DSTATUS = {0: "off", 1: "up", 2: "down"}
 class BlindStatusNgMessage(Message):
     """Blind Status NG message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize BlindStatusNgMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.timeout = 0
         self.status = 0
@@ -105,7 +107,7 @@ class BlindStatusMessage(Message):
 
     def __init__(self, address=None):
         """Initialize BlindStatusMessage class."""
-        Message.__init__(self)
+        super().__init__()
         self.channel = 0
         self.timeout = 0
         self.status = 0

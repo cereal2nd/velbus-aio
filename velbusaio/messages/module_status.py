@@ -17,9 +17,11 @@ PROGRAM_SELECTION = {0: "none", 1: "summer", 2: "winter", 3: "holiday"}
 class ModuleStatusMessage(Message):
     """Module Status Message."""
 
+    command_code = COMMAND_CODE
+
     def __init__(self, address=None):
         """Initialize Module Status Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.closed = []
         self.led_on = []
         self.led_slow_blinking = []
@@ -91,7 +93,7 @@ class ModuleStatusMessage2(Message):
 
     def __init__(self, address=None):
         """Initialize Module Status Message object."""
-        Message.__init__(self)
+        super().__init__()
         self.closed = []
         self.enabled = []
         self.normal = []
@@ -133,7 +135,7 @@ class ModuleStatusPirMessage(Message):
 
     def __init__(self, address=None):
         """Initialize Module Status PIR Message object."""
-        Message.__init__(self)
+        super().__init__()
         # in data[0]
         self.dark: bool = False  # bit 1
         self.light: bool = False  # bit 2
@@ -178,7 +180,7 @@ class ModuleStatusGP4PirMessage(Message):
 
     def __init__(self, address=None):
         """Initialize Module Status GP4 PIR Message object."""
-        Message.__init__(self)
+        super().__init__()
         # in data[0]
         self.closed = []
         self.enabled = []  # only 4 bits
