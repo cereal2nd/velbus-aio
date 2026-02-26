@@ -27,6 +27,7 @@ VMBPIRM = 0x2A
 VMBGP4PIR = 0x2D
 VMBGPOD_2 = 0x3D
 VMBGP4PIR_2 = 0x3E
+VMBGP4PIR_20 = 0x5F
 
 
 @pytest.mark.asyncio
@@ -38,6 +39,7 @@ VMBGP4PIR_2 = 0x3E
         VMBGPOD_2,
         VMBGP4PIR,
         VMBGP4PIR_2,
+        VMBGP4PIR_20,
         VMBPIRM,
     ],
 )
