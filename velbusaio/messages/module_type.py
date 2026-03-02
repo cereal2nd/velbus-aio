@@ -20,7 +20,6 @@ MODULES_WITHOUT_SERIAL = {
     0x08: "VMB4RY",
     0x09: "VMB2BL",
     0x0C: "VMB1TS",
-    0x0D: "VMB1TH",
     0x0E: "VMB1TC",
     0x0F: "VMB1LED",
     0x14: "VMBDME",
@@ -38,7 +37,6 @@ MODULES_WITHOUT_SERIAL = {
         "VMB8IR",
         "VMB4PD",
         "VMB1TS",
-        "VMB1TH",
         "VMB1TC",
         "VMB1LED",
         "VMB4RYLD",
@@ -146,6 +144,7 @@ class ModuleTypeMessage(Message):
         "VMB8IN-20",
         "VMB8DC-20",
         "VMB2DC-20",
+        "VMB1RYS-20",
     ],
 )
 class ModuleType2Message(Message):
