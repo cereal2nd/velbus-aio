@@ -255,7 +255,7 @@ class Velbus:
                 self._destination = f"tcp://{self._destination}"
             parts = urlparse(self._destination)
             if parts.scheme == "tls":
-                ctx = ssl.create_default_context()
+                ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
                 ctx.check_hostname = False
                 ctx.verify_mode = ssl.CERT_NONE
             else:
