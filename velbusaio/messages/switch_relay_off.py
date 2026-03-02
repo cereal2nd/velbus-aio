@@ -38,9 +38,7 @@ class SwitchRelayOffMessage(Message):
         return bytes([COMMAND_CODE, self.channels_to_byte(self.relay_channels)])
 
 
-@register(
-    COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20", "VMB1RYS", "VMB1RYNO", "VMB1RYNOS"]
-)
+@register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20", "VMB1RYS-20"])
 class SwitchRelayOffMessage20(SwitchRelayOffMessage):
     """Switch Relay Off Message for -20 series."""
 
