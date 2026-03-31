@@ -166,7 +166,7 @@ class Module:
         self._type = int(module_type)
         self._data = {}
 
-        self._name = {}
+        self._name = None
         self._name_buffer: dict[int, str] = {}  # temporary buffer while assembling name from memory blocks
         self._sub_address = {}
         self.serial = serial
