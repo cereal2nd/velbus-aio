@@ -1069,7 +1069,7 @@ class Module:
         channel = self._translate_channel_name(message.channel)
         if channel not in self._channels:
             return
-        if self._channels[channel].set_name_part(part, message.name):
+        if self._channels[channel].set_name_part(part, message.name) and self.loaded:
             await self._channels[channel].status_update()
 
     def _translate_channel_name(self, channel: str) -> int:
