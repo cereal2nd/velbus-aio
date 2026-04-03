@@ -479,17 +479,17 @@ class Module:
 
     async def _handle_channel_name_part1(self, message: Message) -> None:
         """Handle channel name part 1 messages."""
-        self._process_channel_name_message(1, message)
+        await self._process_channel_name_message(1, message)
         await self._cache()
 
     async def _handle_channel_name_part2(self, message: Message) -> None:
         """Handle channel name part 2 messages."""
-        self._process_channel_name_message(2, message)
+        await self._process_channel_name_message(2, message)
         await self._cache()
 
     async def _handle_channel_name_part3(self, message: Message) -> None:
         """Handle channel name part 3 messages."""
-        self._process_channel_name_message(3, message)
+        await self._process_channel_name_message(3, message)
         await self._cache()
 
     async def _handle_bus_error_counter(
@@ -1065,11 +1065,12 @@ class Module:
                     data["pulses"] = new_pulses
                 await self._update_channel(chan, data)
 
-    def _process_channel_name_message(self, part: int, message: Message) -> None:
+    async def _process_channel_name_message(self, part: int, message: Message) -> None:
         channel = self._translate_channel_name(message.channel)
         if channel not in self._channels:
             return
-        self._channels[channel].set_name_part(part, message.name)
+        if self._channels[channel].set_name_part(part, message.name):
+            await self._channels[channel].status_update()
 
     def _translate_channel_name(self, channel: str) -> int:
         if keys_exists(
