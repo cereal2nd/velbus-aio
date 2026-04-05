@@ -47,6 +47,10 @@ class Property(BaseItem):
         """
         return type(self).__name__
 
+    def get_property_key(self) -> str:
+        """Return a stable, type-unique key for use in unique_id generation."""
+        return type(self).__name__
+
 
 class PSUPower(Property):
     """PSU Power property."""
