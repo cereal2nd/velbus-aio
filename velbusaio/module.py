@@ -167,7 +167,9 @@ class Module:
         self._data = {}
 
         self._name = None
-        self._name_buffer: dict[int, str] = {}  # temporary buffer while assembling name from memory blocks
+        self._name_buffer: dict[
+            int, str
+        ] = {}  # temporary buffer while assembling name from memory blocks
         self._sub_address = {}
         self.serial = serial
         self.memory_map_version = memorymap
