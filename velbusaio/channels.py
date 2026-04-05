@@ -114,13 +114,15 @@ class Channel(BaseItem):
         # store the char on correct pos
         self._name = self._name[: int(pos)] + chr(char) + self._name[int(pos) + 1 :]
 
-    def set_name_part(self, part: int, name: str) -> None:
-        """Set a part of the channel name."""
+    def set_name_part(self, part: int, name: str) -> bool:
+        """Set a part of the channel name. Returns True if name is now complete."""
         # if int(part) not in self._name_parts:
         #    return
         self._name_parts[int(part)] = name
         if len(self._name_parts) == 3:
             self._generate_name()
+            return True
+        return False
 
     def _generate_name(self) -> None:
         """Generate the channel name if all 3 parts are received."""
