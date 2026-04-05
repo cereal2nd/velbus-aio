@@ -166,7 +166,10 @@ class Module:
         self._type = int(module_type)
         self._data = {}
 
-        self._name = {}
+        self._name = None
+        self._name_buffer: dict[
+            int, str
+        ] = {}  # temporary buffer while assembling name from memory blocks
         self._sub_address = {}
         self.serial = serial
         self.memory_map_version = memorymap
@@ -478,17 +481,17 @@ class Module:
 
     async def _handle_channel_name_part1(self, message: Message) -> None:
         """Handle channel name part 1 messages."""
-        self._process_channel_name_message(1, message)
+        await self._process_channel_name_message(1, message)
         await self._cache()
 
     async def _handle_channel_name_part2(self, message: Message) -> None:
         """Handle channel name part 2 messages."""
-        self._process_channel_name_message(2, message)
+        await self._process_channel_name_message(2, message)
         await self._cache()
 
     async def _handle_channel_name_part3(self, message: Message) -> None:
         """Handle channel name part 3 messages."""
-        self._process_channel_name_message(3, message)
+        await self._process_channel_name_message(3, message)
         await self._cache()
 
     async def _handle_bus_error_counter(
@@ -1007,8 +1010,8 @@ class Module:
         if "ModuleName" not in self._data["Memory"]:
             return
         addr_data = self._data["Memory"]["ModuleName"]
-        if not isinstance(self._name, dict):
-            # Already loaded as string, skip
+        if isinstance(self._name, str):
+            # Name already fully assembled, nothing to do
             return
         # Parse address ranges: "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8"
         ranges = []
@@ -1023,20 +1026,22 @@ class Module:
         incoming_addr = int("0x" + addr, 0)
         for start_addr, end_addr, range_byte_offset in ranges:
             if start_addr <= incoming_addr <= end_addr:
-                # Calculate the position within the overall module name
+                # Calculate the byte position within the overall module name
                 position_in_range = incoming_addr - start_addr
                 base_position = range_byte_offset + position_in_range
-                # Store each byte from the message data
+                # Store each byte in the temporary buffer, not in _name itself.
+                # _name is only set to a string once all bytes have been received.
                 for i, byte_val in enumerate(message.data):
                     char_position = base_position + i
-                    self._name[char_position] = chr(byte_val)
-                # Check if we've received all bytes (check if all positions are filled)
+                    self._name_buffer[char_position] = chr(byte_val)
+                # Check if all expected bytes have been received
                 total_bytes = ranges[-1][2] + (ranges[-1][1] - ranges[-1][0] + 1)
-                if len(self._name) >= total_bytes:
-                    # Convert to string, excluding 0xFF bytes
+                if len(self._name_buffer) >= total_bytes:
+                    # All bytes received: assemble the name string, skip 0xFF (unprogrammed bytes)
                     self._name = "".join(
-                        str(x) for x in self._name.values() if x != chr(0xFF)
+                        str(x) for x in self._name_buffer.values() if x != chr(0xFF)
                     )
+                    self._name_buffer = {}  # release buffer
                     await self._cache()
                 break
 
@@ -1062,11 +1067,12 @@ class Module:
                     data["pulses"] = new_pulses
                 await self._update_channel(chan, data)
 
-    def _process_channel_name_message(self, part: int, message: Message) -> None:
+    async def _process_channel_name_message(self, part: int, message: Message) -> None:
         channel = self._translate_channel_name(message.channel)
         if channel not in self._channels:
             return
-        self._channels[channel].set_name_part(part, message.name)
+        if self._channels[channel].set_name_part(part, message.name) and self.loaded:
+            await self._channels[channel].status_update()
 
     def _translate_channel_name(self, channel: str) -> int:
         if keys_exists(
@@ -1088,8 +1094,9 @@ class Module:
             return True
         if self._is_loading:
             return False
-        # the name should be loaded
-        if isinstance(self._name, dict):
+        # Name loading is still in progress if the buffer is non-empty.
+        # _name is an empty dict (initial state), None (no name spec), or a str (fully loaded).
+        if self._name_buffer:
             return False
         # all channel names should be loaded
         for chan in self._channels.values():

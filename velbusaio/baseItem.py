@@ -27,6 +27,7 @@ class BaseItem(ABC):
         """Initialize the property."""
         self._module = module
         self._name = name
+        self._default_name = name
         self._writer = writer
         self._on_status_update: list[Callable[[], Awaitable[None]]] = []
 
@@ -39,6 +40,11 @@ class BaseItem(ABC):
     def set_name(self, name: str) -> None:
         """Set the name of this item."""
         self._name = name
+
+    @final
+    def get_default_name(self) -> str:
+        """Return the default name of this item as defined in the module spec."""
+        return self._default_name
 
     @final
     def set_writer(self, writer: Callable[[Message], Awaitable[None]]) -> None:
