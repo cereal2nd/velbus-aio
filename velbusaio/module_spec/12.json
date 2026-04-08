@@ -32,7 +32,7 @@
       "03": "02F0-02FF",
       "04": "03F0-03FF"
     },
-    "ModuleName": "00E0-00EF;01E0-01EF"
+    "ModuleName": "00E0-00EF;01E0-01EF;02E0-02EF;03E0-03EF"
   },
   "Type": "VMB4DC",
   "sliderScale": 100

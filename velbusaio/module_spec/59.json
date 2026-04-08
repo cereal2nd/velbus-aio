@@ -49,7 +49,9 @@
     }
   },
   "Memory": {
-    "ModuleName": "03BC-03FB"
+    "Channels": {
+      "09": "0074-0083"
+    }
   },
   "Properties": {
     "light_value": {

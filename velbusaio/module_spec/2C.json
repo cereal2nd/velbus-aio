@@ -47,6 +47,9 @@
     }
   },
   "Memory": {
+    "Channels": {
+      "09": "0080-008F"
+    },
     "ModuleName": "00B0-00EF"
   },
   "Properties": {

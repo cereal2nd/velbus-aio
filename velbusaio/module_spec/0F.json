@@ -9,7 +9,7 @@
   },
   "Memory": {
     "Channels": {
-      "01": "0070-007F"
+      "01": "00F0-00FF"
     }
   },
   "Type": "VMB1LED"
