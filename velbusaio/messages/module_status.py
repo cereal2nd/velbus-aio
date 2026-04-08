@@ -81,7 +81,6 @@ class ModuleStatusMessage(Message):
         "VMBGP4-20",
         "VMBGPO-20",
         "VMBEL4PIR-20",
-        "VMBGP4PIR-20",
         "VMBPSUMNGR-20",
         "VMB8IN-20",
     ],
@@ -172,7 +171,7 @@ class ModuleStatusPirMessage(Message):
         raise NotImplementedError
 
 
-@register(COMMAND_CODE, ["VMBGP4PIR", "VMBGP4PIR-2"])
+@register(COMMAND_CODE, ["VMBGP4PIR", "VMBGP4PIR-2", "VMBGP4PIR-20"])
 class ModuleStatusGP4PirMessage(Message):
     """Module Status GP4 PIR Message."""
 
