@@ -35,18 +35,9 @@
       "Name": "Absence output",
       "Subdevice": "no",
       "Type": "Sensor"
-    },
-    "09": {
-      "Editable": "yes",
-      "Name": "Temperature",
-      "Subdevice": "no",
-      "Type": "Temperature"
     }
   },
   "Memory": {
-    "Channels": {
-      "09": "0080-008F"
-    },
     "ModuleName": "00B0-00EF"
   },
   "Properties": {
@@ -55,6 +46,5 @@
       "Type": "LightValue"
     }
   },
-  "TemperatureChannel": "09",
   "Type": "VMBPIRM"
 }
