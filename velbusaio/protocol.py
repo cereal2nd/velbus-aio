@@ -53,6 +53,8 @@ class VelbusProtocol(asyncio.BufferedProtocol):
 
     def _notify_connection_state_callbacks(self, is_connected: bool) -> None:
         """Notify all registered callbacks of connection state change."""
+        if self._connection_state_callback is None:
+            return
         task = asyncio.ensure_future(self._connection_state_callback(is_connected))
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
@@ -69,12 +71,11 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         # Notify callbacks that connection is established
         self._notify_connection_state_callbacks(True)
 
-    async def pause_writing(self) -> None:
+    def pause_writing(self) -> None:
         """Pause writing."""
         self._restart_writer = False
         if self._writer_task:
             self._send_queue.put_nowait(None)
-        await asyncio.sleep(0.1)
 
     def restart_writing(self) -> None:
         """Resume writing."""
@@ -103,10 +104,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
             self._log.error(f"Velbus connection lost: {exc!r}")
 
         self.transport = None
-        asyncio.ensure_future(self.pause_writing())  # noqa: RUF006
-
-        # Notify callbacks that connection is lost
-        self._notify_connection_state_callbacks(False)
+        self.pause_writing()
 
     # Everything read-related
 
@@ -132,7 +130,6 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         while len(self._serial_buf) > MINIMUM_MESSAGE_SIZE and _recheck:
             # try to construct a Velbus message from the buffer
 
-            _remaining_buf = self._serial_buf[MAXIMUM_MESSAGE_SIZE:]
             msg, remaining_data = create_message_info(
                 bytearray(self._serial_buf[:MAXIMUM_MESSAGE_SIZE])
             )
@@ -142,7 +139,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
                 _recheck = True
             else:
                 _recheck = False
-            self._serial_buf = bytes(remaining_data) + _remaining_buf
+            self._serial_buf = bytes(remaining_data)
 
     def buffer_updated(self, nbytes: int) -> None:
         """Receive data from the Buffered Streaming protocol.
@@ -243,7 +240,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
     async def _write_message(self, msg: RawMessage) -> bool:
         """Write a message to Velbus."""
         self._log.debug(f"TX: {msg}")
-        if not self.transport.is_closing():
+        if self.transport and not self.transport.is_closing():
             self.transport.write(msg.to_bytes())
             self._last_activity_time = time.time()
             return True

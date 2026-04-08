@@ -98,7 +98,8 @@ class MemoText(Property):
                 await self._writer(msg)
                 msg = cls(self.get_module_address())
                 msg.start = msgcntr
-        await self._writer(msg)
+        if msg.memo_text:
+            await self._writer(msg)
 
 
 class SelectedProgram(Property):
@@ -129,11 +130,11 @@ class SelectedProgram(Property):
 
     async def set_selected_program(self, program_str: str) -> None:
         """Set the currently selected program."""
-        self._selected_program_str = program_str
         command_code = 0xB3
         cls = commandRegistry.get_command(command_code, self._module.get_type())
         index = list(PROGRAM_SELECTION.values()).index(program_str)
         program = list(PROGRAM_SELECTION.keys())[index]
+        self._selected_program_str = program_str
         msg = cls(self.get_module_address(), program)
         await self._writer(msg)
 
