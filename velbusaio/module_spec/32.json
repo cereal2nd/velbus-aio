@@ -15,50 +15,50 @@
     "01": {
       "Editable": "yes",
       "Name": "Alarm 1",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "02": {
       "Editable": "yes",
       "Name": "Alarm 2",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "03": {
       "Editable": "yes",
       "Name": "Alarm 3",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "04": {
       "Editable": "yes",
       "Name": "Alarm 4",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "05": {
       "Editable": "yes",
       "Name": "Alarm 5",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "06": {
       "Editable": "yes",
       "Name": "Alarm 6",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "07": {
       "Editable": "yes",
       "Name": "Alarm 7",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "08": {
       "Editable": "yes",
       "Name": "Alarm 8",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "09": {
       "Editable": "yes",
@@ -168,7 +168,6 @@
         "Unit": "12:7:Save"
       }
     },
-    "ModuleName": "0000-003F",
     "Channels": {
       "01": "0082-0091",
       "02": "0092-00A1",
@@ -182,13 +181,14 @@
       "10": "03B0-03BF",
       "11": "04E2-04F1",
       "12": "0614-0623"
-    }
+    },
+    "ModuleName": "0000-003F"
   },
-  "Type": "VMB4AN",
   "Properties": {
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "Type": "VMB4AN"
 }

@@ -263,12 +263,12 @@
       "13": "00E0-00EF"
     }
   },
-  "TemperatureChannel": "10",
-  "Type": "VMBMETEO",
   "Properties": {
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "TemperatureChannel": "10",
+  "Type": "VMBMETEO"
 }

@@ -3,54 +3,53 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Virtual button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual button 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual button 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual button 5",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual button 6",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 7",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 8",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     }
   },
   "Memory": {
-    "ModuleName": "03C0-03FF",
     "Channels": {
       "01": "0000-000F",
       "02": "0014-0023",
@@ -60,7 +59,8 @@
       "06": "0064-0073",
       "07": "0078-0087",
       "08": "008C-009B"
-    }
+    },
+    "ModuleName": "03C0-03FF"
   },
   "Type": "VMBIN"
 }

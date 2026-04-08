@@ -4,24 +4,56 @@
     "01": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Temperature"
     },
-    "02": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "03": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "04": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "05": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "06": { "Name": "Alarm 1", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "07": { "Name": "Alarm 2", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "08": { "Name": "Alarm 3", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "09": { "Name": "Alarm 4", "Type": "ThermostatChannel", "Subdevice": "no" }
+    "02": {
+      "Name": "Heater",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "03": {
+      "Name": "Boost",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "04": {
+      "Name": "Pump",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "05": {
+      "Name": "Cooler",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "06": {
+      "Name": "Alarm 1",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "07": {
+      "Name": "Alarm 2",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "08": {
+      "Name": "Alarm 3",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "09": {
+      "Name": "Alarm 4",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    }
   },
-  "TemperatureChannel": "01",
-  "Type": "VMB1TC",
   "Memory": {
-    "ModuleName": "00F0-00FF",
     "Channels": {
       "01": "0060-006F"
-    }
-  }
+    },
+    "ModuleName": "00F0-00FF"
+  },
+  "TemperatureChannel": "01",
+  "Type": "VMB1TC"
 }

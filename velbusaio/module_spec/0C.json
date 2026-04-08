@@ -3,16 +3,16 @@
     "01": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Temperature"
     }
   },
-  "TemperatureChannel": "01",
-  "Thermostat": "yes",
-  "Type": "VMB1TS",
   "Memory": {
     "Channels": {
       "01": "00F0-00FF"
     }
-  }
+  },
+  "TemperatureChannel": "01",
+  "Thermostat": "yes",
+  "Type": "VMB1TS"
 }

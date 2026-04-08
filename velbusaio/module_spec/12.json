@@ -1,39 +1,39 @@
 {
-  "sliderScale": 100,
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Dimmer 1",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "02": {
       "Editable": "yes",
       "Name": "Dimmer 2",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "03": {
       "Editable": "yes",
       "Name": "Dimmer 3",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "04": {
       "Editable": "yes",
       "Name": "Dimmer 4",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     }
   },
   "Memory": {
-    "ModuleName": "00E0-00EF;01E0-01EF",
     "Channels": {
       "01": "00F0-00FF",
       "02": "01F0-01FF",
       "03": "02F0-02FF",
       "04": "03F0-03FF"
-    }
+    },
+    "ModuleName": "00E0-00EF;01E0-01EF"
   },
-  "Type": "VMB4DC"
+  "Type": "VMB4DC",
+  "sliderScale": 100
 }

@@ -1,45 +1,45 @@
 {
-  "sliderScale": 254,
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Dimmer 1",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "02": {
       "Editable": "yes",
       "Name": "Dimmer 2",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "03": {
       "Editable": "yes",
       "Name": "Dimmer 3",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "04": {
       "Editable": "yes",
       "Name": "Dimmer 4",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     }
   },
   "Memory": {
-    "ModuleName": "062C-066B",
     "Channels": {
       "01": "0000-000F",
       "02": "0010-001F",
       "03": "0020-002F",
       "04": "0030-003F"
+    },
+    "ModuleName": "062C-066B"
+  },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "Type": "VMB4LEDPWM-20",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "sliderScale": 254
 }

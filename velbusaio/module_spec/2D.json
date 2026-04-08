@@ -1,66 +1,86 @@
 {
   "AllChannelStatus": "FF",
   "ChannelNumbers": {
-    "Name": { "Convert": "hex", "Map": { "09": "10" } }
+    "Name": {
+      "Convert": "hex",
+      "Map": {
+        "09": "10"
+      }
+    }
   },
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
-    "05": { "Name": "Dark/Light output", "Type": "Sensor", "Subdevice": "no" },
-    "06": { "Name": "Motion output", "Type": "Sensor", "Subdevice": "no" },
+    "05": {
+      "Name": "Dark/Light output",
+      "Subdevice": "no",
+      "Type": "Sensor"
+    },
+    "06": {
+      "Name": "Motion output",
+      "Subdevice": "no",
+      "Type": "Sensor"
+    },
     "07": {
       "Name": "Light Depending motion",
-      "Type": "Sensor",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Sensor"
     },
-    "08": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" },
+    "08": {
+      "Name": "Absence output",
+      "Subdevice": "no",
+      "Type": "Sensor"
+    },
     "09": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Temperature"
     }
   },
   "Memory": {
-    "ModuleName": "03C0-03FF",
     "Channels": {
       "01": "0000-000F",
       "02": "0014-0023",
       "03": "0028-0037",
       "04": "003C-004B",
       "09": "00E1-00F0"
+    },
+    "ModuleName": "03C0-03FF"
+  },
+  "Properties": {
+    "light_value": {
+      "Name": "Light value",
+      "Type": "LightValue"
+    },
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",
-  "Type": "VMBGP4PIR",
-  "Properties": {
-    "light_value": { "Type": "LightValue", "Name": "Light value" },
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMBGP4PIR"
 }

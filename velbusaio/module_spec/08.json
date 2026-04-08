@@ -3,29 +3,28 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay 1",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "02": {
       "Editable": "yes",
       "Name": "Relay 2",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "03": {
       "Editable": "yes",
       "Name": "Relay 3",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "04": {
       "Editable": "yes",
       "Name": "Relay 4",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     }
   },
-  "Type": "VMB4RY",
   "Memory": {
     "Channels": {
       "01": "00F0-00FF",
@@ -33,5 +32,6 @@
       "03": "02F0-02FF",
       "04": "03F0-03FF"
     }
-  }
+  },
+  "Type": "VMB4RY"
 }

@@ -1,58 +1,55 @@
 {
-  "Type": "VMB8DC-20",
-  "sliderScale": 254,
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Dimmer 1",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "02": {
       "Editable": "yes",
       "Name": "Dimmer 2",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "03": {
       "Editable": "yes",
       "Name": "Dimmer 3",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "04": {
       "Editable": "yes",
       "Name": "Dimmer 4",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "05": {
       "Editable": "yes",
       "Name": "Dimmer 5",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "06": {
       "Editable": "yes",
       "Name": "Dimmer 6",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "07": {
       "Editable": "yes",
       "Name": "Dimmer 7",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "08": {
       "Editable": "yes",
       "Name": "Dimmer 8",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     }
   },
   "Memory": {
-    "ModuleName": "049C-04DB",
     "Channels": {
       "01": "0000-000F",
       "02": "0010-001F",
@@ -62,12 +59,15 @@
       "06": "0050-005F",
       "07": "0060-006F",
       "08": "0070-007F"
-    }
+    },
+    "ModuleName": "049C-04DB"
   },
   "Properties": {
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "Type": "VMB8DC-20",
+  "sliderScale": 254
 }

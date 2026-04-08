@@ -1,74 +1,126 @@
 {
   "AllChannelStatus": "FF",
   "ChannelNumbers": {
-    "Name": { "Convert": "hex", "Map": { "09": "10" } }
+    "Name": {
+      "Convert": "hex",
+      "Map": {
+        "09": "10"
+      }
+    }
   },
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Button"
     },
-    "05": { "Name": "Dark/Light output", "Type": "Sensor", "Subdevice": "no" },
-    "06": { "Name": "Motion output", "Type": "Sensor", "Subdevice": "no" },
+    "05": {
+      "Name": "Dark/Light output",
+      "Subdevice": "no",
+      "Type": "Sensor"
+    },
+    "06": {
+      "Name": "Motion output",
+      "Subdevice": "no",
+      "Type": "Sensor"
+    },
     "07": {
       "Name": "Light Depending motion",
-      "Type": "Sensor",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Sensor"
     },
-    "08": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" },
+    "08": {
+      "Name": "Absence output",
+      "Subdevice": "no",
+      "Type": "Sensor"
+    },
     "10": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
+      "Subdevice": "no",
+      "Type": "Temperature"
     },
-    "11": { "Name": "Heater", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "12": { "Name": "Boost", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "13": { "Name": "Pump", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "14": { "Name": "Cooler", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "15": { "Name": "Alarm 1", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "16": { "Name": "Alarm 2", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "17": { "Name": "Alarm 3", "Type": "ThermostatChannel", "Subdevice": "no" },
-    "18": { "Name": "Alarm 4", "Type": "ThermostatChannel", "Subdevice": "no" }
+    "11": {
+      "Name": "Heater",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "12": {
+      "Name": "Boost",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "13": {
+      "Name": "Pump",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "14": {
+      "Name": "Cooler",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "15": {
+      "Name": "Alarm 1",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "16": {
+      "Name": "Alarm 2",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "17": {
+      "Name": "Alarm 3",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    },
+    "18": {
+      "Name": "Alarm 4",
+      "Subdevice": "no",
+      "Type": "ThermostatChannel"
+    }
   },
   "Memory": {
-    "ModuleName": "03C0-03FF",
     "Channels": {
       "01": "0000-000F",
       "02": "0014-0023",
       "03": "0028-0037",
       "04": "003C-004B",
       "10": "00E1-00F0"
+    },
+    "ModuleName": "03C0-03FF"
+  },
+  "Properties": {
+    "light_value": {
+      "Name": "Light value",
+      "Type": "LightValue"
+    },
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "TemperatureChannel": "10",
   "ThermostatAddr": "0",
-  "Type": "VMBGP4PIR-2",
-  "Properties": {
-    "light_value": { "Type": "LightValue", "Name": "Light value" },
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMBGP4PIR-2"
 }

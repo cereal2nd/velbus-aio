@@ -1,31 +1,31 @@
 {
-  "sliderScale": 254,
   "Channels": {
     "01": {
       "Editable": "yes",
       "Name": "Dimmer 1",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     },
     "02": {
       "Editable": "yes",
       "Name": "Dimmer 2",
-      "Type": "Dimmer",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Dimmer"
     }
   },
   "Memory": {
-    "ModuleName": "06F4-0733",
     "Channels": {
       "01": "0000-000F",
       "02": "0010-001F"
+    },
+    "ModuleName": "06F4-0733"
+  },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "Type": "VMB2DC-20",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "sliderScale": 254
 }
