@@ -33,9 +33,9 @@ async def on_module_found(module):
     logging.info("============================")  # noqa: LOG015
 
 
-async def on_connect(velbus: Velbus):
+async def on_connect():
     logging.info("++++++++++++++++++++++++++++++++++")  # noqa: LOG015
-    logging.info("Connected to Velbus interface %s", velbus.dsn)  # noqa: LOG015
+    logging.info("Connected to Velbus interface")  # noqa: LOG015
     logging.info("++++++++++++++++++++++++++++++++++")  # noqa: LOG015
 
 
