@@ -4,7 +4,7 @@
     "Name": {
       "Convert": "hex",
       "Map": {
-        "09": "10"
+        "21": "34"
       }
     }
   },
@@ -57,49 +57,183 @@
       "Subdevice": "no",
       "Type": "Button"
     },
+    "09": {
+      "Editable": "yes",
+      "Name": "Virtual button 9",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
     "10": {
+      "Editable": "yes",
+      "Name": "Virtual button 10",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "11": {
+      "Editable": "yes",
+      "Name": "Virtual button 11",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "12": {
+      "Editable": "yes",
+      "Name": "Virtual button 12",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "13": {
+      "Editable": "yes",
+      "Name": "Virtual button 13",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "14": {
+      "Editable": "yes",
+      "Name": "Virtual button 14",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "15": {
+      "Editable": "yes",
+      "Name": "Virtual button 15",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "16": {
+      "Editable": "yes",
+      "Name": "Virtual button 16",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "17": {
+      "Editable": "yes",
+      "Name": "Virtual button 17",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "18": {
+      "Editable": "yes",
+      "Name": "Virtual button 18",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "19": {
+      "Editable": "yes",
+      "Name": "Virtual button 19",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "20": {
+      "Editable": "yes",
+      "Name": "Virtual button 20",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "21": {
+      "Editable": "yes",
+      "Name": "Virtual button 21",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "22": {
+      "Editable": "yes",
+      "Name": "Virtual button 22",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "23": {
+      "Editable": "yes",
+      "Name": "Virtual button 23",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "24": {
+      "Editable": "yes",
+      "Name": "Virtual button 24",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "25": {
+      "Editable": "yes",
+      "Name": "Virtual button 25",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "26": {
+      "Editable": "yes",
+      "Name": "Virtual button 26",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "27": {
+      "Editable": "yes",
+      "Name": "Virtual button 27",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "28": {
+      "Editable": "yes",
+      "Name": "Virtual button 28",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "29": {
+      "Editable": "yes",
+      "Name": "Virtual button 29",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "30": {
+      "Editable": "yes",
+      "Name": "Virtual button 30",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "31": {
+      "Editable": "yes",
+      "Name": "Virtual button 31",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "32": {
+      "Editable": "yes",
+      "Name": "Virtual button 32",
+      "Subdevice": "no",
+      "Type": "Button"
+    },
+    "34": {
       "Editable": "yes",
       "Name": "Temperature",
       "Subdevice": "no",
       "Type": "Temperature"
     },
-    "11": {
+    "35": {
       "Name": "Heater",
       "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
-    "12": {
+    "36": {
       "Name": "Boost",
       "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
-    "13": {
+    "37": {
       "Name": "Pump",
       "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
-    "14": {
+    "38": {
       "Name": "Cooler",
       "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
-    "15": {
+    "39": {
       "Name": "Alarm 1",
       "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
-    "16": {
+    "40": {
       "Name": "Alarm 2",
-      "Subdevice": "no",
-      "Type": "ThermostatChannel"
-    },
-    "17": {
-      "Name": "Alarm 3",
-      "Subdevice": "no",
-      "Type": "ThermostatChannel"
-    },
-    "18": {
-      "Name": "Alarm 4",
       "Subdevice": "no",
       "Type": "ThermostatChannel"
     }
@@ -114,17 +248,45 @@
       "06": "0064-0073",
       "07": "0078-0087",
       "08": "008C-009B",
-      "10": "00E1-00F0"
+      "09": "00A0-00AF",
+      "10": "00B4-00C3",
+      "11": "00C8-00D7",
+      "12": "00DC-00EB",
+      "13": "00F0-00FF",
+      "14": "0104-0113",
+      "15": "0118-0127",
+      "16": "012C-013B",
+      "17": "0140-014F",
+      "18": "0154-0163",
+      "19": "0168-0177",
+      "20": "017C-018B",
+      "21": "0190-019F",
+      "22": "01A4-01B3",
+      "23": "01B8-01C7",
+      "24": "01CC-01DB",
+      "25": "01E0-01EF",
+      "26": "01F4-0203",
+      "27": "0208-0217",
+      "28": "021C-022B",
+      "29": "0230-023F",
+      "30": "0244-0253",
+      "31": "0258-0267",
+      "32": "026C-027B",
+      "34": "02C1-02D0"
     },
-    "ModuleName": "03C0-03FF"
+    "ModuleName": "09BE-09FD"
   },
   "Properties": {
+    "memo_text": {
+      "Name": "Memo Text",
+      "Type": "MemoText"
+    },
     "selected_program": {
       "Name": "Selected program",
       "Type": "SelectedProgram"
     }
   },
-  "TemperatureChannel": "10",
-  "ThermostatAddr": "0",
+  "TemperatureChannel": "34",
+  "ThermostatAddr": "3",
   "Type": "VMBGPO"
 }
