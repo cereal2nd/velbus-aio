@@ -249,6 +249,7 @@ class PacketHandler:
         rtr = rawmsg.rtr
         command_value = rawmsg.command
         data = rawmsg.data_only
+        hex_cmd = f"{command_value:02X}"
 
         # handle module type response message
         if command_value == 0xFF:
@@ -269,15 +270,15 @@ class PacketHandler:
                 self._handle_module_subtype(msg)
 
         # ignore broadcast
-        elif command_value in self.broadcast:
+        elif hex_cmd in self.broadcast:
             self._log.debug(
-                f"Received broadcast message {self.broadcast[str(command_value).upper()]} from {address}, ignoring"
+                f"Received broadcast message {self.broadcast[hex_cmd]['Name']} from {address}, ignoring"
             )
 
         # ignore messages
-        elif command_value in self.ignore:
+        elif hex_cmd in self.ignore:
             self._log.debug(
-                f"Received ignored message {self.ignore[str(command_value).upper()]} from {address}, ignoring"
+                f"Received ignored message {self.ignore[hex_cmd]['Name']} from {address}, ignoring"
             )
 
         # handle other messages for modules that are already scanned

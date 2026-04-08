@@ -58,13 +58,13 @@ class VlpFile:
 class vlpModule:
     """VLP module representation."""
 
-    def __init__(self, name, addresses, build, serial, type, memory) -> None:
+    def __init__(self, name, addresses, build, serial, module_type, memory) -> None:
         """Initialize VLP module."""
         self._name = name
         self._addresses = addresses
         self._build = build
         self._serial = serial
-        self._type = type
+        self._type = module_type
         self._memory = memory
         self._spec = {}
         self._channels = {}
@@ -171,6 +171,9 @@ class vlpModule:
                                 self._log.debug(
                                     f"   => Direct match for value {int_key}: {translate_value}"
                                 )
+                                self._channels[translate_value["Channel"]][
+                                    translate_value["SubName"]
+                                ] = translate_value["Value"]
                                 translation_found = True
                         except ValueError:
                             # Not an integer key, skip
@@ -236,7 +239,7 @@ class vlpModule:
             name = byte_data.decode("ascii")
         except UnicodeDecodeError as e:
             self._log.error(f"  => UnicodeDecodeError: {e}")
-            name = byte_data
+            return None
         return name
 
     async def _load_module_spec(self) -> None:
@@ -263,7 +266,7 @@ class vlpModule:
 
         if sys.version_info >= (3, 13):
             with importlib.resources.path(
-                __name__, f"module_spec/{h2(self._type_id)}.json"
+                __name__, f"module_spec/{h2(memmap_id)}.json"
             ) as fspath:
                 async with async_open(fspath) as protocol_file:
                     self._spec = json.loads(await protocol_file.read())
@@ -271,7 +274,7 @@ class vlpModule:
             async with async_open(
                 str(
                     importlib.resources.files(__name__.split(".")[0]).joinpath(
-                        f"module_spec/{h2(self._type_id)}.json"
+                        f"module_spec/{h2(memmap_id)}.json"
                     )
                 )
             ) as protocol_file:

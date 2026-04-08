@@ -172,19 +172,22 @@ class Channel(BaseItem):
     def get_channel_info(self) -> dict[str, Any]:
         """Get the channel info as a dictionary."""
         data = {}
+        data["type"] = self.__class__.__name__
         for key, value in self.__dict__.items():
-            data["type"] = self.__class__.__name__
             if key not in ["_module", "_writer", "_name_parts", "_on_status_update"]:
                 data[key.replace("_", "", 1)] = value
         return data
 
     async def update(self, data: dict) -> None:
         """Set the attributes of this channel."""
+        changed = False
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
-            if cur_val is None or cur_val != new_val:
+            if cur_val != new_val:
                 setattr(self, f"_{key}", new_val)
-                await self.status_update()
+                changed = True
+        if changed:
+            await self.status_update()
 
     async def status_update(self) -> None:
         """Call all registered status update methods."""
@@ -452,6 +455,8 @@ class ButtonCounter(Button):
         """Return the current state of the counter."""
         if self._power:
             return self._power
+        if not self._counter or not self._pulses:
+            return 0
         return round((self._counter / self._pulses), 2)
 
     def get_counter_unit(self) -> str:
@@ -676,6 +681,7 @@ class Temperature(Channel):
             current_temp_rounded_to_precision - precision
             <= new_temp
             < current_temp_rounded_to_precision
+            and self._cur_precision is not None
             and self._cur_precision < precision
         ):
             # The newly received temperature is 1 LSb below the current value

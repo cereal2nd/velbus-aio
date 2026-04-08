@@ -159,6 +159,12 @@ class Velbus:
     async def _on_connection_state(self, is_connected: bool) -> None:
         """Respond to Protocol connection state changes."""
         self._is_connected = is_connected
+        if is_connected:
+            for callback in self._on_connect_callbacks:
+                await callback()
+        else:
+            for callback in self._on_disconnect_callbacks:
+                await callback()
         for mod in self._modules.values():
             for chan in mod.get_channels().values():
                 await chan.status_update()
@@ -264,7 +270,7 @@ class Velbus:
                 (
                     _transport,
                     _protocol,
-                ) = await asyncio.get_event_loop().create_connection(
+                ) = await asyncio.get_running_loop().create_connection(
                     lambda: self._protocol,
                     host=parts.hostname,
                     port=parts.port,
@@ -280,7 +286,7 @@ class Velbus:
                     _transport,
                     _protocol,
                 ) = await serial_asyncio_fast.create_serial_connection(
-                    asyncio.get_event_loop(),
+                    asyncio.get_running_loop(),
                     lambda: self._protocol,
                     url=self._destination,
                     baudrate=38400,

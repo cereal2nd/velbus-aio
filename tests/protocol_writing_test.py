@@ -20,7 +20,7 @@ class TestVelbusProtocolWriting:
         protocol._restart_writer = True
         protocol._writer_task = Mock()
 
-        await protocol.pause_writing()
+        protocol.pause_writing()
 
         assert protocol._restart_writer is False
 

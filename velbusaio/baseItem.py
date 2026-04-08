@@ -147,7 +147,7 @@ class BaseItem(ABC):
         changed = False
         for key, new_val in data.items():
             cur_val = getattr(self, f"_{key}", None)
-            if cur_val is None or cur_val != new_val:
+            if cur_val != new_val:
                 setattr(self, f"_{key}", new_val)
                 changed = True
         if changed:
@@ -173,8 +173,8 @@ class BaseItem(ABC):
     def get_info(self) -> dict[str, Any]:
         """Get the channel info as a dictionary."""
         data = {}
+        data["type"] = self.__class__.__name__
         for key, value in self.__dict__.items():
-            data["type"] = self.__class__.__name__
             if key not in ["_module", "_writer", "_name_parts", "_on_status_update"]:
                 data[key.replace("_", "", 1)] = value
         return data

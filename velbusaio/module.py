@@ -315,7 +315,12 @@ class Module:
 
     def to_cache(self) -> dict:
         """Build cache dict."""
-        d = {"name": self._name, "channels": {}, "sub_addresses": {}, "properties": {}}
+        d = {
+            "name": self._name if isinstance(self._name, str) else "",
+            "channels": {},
+            "sub_addresses": {},
+            "properties": {},
+        }
         for num, chan in self._channels.items():
             d["channels"][num] = chan.to_cache()
         for num, address in self._sub_address.items():
@@ -374,6 +379,8 @@ class Module:
 
     def get_name(self) -> str:
         """Get the module name."""
+        if isinstance(self._name, dict):
+            return ""
         return self._name
 
     def get_sw_version(self) -> str:
@@ -677,7 +684,9 @@ class Module:
             channel = self._translate_channel_name(channel_id + channel_offset)
             if channel_id in message.closed:
                 await self._update_channel(channel, {"closed": True})
-            elif isinstance(self._channels[channel], (Button, ButtonCounter)):
+            elif channel in self._channels and isinstance(
+                self._channels[channel], (Button, ButtonCounter)
+            ):
                 await self._update_channel(channel, {"closed": False})
             if channel_id in message.enabled:
                 await self._update_channel(channel, {"enabled": True})
@@ -731,7 +740,9 @@ class Module:
             await self._update_channel(
                 channel, {"closed": channel_id in message.closed}
             )
-            if type(self._channels[channel]) is Button:
+            if channel in self._channels and isinstance(
+                self._channels[channel], Button
+            ):
                 await self._update_channel(
                     channel, {"enabled": channel_id in message.enabled}
                 )
@@ -909,7 +920,7 @@ class Module:
         """List all properties for this module."""
         return self._properties
 
-    async def load_from_vlp(self, vlp_data: dict) -> None:
+    async def load_from_vlp(self, vlp_data) -> None:
         """Initialize the module from VLP data."""
         self._is_loading = True
         self._use_cache = False
@@ -936,7 +947,7 @@ class Module:
         await self._load_properties()
 
         # load the data from memory ( the stuff that we need)
-        if "name" in cache and cache["name"] != "":
+        if "name" in cache and isinstance(cache["name"], str) and cache["name"] != "":
             self._name = cache["name"]
         else:
             await self.__load_memory()
@@ -1051,6 +1062,8 @@ class Module:
         if "Memory" not in self._data:
             return
         if "Address" not in self._data["Memory"]:
+            return
+        if addr not in self._data["Memory"]["Address"]:
             return
         mdata = self._data["Memory"]["Address"][addr]
         if "Match" in mdata:
