@@ -3,49 +3,41 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual button 3",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual button 4",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual button 5",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual button 6",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 7",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 8",
-      "Subdevice": "no",
       "Type": "Button"
     }
   },

@@ -3,25 +3,21 @@
     "01": {
       "Editable": "yes",
       "Name": "RF Channel 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "RF Channel 2",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "RF Channel 3",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "RF Channel 4",
-      "Subdevice": "no",
       "Type": "Button"
     }
   },

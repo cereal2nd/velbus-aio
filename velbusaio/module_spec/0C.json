@@ -3,7 +3,6 @@
     "01": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Subdevice": "no",
       "Type": "Temperature"
     }
   },

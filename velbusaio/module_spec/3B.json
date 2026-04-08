@@ -12,95 +12,78 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual button 3",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual button 4",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual button 5",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual button 6",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 7",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 8",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "10": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Subdevice": "no",
       "Type": "Temperature"
     },
     "11": {
       "Name": "Heater",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "12": {
       "Name": "Boost",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "13": {
       "Name": "Pump",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "14": {
       "Name": "Cooler",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "15": {
       "Name": "Alarm 1",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "16": {
       "Name": "Alarm 2",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "17": {
       "Name": "Alarm 3",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "18": {
       "Name": "Alarm 4",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     }
   },

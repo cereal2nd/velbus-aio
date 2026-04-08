@@ -9,43 +9,36 @@
     "02": {
       "Editable": "yes",
       "Name": "Virtual relay 1",
-      "Subdevice": "no",
       "Type": "Relay"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual relay 2",
-      "Subdevice": "no",
       "Type": "Relay"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual relay 3",
-      "Subdevice": "no",
       "Type": "Relay"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual relay 4",
-      "Subdevice": "no",
       "Type": "Relay"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual relay 5",
-      "Subdevice": "no",
       "Type": "Relay"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual relay 6",
-      "Subdevice": "no",
       "Type": "Relay"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual relay 7",
-      "Subdevice": "no",
       "Type": "Relay"
     }
   },

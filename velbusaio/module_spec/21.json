@@ -12,229 +12,190 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual button 5",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual button 6",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 7",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 8",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "09": {
       "Editable": "yes",
       "Name": "Virtual button 9",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "10": {
       "Editable": "yes",
       "Name": "Virtual button 10",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "11": {
       "Editable": "yes",
       "Name": "Virtual button 11",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "12": {
       "Editable": "yes",
       "Name": "Virtual button 12",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "13": {
       "Editable": "yes",
       "Name": "Virtual button 13",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "14": {
       "Editable": "yes",
       "Name": "Virtual button 14",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "15": {
       "Editable": "yes",
       "Name": "Virtual button 15",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "16": {
       "Editable": "yes",
       "Name": "Virtual button 16",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "17": {
       "Editable": "yes",
       "Name": "Virtual button 17",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "18": {
       "Editable": "yes",
       "Name": "Virtual button 18",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "19": {
       "Editable": "yes",
       "Name": "Virtual button 19",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "20": {
       "Editable": "yes",
       "Name": "Virtual button 20",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "21": {
       "Editable": "yes",
       "Name": "Virtual button 21",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "22": {
       "Editable": "yes",
       "Name": "Virtual button 22",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "23": {
       "Editable": "yes",
       "Name": "Virtual button 23",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "24": {
       "Editable": "yes",
       "Name": "Virtual button 24",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "25": {
       "Editable": "yes",
       "Name": "Virtual button 25",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "26": {
       "Editable": "yes",
       "Name": "Virtual button 26",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "27": {
       "Editable": "yes",
       "Name": "Virtual button 27",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "28": {
       "Editable": "yes",
       "Name": "Virtual button 28",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "29": {
       "Editable": "yes",
       "Name": "Virtual button 29",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "30": {
       "Editable": "yes",
       "Name": "Virtual button 30",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "31": {
       "Editable": "yes",
       "Name": "Virtual button 31",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "32": {
       "Editable": "yes",
       "Name": "Virtual button 32",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "34": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Subdevice": "no",
       "Type": "Temperature"
     },
     "35": {
       "Name": "Heater",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "36": {
       "Name": "Boost",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "37": {
       "Name": "Pump",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "38": {
       "Name": "Cooler",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "39": {
       "Name": "Alarm 1",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     },
     "40": {
       "Name": "Alarm 2",
-      "Subdevice": "no",
       "Type": "ThermostatChannel"
     }
   },

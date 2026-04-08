@@ -3,97 +3,81 @@
     "01": {
       "Editable": "yes",
       "Name": "Alarm 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Alarm 2",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Alarm 3",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Alarm 4",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Alarm 5",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Alarm 6",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "07": {
       "Editable": "yes",
       "Name": "Alarm 7",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Alarm 8",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "09": {
       "Editable": "yes",
       "Name": "Alarm 9",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "10": {
       "Editable": "yes",
       "Name": "Alarm 10",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "11": {
       "Editable": "yes",
       "Name": "Alarm 11",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "12": {
       "Editable": "yes",
       "Name": "Alarm 12",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "13": {
       "Editable": "yes",
       "Name": "Alarm 13",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "14": {
       "Editable": "yes",
       "Name": "Alarm 14",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "15": {
       "Editable": "yes",
       "Name": "Alarm 15",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "16": {
       "Editable": "yes",
       "Name": "Alarm 16",
-      "Subdevice": "no",
       "Type": "Button"
     }
   },

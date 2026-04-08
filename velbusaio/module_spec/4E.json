@@ -51,145 +51,121 @@
     "09": {
       "Editable": "yes",
       "Name": "Counter Alarm 9",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "10": {
       "Editable": "yes",
       "Name": "Counter Alarm 10",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "11": {
       "Editable": "yes",
       "Name": "Counter Alarm 11",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "12": {
       "Editable": "yes",
       "Name": "Counter Alarm 12",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "13": {
       "Editable": "yes",
       "Name": "Counter Alarm 13",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "14": {
       "Editable": "yes",
       "Name": "Counter Alarm 14",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "15": {
       "Editable": "yes",
       "Name": "Counter Alarm 15",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "16": {
       "Editable": "yes",
       "Name": "Counter Alarm 16",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "17": {
       "Editable": "yes",
       "Name": "Counter Alarm 17",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "18": {
       "Editable": "yes",
       "Name": "Counter Alarm 18",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "19": {
       "Editable": "yes",
       "Name": "Counter Alarm 19",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "20": {
       "Editable": "yes",
       "Name": "Counter Alarm 20",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "21": {
       "Editable": "yes",
       "Name": "Counter Alarm 21",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "22": {
       "Editable": "yes",
       "Name": "Counter Alarm 22",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "23": {
       "Editable": "yes",
       "Name": "Counter Alarm 23",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "24": {
       "Editable": "yes",
       "Name": "Counter Alarm 24",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "25": {
       "Editable": "yes",
       "Name": "Counter Alarm 25",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "26": {
       "Editable": "yes",
       "Name": "Counter Alarm 26",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "27": {
       "Editable": "yes",
       "Name": "Counter Alarm 27",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "28": {
       "Editable": "yes",
       "Name": "Counter Alarm 28",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "29": {
       "Editable": "yes",
       "Name": "Counter Alarm 29",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "30": {
       "Editable": "yes",
       "Name": "Counter Alarm 30",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "31": {
       "Editable": "yes",
       "Name": "Counter Alarm 31",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "32": {
       "Editable": "yes",
       "Name": "Counter Alarm 32",
-      "Subdevice": "no",
       "Type": "Button"
     }
   },

@@ -3,49 +3,41 @@
     "01": {
       "Editable": "yes",
       "Name": "Input 1",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "02": {
       "Editable": "yes",
       "Name": "Input 2",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "03": {
       "Editable": "yes",
       "Name": "Input 3",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "04": {
       "Editable": "yes",
       "Name": "Input 4",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "05": {
       "Editable": "yes",
       "Name": "Input 5",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "06": {
       "Editable": "yes",
       "Name": "Input 6",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "07": {
       "Editable": "yes",
       "Name": "Input 7",
-      "Subdevice": "no",
       "Type": "ButtonCounter"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button",
-      "Subdevice": "no",
       "Type": "Button"
     }
   },

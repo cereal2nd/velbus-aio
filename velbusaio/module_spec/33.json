@@ -2,46 +2,38 @@
   "Channels": {
     "01": {
       "Name": "Motion 1",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "02": {
       "Name": "Motion 2",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "03": {
       "Editable": "no",
       "Name": "Bell 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "04": {
       "Editable": "no",
       "Name": "Bell 2",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "05": {
       "Name": "Door 1",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "06": {
       "Name": "Door 2",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 1",
-      "Subdevice": "no",
       "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 2",
-      "Subdevice": "no",
       "Type": "Button"
     }
   },

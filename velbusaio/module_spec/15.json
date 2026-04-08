@@ -3,7 +3,6 @@
     "01": {
       "Editable": "yes",
       "Name": "Dimmer",
-      "Subdevice": "no",
       "Type": "Dimmer"
     }
   },

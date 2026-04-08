@@ -10,7 +10,6 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind",
-      "Subdevice": "no",
       "Type": "Blind"
     }
   },

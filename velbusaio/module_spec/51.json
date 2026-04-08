@@ -3,37 +3,30 @@
   "Channels": {
     "01": {
       "Name": "Dark output",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "02": {
       "Name": "Light output",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "03": {
       "Name": "Motion 1 output",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "04": {
       "Name": "Light depending motion 1 output",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "05": {
       "Name": "Motion 2 output",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "06": {
       "Name": "Light depending motion 2 output",
-      "Subdevice": "no",
       "Type": "Sensor"
     },
     "07": {
       "Name": "Absence output",
-      "Subdevice": "no",
       "Type": "Sensor"
     }
   },
