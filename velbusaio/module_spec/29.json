@@ -27,6 +27,7 @@
       "Type": "Relay"
     },
     "06": {
+      "Editable": "no",
       "Name": "Input button",
       "Type": "Button"
     }

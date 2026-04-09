@@ -43,6 +43,7 @@
       "Type": "Sensor"
     },
     "10": {
+      "Editable": "no",
       "Name": "Temperature",
       "Type": "Temperature"
     },
