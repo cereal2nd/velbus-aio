@@ -3,41 +3,34 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Push button 5",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Push button 6",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     }
   },
-  "Type": "VMB6IN",
   "Memory": {
     "Channels": {
       "01": "0000-000E",
@@ -47,5 +40,6 @@
       "05": "0040-004E",
       "06": "0050-005E"
     }
-  }
+  },
+  "Type": "VMB6IN"
 }

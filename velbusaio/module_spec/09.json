@@ -3,21 +3,21 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind 1",
-      "Type": "Blind",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Blind"
     },
     "02": {
       "Editable": "yes",
       "Name": "Blind 2",
-      "Type": "Blind",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Blind"
     }
   },
-  "Type": "VMB2BL",
   "Memory": {
     "Channels": {
-      "01": "0070-007F",
-      "02": "00F0-00FF"
+      "01": "00F0-00FF",
+      "02": "01F0-01FF"
     }
-  }
+  },
+  "Type": "VMB2BL"
 }

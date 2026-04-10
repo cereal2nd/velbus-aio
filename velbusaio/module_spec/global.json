@@ -1,16 +1,16 @@
 {
   "Properties": {
+    "bus_error_off": {
+      "Name": "Bus Error Off",
+      "Type": "BusErrorOff"
+    },
     "bus_error_rx": {
-      "Type": "BusErrorRx",
-      "Name": "Bus Error Receive"
+      "Name": "Bus Error Receive",
+      "Type": "BusErrorRx"
     },
     "bus_error_tx": {
-      "Type": "BusErrorTx",
-      "Name": "Bus Error Transmit"
-    },
-    "bus_error_off": {
-      "Type": "BusErrorOff",
-      "Name": "Bus Error Off"
+      "Name": "Bus Error Transmit",
+      "Type": "BusErrorTx"
     }
   }
 }

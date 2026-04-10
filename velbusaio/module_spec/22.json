@@ -3,50 +3,42 @@
     "01": {
       "Editable": "yes",
       "Name": "Input 1",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "02": {
       "Editable": "yes",
       "Name": "Input 2",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "03": {
       "Editable": "yes",
       "Name": "Input 3",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "04": {
       "Editable": "yes",
       "Name": "Input 4",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "05": {
       "Editable": "yes",
       "Name": "Input 5",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "06": {
       "Editable": "yes",
       "Name": "Input 6",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "07": {
       "Editable": "yes",
       "Name": "Input 7",
-      "Type": "ButtonCounter",
-      "Subdevice": "no"
+      "Type": "ButtonCounter"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     }
   },
   "Memory": {
@@ -128,7 +120,6 @@
         }
       }
     },
-    "ModuleName": "03AC-03EB",
     "Channels": {
       "01": "0000-000F",
       "02": "0010-001F",
@@ -138,7 +129,8 @@
       "06": "0050-005F",
       "07": "0060-006F",
       "08": "0070-007F"
-    }
+    },
+    "ModuleName": "03AC-03EB"
   },
   "Type": "VMB7IN"
 }

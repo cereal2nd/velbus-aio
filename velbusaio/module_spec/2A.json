@@ -1,37 +1,43 @@
 {
   "AllChannelStatus": "FF",
   "Channels": {
-    "01": { "Name": "Dark output", "Type": "Sensor", "Subdevice": "no" },
-    "02": { "Name": "Light output", "Type": "Sensor", "Subdevice": "no" },
-    "03": { "Name": "Motion output 1", "Type": "Sensor", "Subdevice": "no" },
+    "01": {
+      "Name": "Dark output",
+      "Type": "Sensor"
+    },
+    "02": {
+      "Name": "Light output",
+      "Type": "Sensor"
+    },
+    "03": {
+      "Name": "Motion output 1",
+      "Type": "Sensor"
+    },
     "04": {
       "Name": "Motion output 1 (LD)",
-      "Type": "Sensor",
-      "Subdevice": "no"
+      "Type": "Sensor"
     },
-    "05": { "Name": "Motion output 2", "Type": "Sensor", "Subdevice": "no" },
+    "05": {
+      "Name": "Motion output 2",
+      "Type": "Sensor"
+    },
     "06": {
       "Name": "Motion output 2 (LD)",
-      "Type": "Sensor",
-      "Subdevice": "no"
+      "Type": "Sensor"
     },
-    "07": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" },
-    "09": {
-      "Editable": "yes",
-      "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
+    "07": {
+      "Name": "Absence output",
+      "Type": "Sensor"
     }
   },
-  "TemperatureChannel": "09",
-  "Type": "VMBPIRM",
   "Memory": {
-    "ModuleName": "00B0-00EF",
-    "Channels": {
-      "09": "0080-008F"
-    }
+    "ModuleName": "00B0-00EF"
   },
   "Properties": {
-    "light_value": { "Type": "LightValue", "Name": "Light value" }
-  }
+    "light_value": {
+      "Name": "Light value",
+      "Type": "LightValue"
+    }
+  },
+  "Type": "VMBPIRM"
 }

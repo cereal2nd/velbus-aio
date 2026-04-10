@@ -3,21 +3,20 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind",
-      "Type": "Blind",
-      "Subdevice": "no"
+      "Type": "Blind"
     }
   },
   "Memory": {
-    "ModuleName": "004C-008B",
     "Channels": {
       "01": "0000-000F"
-    }
+    },
+    "ModuleName": "004C-008B"
   },
-  "Type": "VMB1BLS",
   "Properties": {
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "Type": "VMB1BLS"
 }

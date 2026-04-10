@@ -1,31 +1,47 @@
 {
   "AllChannelStatus": "FF",
   "Channels": {
-    "01": { "Name": "Dark output", "Type": "Sensor", "Subdevice": "no" },
-    "02": { "Name": "Light output", "Type": "Sensor", "Subdevice": "no" },
-    "03": { "Name": "Motion 1 output", "Type": "Sensor", "Subdevice": "no" },
+    "01": {
+      "Name": "Dark output",
+      "Type": "Sensor"
+    },
+    "02": {
+      "Name": "Light output",
+      "Type": "Sensor"
+    },
+    "03": {
+      "Name": "Motion 1 output",
+      "Type": "Sensor"
+    },
     "04": {
       "Name": "Light depending motion 1 output",
-      "Type": "Sensor",
-      "Subdevice": "no"
+      "Type": "Sensor"
     },
-    "05": { "Name": "Motion 2 output", "Type": "Sensor", "Subdevice": "no" },
+    "05": {
+      "Name": "Motion 2 output",
+      "Type": "Sensor"
+    },
     "06": {
       "Name": "Light depending motion 2 output",
-      "Type": "Sensor",
-      "Subdevice": "no"
+      "Type": "Sensor"
     },
-    "07": { "Name": "Absence output", "Type": "Sensor", "Subdevice": "no" }
+    "07": {
+      "Name": "Absence output",
+      "Type": "Sensor"
+    }
   },
   "Memory": {
     "ModuleName": "03BC-03FB"
   },
-  "Type": "VMBEL4-20",
   "Properties": {
-    "light_value": { "Type": "LightValue", "Name": "Light value" },
+    "light_value": {
+      "Name": "Light value",
+      "Type": "LightValue"
+    },
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "Type": "VMBEL4-20"
 }

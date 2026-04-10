@@ -3,54 +3,49 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay 1",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "02": {
       "Editable": "yes",
       "Name": "Relay 2",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "03": {
       "Editable": "yes",
       "Name": "Relay 3",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "04": {
       "Editable": "yes",
       "Name": "Relay 4",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual relay 5",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "06": {
       "Editable": "yes",
       "Name": "Virtual relay 6",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "07": {
       "Editable": "yes",
       "Name": "Virtual relay 7",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual relay 8",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     }
   },
   "Memory": {
-    "ModuleName": "07BC-07FB",
     "Channels": {
       "01": "0000-000F",
       "02": "0014-0023",
@@ -60,7 +55,8 @@
       "06": "0064-0073",
       "07": "0078-0087",
       "08": "008C-009B"
-    }
+    },
+    "ModuleName": "07BC-07FB"
   },
   "Type": "VMB4RYLD-20"
 }

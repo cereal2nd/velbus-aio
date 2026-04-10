@@ -3,36 +3,32 @@
     "01": {
       "Editable": "yes",
       "Name": "RF Channel 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "RF Channel 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "RF Channel 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "RF Channel 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     }
   },
   "Memory": {
-    "ModuleName": "02C0-02FF",
     "Channels": {
       "01": "0000-000F",
       "02": "0100-010F",
       "03": "0200-020F",
       "04": "0300-030F"
-    }
+    },
+    "ModuleName": "02C0-02FF"
   },
   "Type": "VMB4RF"
 }
