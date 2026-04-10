@@ -3,14 +3,13 @@
     "01": {
       "Editable": "yes",
       "Name": "Dimmer",
-      "Type": "Dimmer",
-      "Subdevice": "no"
+      "Type": "Dimmer"
     }
   },
-  "Type": "VMBDME",
   "Memory": {
     "Channels": {
       "01": "00F0-00FF"
     }
-  }
+  },
+  "Type": "VMBDME"
 }

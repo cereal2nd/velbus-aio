@@ -3,42 +3,36 @@
     "01": {
       "Editable": "yes",
       "Name": "Relay",
-      "Type": "Relay",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Relay"
     },
     "02": {
       "Editable": "yes",
       "Name": "Virtual relay 1",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "03": {
       "Editable": "yes",
       "Name": "Virtual relay 2",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "04": {
       "Editable": "yes",
       "Name": "Virtual relay 3",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "05": {
       "Editable": "yes",
       "Name": "Virtual relay 4",
-      "Type": "Relay",
-      "Subdevice": "no"
+      "Type": "Relay"
     },
     "06": {
       "Editable": "yes",
       "Name": "Input button",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     }
   },
   "Memory": {
-    "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8",
     "Channels": {
       "01": "00F0-00FF",
       "02": "01F0-01FF",
@@ -46,7 +40,8 @@
       "04": "03F0-03FF",
       "05": "04F0-04FF",
       "06": "00EA-00EF;01EA-01EF;02EA-02ED"
-    }
+    },
+    "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8"
   },
   "Type": "VMB1RYS"
 }

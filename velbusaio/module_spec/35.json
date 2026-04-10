@@ -90,7 +90,6 @@
     }
   },
   "Memory": {
-    "ModuleName": "06C0-06FF",
     "Channels": {
       "01": "001C-002B",
       "02": "0030-003F",
@@ -102,15 +101,16 @@
       "08": "00A8-00B7",
       "09": "0398-03A7",
       "18": "03CC-03DB"
+    },
+    "ModuleName": "06C0-06FF"
+  },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "TemperatureChannel": "09",
   "ThermostatAddr": "0",
-  "Type": "VMBEL2",
-  "Properties": {
-    "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
-    }
-  }
+  "Type": "VMBEL2"
 }

@@ -3,198 +3,351 @@
     "01": {
       "Editable": "yes",
       "Name": "Input 1",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "02": {
       "Editable": "yes",
       "Name": "Input 2",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "03": {
       "Editable": "yes",
       "Name": "Input 3",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "04": {
       "Editable": "yes",
       "Name": "Input 4",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "05": {
       "Editable": "yes",
       "Name": "Input 5",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "06": {
       "Editable": "yes",
       "Name": "Input 6",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "07": {
       "Editable": "yes",
       "Name": "Input 7",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "08": {
       "Editable": "yes",
       "Name": "Input 8",
-      "Type": "ButtonCounter",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "ButtonCounter"
     },
     "09": {
       "Editable": "yes",
       "Name": "Counter Alarm 9",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "10": {
       "Editable": "yes",
       "Name": "Counter Alarm 10",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "11": {
       "Editable": "yes",
       "Name": "Counter Alarm 11",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "12": {
       "Editable": "yes",
       "Name": "Counter Alarm 12",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "13": {
       "Editable": "yes",
       "Name": "Counter Alarm 13",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "14": {
       "Editable": "yes",
       "Name": "Counter Alarm 14",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "15": {
       "Editable": "yes",
       "Name": "Counter Alarm 15",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "16": {
       "Editable": "yes",
       "Name": "Counter Alarm 16",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "17": {
       "Editable": "yes",
       "Name": "Counter Alarm 17",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "18": {
       "Editable": "yes",
       "Name": "Counter Alarm 18",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "19": {
       "Editable": "yes",
       "Name": "Counter Alarm 19",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "20": {
       "Editable": "yes",
       "Name": "Counter Alarm 20",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "21": {
       "Editable": "yes",
       "Name": "Counter Alarm 21",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "22": {
       "Editable": "yes",
       "Name": "Counter Alarm 22",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "23": {
       "Editable": "yes",
       "Name": "Counter Alarm 23",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "24": {
       "Editable": "yes",
       "Name": "Counter Alarm 24",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "25": {
       "Editable": "yes",
       "Name": "Counter Alarm 25",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "26": {
       "Editable": "yes",
       "Name": "Counter Alarm 26",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "27": {
       "Editable": "yes",
       "Name": "Counter Alarm 27",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "28": {
       "Editable": "yes",
       "Name": "Counter Alarm 28",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "29": {
       "Editable": "yes",
       "Name": "Counter Alarm 29",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "30": {
       "Editable": "yes",
       "Name": "Counter Alarm 30",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "31": {
       "Editable": "yes",
       "Name": "Counter Alarm 31",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "32": {
       "Editable": "yes",
       "Name": "Counter Alarm 32",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     }
   },
   "Memory": {
-    "ModuleName": "07BC-07FB",
+    "Address": {
+      "02EA": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "01",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "02EE": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "02",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "02F2": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "03",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "02F6": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "04",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "02FA": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "05",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "02FE": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "06",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "0302": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "07",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      },
+      "0306": {
+        "Match": {
+          "1": {
+            "%........": {
+              "Channel": "08",
+              "SubName": "Unit"
+            },
+            "%00000000": {
+              "Value": "reserved"
+            },
+            "%00000001": {
+              "Value": "liter"
+            },
+            "%00000010": {
+              "Value": "m3"
+            },
+            "%00000011": {
+              "Value": "kWh"
+            }
+          }
+        }
+      }
+    },
     "Channels": {
       "01": "0000-000F",
       "02": "0014-0023",
@@ -229,184 +382,7 @@
       "31": "0248-0257",
       "32": "0258-0267"
     },
-    "Address": {
-      "02EA": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "01",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "02EE": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "02",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "02F2": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "03",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "02F6": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "04",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "02FA": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "05",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "02FE": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "06",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "0302": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "07",
-              "SubName": "Unit"
-            }
-          }
-        }
-      },
-      "0306": {
-        "Match": {
-          "1": {
-            "%00000000": {
-              "Value": "reserved"
-            },
-            "%00000001": {
-              "Value": "liter"
-            },
-            "%00000010": {
-              "Value": "m3"
-            },
-            "%00000011": {
-              "Value": "kWh"
-            },
-            "%........": {
-              "Channel": "08",
-              "SubName": "Unit"
-            }
-          }
-        }
-      }
-    }
+    "ModuleName": "07BC-07FB"
   },
   "Type": "VMB8IN-20"
 }

@@ -4,44 +4,37 @@
     "01": {
       "Editable": "yes",
       "Name": "Push button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "02": {
       "Editable": "yes",
       "Name": "Push button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "03": {
       "Editable": "yes",
       "Name": "Push button 3",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "04": {
       "Editable": "yes",
       "Name": "Push button 4",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "05": {
       "Editable": "yes",
       "Name": "Push button 5",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "06": {
       "Editable": "yes",
       "Name": "Push button 6",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "07": {
       "Editable": "yes",
       "Name": "Push button 7",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "08": {
       "Editable": "yes",
@@ -171,15 +164,10 @@
     "33": {
       "Editable": "yes",
       "Name": "Temperature",
-      "Type": "Temperature",
-      "Subdevice": "no"
+      "Type": "Temperature"
     }
   },
-  "TemperatureChannel": "33",
-  "ThermostatAddr": "3",
-  "Type": "VMBELO",
   "Memory": {
-    "ModuleName": "0FA8-0FE7",
     "Channels": {
       "01": "001C-002B",
       "02": "0030-003F",
@@ -215,16 +203,20 @@
       "32": "0288-0297",
       "33": "05E4-05F3",
       "42": "0608-0617"
-    }
+    },
+    "ModuleName": "0FA8-0FE7"
   },
   "Properties": {
     "memo_text": {
-      "Type": "MemoText",
-      "Name": "Memo Text"
+      "Name": "Memo Text",
+      "Type": "MemoText"
     },
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "TemperatureChannel": "33",
+  "ThermostatAddr": "3",
+  "Type": "VMBELO"
 }

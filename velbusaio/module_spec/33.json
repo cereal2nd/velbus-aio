@@ -1,42 +1,48 @@
 {
   "Channels": {
-    "01": { "Name": "Motion 1", "Type": "Sensor", "Subdevice": "no" },
-    "02": { "Name": "Motion 2", "Type": "Sensor", "Subdevice": "no" },
+    "01": {
+      "Name": "Motion 1",
+      "Type": "Sensor"
+    },
+    "02": {
+      "Name": "Motion 2",
+      "Type": "Sensor"
+    },
     "03": {
       "Editable": "no",
       "Name": "Bell 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "04": {
       "Editable": "no",
       "Name": "Bell 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
-    "05": { "Name": "Door 1", "Type": "Sensor", "Subdevice": "no" },
-    "06": { "Name": "Door 2", "Type": "Sensor", "Subdevice": "no" },
+    "05": {
+      "Name": "Door 1",
+      "Type": "Sensor"
+    },
+    "06": {
+      "Name": "Door 2",
+      "Type": "Sensor"
+    },
     "07": {
       "Editable": "yes",
       "Name": "Virtual button 1",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     },
     "08": {
       "Editable": "yes",
       "Name": "Virtual button 2",
-      "Type": "Button",
-      "Subdevice": "no"
+      "Type": "Button"
     }
   },
   "Memory": {
-    "ModuleName": "00B0-00EF",
     "Channels": {
-      "01": "0000-000F",
-      "02": "0010-001F",
       "07": "0000-000F",
       "08": "0010-001F"
-    }
+    },
+    "ModuleName": "00B0-00EF"
   },
   "Type": "VMBVP01"
 }

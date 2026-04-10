@@ -1,3 +1,6 @@
 {
+  "Memory": {
+    "ModuleName": "0000-003F"
+  },
   "Type": "VMCM3"
 }

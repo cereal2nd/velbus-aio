@@ -15,50 +15,50 @@
     "01": {
       "Editable": "yes",
       "Name": "Alarm 1",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "02": {
       "Editable": "yes",
       "Name": "Alarm 2",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "03": {
       "Editable": "yes",
       "Name": "Alarm 3",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "04": {
       "Editable": "yes",
       "Name": "Alarm 4",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "05": {
       "Editable": "yes",
       "Name": "Alarm 5",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "06": {
       "Editable": "yes",
       "Name": "Alarm 6",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "07": {
       "Editable": "yes",
       "Name": "Alarm 7",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "08": {
       "Editable": "yes",
       "Name": "Alarm 8",
-      "Type": "Sensor",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Sensor"
     },
     "09": {
       "Editable": "yes",
@@ -82,93 +82,6 @@
     }
   },
   "Memory": {
-    "Address": {
-      "02E0": {
-        "Unit": "09:0:Start"
-      },
-      "02E1": {
-        "Unit": "09:1"
-      },
-      "02E2": {
-        "Unit": "09:2"
-      },
-      "02E3": {
-        "Unit": "09:3"
-      },
-      "02E4": {
-        "Unit": "09:4"
-      },
-      "02E5": {
-        "Unit": "09:5"
-      },
-      "02E6": {
-        "Unit": "09:7:Save"
-      },
-      "0412": {
-        "Unit": "10:0:Start"
-      },
-      "0413": {
-        "Unit": "10:1"
-      },
-      "0414": {
-        "Unit": "10:2"
-      },
-      "0415": {
-        "Unit": "10:3"
-      },
-      "0416": {
-        "Unit": "10:4"
-      },
-      "0417": {
-        "Unit": "10:5"
-      },
-      "0418": {
-        "Unit": "10:7:Save"
-      },
-      "0544": {
-        "Unit": "11:0:Start"
-      },
-      "0545": {
-        "Unit": "11:1"
-      },
-      "0546": {
-        "Unit": "11:2"
-      },
-      "0547": {
-        "Unit": "11:3"
-      },
-      "0548": {
-        "Unit": "11:4"
-      },
-      "0549": {
-        "Unit": "11:5"
-      },
-      "054A": {
-        "Unit": "11:7:Save"
-      },
-      "0676": {
-        "Unit": "12:0:Start"
-      },
-      "0677": {
-        "Unit": "12:1"
-      },
-      "0678": {
-        "Unit": "12:2"
-      },
-      "0679": {
-        "Unit": "12:3"
-      },
-      "067A": {
-        "Unit": "12:4"
-      },
-      "067B": {
-        "Unit": "12:5"
-      },
-      "067C": {
-        "Unit": "12:7:Save"
-      }
-    },
-    "ModuleName": "0000-003F",
     "Channels": {
       "01": "0082-0091",
       "02": "0092-00A1",
@@ -182,13 +95,14 @@
       "10": "03B0-03BF",
       "11": "04E2-04F1",
       "12": "0614-0623"
-    }
+    },
+    "ModuleName": "0000-003F"
   },
-  "Type": "VMB4AN",
   "Properties": {
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "Type": "VMB4AN"
 }

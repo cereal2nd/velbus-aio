@@ -3,22 +3,22 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind 1",
-      "Type": "Blind",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Blind"
     },
     "02": {
       "Editable": "yes",
       "Name": "Blind 2",
-      "Type": "Blind",
-      "Subdevice": "yes"
+      "Subdevice": "yes",
+      "Type": "Blind"
     }
   },
   "Memory": {
-    "ModuleName": "07BC-07FB",
     "Channels": {
       "01": "0000-000F",
       "02": "001C-002B"
-    }
+    },
+    "ModuleName": "07BC-07FB"
   },
   "Type": "VMB2BLE-20"
 }

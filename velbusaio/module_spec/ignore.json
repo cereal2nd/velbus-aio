@@ -1,10 +1,10 @@
 {
-  "FD": {
-    "Name": "COMMAND_READ_DATA_FROM_MEMEORY",
-    "Prio": "Low"
-  },
   "C9": {
     "Name": "COMMAND_READ_MEMORY_BLOCK",
+    "Prio": "Low"
+  },
+  "CA": {
+    "Name": "COMMAND_WRITE_MEMORY_BLOCK",
     "Prio": "Low"
   },
   "CB": {
@@ -15,8 +15,8 @@
     "Name": "COMMAND_WRITE_DATA_TO_MEMORY",
     "Prio": "Low"
   },
-  "CA": {
-    "Name": "COMMAND_WRITE_MEMORY_BLOCK",
+  "FD": {
+    "Name": "COMMAND_READ_DATA_FROM_MEMEORY",
     "Prio": "Low"
   }
 }

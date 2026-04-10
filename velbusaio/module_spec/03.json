@@ -10,14 +10,13 @@
     "01": {
       "Editable": "yes",
       "Name": "Blind",
-      "Type": "Blind",
-      "Subdevice": "no"
+      "Type": "Blind"
     }
   },
-  "Type": "VMB1BL",
   "Memory": {
     "Channels": {
       "01": "0070-007F"
     }
-  }
+  },
+  "Type": "VMB1BL"
 }

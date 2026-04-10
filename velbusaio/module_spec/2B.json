@@ -32,15 +32,15 @@
   "Memory": {
     "ModuleName": "00B0-00EF"
   },
-  "Type": "VMBPIRC",
   "Properties": {
     "light_value": {
-      "Type": "LightValue",
-      "Name": "Light value"
+      "Name": "Light value",
+      "Type": "LightValue"
     },
     "selected_program": {
-      "Type": "SelectedProgram",
-      "Name": "Selected program"
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
-  }
+  },
+  "Type": "VMBPIRC"
 }
