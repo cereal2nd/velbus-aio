@@ -407,13 +407,21 @@ class ButtonCounter(Button):
 
     def get_categories(self) -> list[str]:
         """Return the categories for this channel."""
-        if self._counter is not None or self._power is not None or self._energy is not None:
+        if (
+            self._counter is not None
+            or self._power is not None
+            or self._energy is not None
+        ):
             return ["sensor"]
         return ["binary_sensor", "button"]
 
     def is_counter_channel(self) -> bool:
         """Return if this channel is a counter channel."""
-        if self._counter is not None or self._power is not None or self._energy is not None:
+        if (
+            self._counter is not None
+            or self._power is not None
+            or self._energy is not None
+        ):
             return True
         return False
 
@@ -428,7 +436,11 @@ class ButtonCounter(Button):
         """Return the accumulated energy in kWh, or None if not yet received."""
         if self._energy is not None:
             return round(self._energy / 1000, 3)
-        if self._counter is not None and self._pulses and self._Unit == ENERGY_KILO_WATT_HOUR:
+        if (
+            self._counter is not None
+            and self._pulses
+            and self._Unit == ENERGY_KILO_WATT_HOUR
+        ):
             return round(self._counter / self._pulses, 2)
         return None
 
