@@ -1230,7 +1230,7 @@ class Module:
                 continue
             self._properties[prop] = cls(
                 module=self,
-                name=prop,
+                name=prop_data.get("Name", prop),
                 writer=self._writer,
             )
 
