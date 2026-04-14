@@ -402,13 +402,13 @@ class ButtonCounter(Button):
 
     def get_categories(self) -> list[str]:
         """Return the categories for this channel."""
-        if self._counter:
+        if self._counter or self._power is not None or self._energy is not None:
             return ["sensor"]
         return ["binary_sensor", "button"]
 
     def is_counter_channel(self) -> bool:
         """Return if this channel is a counter channel."""
-        if self._counter:
+        if self._counter or self._power is not None or self._energy is not None:
             return True
         return False
 
