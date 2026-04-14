@@ -967,14 +967,17 @@ class Module:
         # load the channel names
         if "channels" in cache:
             for num, chan in cache["channels"].items():
-                self._channels[int(num)].set_name(chan["name"])
+                chan_num = self._translate_channel_name(num)
+                if chan_num not in self._channels:
+                    continue
+                self._channels[chan_num].set_name(chan["name"])
                 if "subdevice" in chan:
-                    self._channels[int(num)].set_sub_device(chan["subdevice"])
+                    self._channels[chan_num].set_sub_device(chan["subdevice"])
                 else:
-                    self._channels[int(num)].set_sub_device(False)
+                    self._channels[chan_num].set_sub_device(False)
                 if "Unit" in chan:
-                    self._channels[int(num)].set_unit(chan["Unit"])
-                self._channels[int(num)].set_loaded(True)
+                    self._channels[chan_num].set_unit(chan["Unit"])
+                self._channels[chan_num].set_loaded(True)
         else:
             await self._request_channel_name()
         # load the module specific stuff
@@ -1254,9 +1257,10 @@ class Module:
                 )
                 continue
 
-            self._channels[int(chan)] = cls(
+            chan_num = self._translate_channel_name(chan)
+            self._channels[chan_num] = cls(
                 module=self,
-                num=int(chan),
+                num=chan_num,
                 name=chan_data["Name"],
                 nameEditable=edit,
                 subDevice=sub,
@@ -1267,9 +1271,9 @@ class Module:
                 if "Thermostat" in self._data or (
                     "ThermostatAddr" in self._data and self._data["ThermostatAddr"] != 0
                 ):
-                    await self._update_channel(int(chan), {"thermostat": True})
+                    await self._update_channel(chan_num, {"thermostat": True})
             if chan_data["Type"] == "Dimmer" and "sliderScale" in self._data:
-                self._channels[int(chan)].slider_scale = self._data["sliderScale"]
+                self._channels[chan_num].slider_scale = self._data["sliderScale"]
 
 
 class VmbDali(Module):
