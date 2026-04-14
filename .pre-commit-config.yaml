@@ -72,7 +72,7 @@ repos:
         pass_filenames: false
         always_run: true
       - id: validate-module-specs
-        name: Validate module specs and MODULE_DIRECTORY consistency
+        name: Validate module specs (MODULE_DIRECTORY coverage, editable channels, sorted JSON keys)
         entry: python3 scripts/parse_specs.py
         language: system
         pass_filenames: false
