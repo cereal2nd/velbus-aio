@@ -56,6 +56,33 @@ def locate_module_spec_dir(start: Path | None = None) -> Path | None:
     return None
 
 
+def _unsorted_keys(data: Any, path: str = "") -> list[str]:
+    """Recursively find dict keys that are not sorted alphabetically."""
+    errors: list[str] = []
+    if isinstance(data, dict):
+        keys = list(data.keys())
+        if keys != sorted(keys):
+            errors.append(f"  at '{path}': {keys} (expected {sorted(keys)})")
+        for key, value in data.items():
+            errors.extend(_unsorted_keys(value, f"{path}.{key}" if path else key))
+    elif isinstance(data, list):
+        for i, item in enumerate(data):
+            errors.extend(_unsorted_keys(item, f"{path}[{i}]"))
+    return errors
+
+
+def check_json_sorted(path: Path) -> list[str]:
+    """Check that all JSON keys are sorted alphabetically at every level."""
+    try:
+        spec = load_json(path)
+    except Exception as exc:
+        return [f"{path}: failed to load JSON: {exc}"]
+    issues = _unsorted_keys(spec)
+    if issues:
+        return [f"{path.name}: keys not sorted:"] + issues
+    return []
+
+
 def validate_spec(path: Path) -> list[str]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -199,8 +226,8 @@ def main(argv: list[str] | None = None) -> int:
     # Validate individual spec files
     print(f"\nValidating {len(spec_files)} module spec files...")
     for p in spec_files:
-        errs = validate_spec(p)
-        all_errors.extend(errs)
+        all_errors.extend(validate_spec(p))
+        all_errors.extend(check_json_sorted(p))
 
     if all_errors:
         print("\nModule spec validation failed. Problems found:")
@@ -211,6 +238,7 @@ def main(argv: list[str] | None = None) -> int:
     print("\nModule spec validation passed:")
     print(" - All modules in MODULE_DIRECTORY have spec files")
     print(" - All editable channels have memory locations")
+    print(" - All JSON files have alphabetically sorted keys")
     return 0
 
 
