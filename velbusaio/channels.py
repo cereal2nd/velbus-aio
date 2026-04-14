@@ -237,6 +237,11 @@ class Channel(BaseItem):
         """Return the sensor type."""
         return None
 
+    @property
+    def energy(self) -> float | None:
+        """Return the accumulated energy in kWh, or None if not applicable."""
+        return None
+
 
 class Blind(Channel):
     """A blind channel."""
@@ -418,9 +423,18 @@ class ButtonCounter(Button):
             return "counter"
         return None
 
+    @property
+    def energy(self) -> float | None:
+        """Return the accumulated energy in kWh, or None if not yet received."""
+        if self._energy is not None:
+            return round(self._energy / 1000, 3)
+        if self._counter is not None and self._pulses:
+            return round(self._counter / self._pulses, 2)
+        return None
+
     def get_state(self) -> int:
         """Return the current state of the counter."""
-        if self._energy:
+        if self._energy is not None:
             return self._energy
         # if we don't know the delay
         # or we don't know the unit
