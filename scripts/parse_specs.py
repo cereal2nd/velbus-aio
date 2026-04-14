@@ -79,7 +79,7 @@ def check_json_sorted(path: Path) -> list[str]:
         return [f"{path}: failed to load JSON: {exc}"]
     issues = _unsorted_keys(spec)
     if issues:
-        return [f"{path.name}: keys not sorted:"] + issues
+        return [f"{path}: keys not sorted:"] + issues
     return []
 
 
