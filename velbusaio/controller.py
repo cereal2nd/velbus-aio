@@ -14,8 +14,7 @@ import time
 import typing as t
 from urllib.parse import urlparse
 
-import serial
-import serial_asyncio_fast
+import serialx
 
 from velbusaio.channels import (
     Blind,
@@ -254,18 +253,30 @@ class Velbus:
         """Connect to the bus and load all the data."""
         await self._handler.read_protocol_data()
         # connect to the bus
-        if ":" in self._destination:
-            # tcp/ip combination
-            if not re.search(r"^[A-Za-z0-9+.\-]+://", self._destination):
-                # if no scheme, then add the tcp://
-                self._destination = f"tcp://{self._destination}"
-            parts = urlparse(self._destination)
+        destination = self._destination
+        has_scheme = bool(re.search(r"^[A-Za-z0-9+.\-]+://", destination))
+        is_bare_host_port = bool(re.search(r"^[^/]+:\d+$", destination))
+
+        tcp_destination: str | None = None
+        if has_scheme:
+            parts = urlparse(destination)
+            if parts.scheme in {"tcp", "tls"}:
+                tcp_destination = destination
+        elif is_bare_host_port:
+            tcp_destination = f"tcp://{destination}"
+
+        if tcp_destination is not None:
+            parts = urlparse(tcp_destination)
             if parts.scheme == "tls":
                 ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
                 ctx.check_hostname = False
                 ctx.verify_mode = ssl.CERT_NONE
             else:
                 ctx = None
+
+            if parts.hostname is None or parts.port is None:
+                raise VelbusConnectionFailed
+
             try:
                 (
                     _transport,
@@ -276,28 +287,28 @@ class Velbus:
                     port=parts.port,
                     ssl=ctx,
                 )
-
             except (ConnectionRefusedError, OSError) as err:
                 raise VelbusConnectionFailed from err
-        else:
-            # serial port
-            try:
-                (
-                    _transport,
-                    _protocol,
-                ) = await serial_asyncio_fast.create_serial_connection(
-                    asyncio.get_running_loop(),
-                    lambda: self._protocol,
-                    url=self._destination,
-                    baudrate=38400,
-                    bytesize=serial.EIGHTBITS,
-                    parity=serial.PARITY_NONE,
-                    stopbits=serial.STOPBITS_ONE,
-                    xonxoff=0,
-                    rtscts=1,
-                )
-            except (FileNotFoundError, serial.SerialException) as err:
-                raise VelbusConnectionFailed from err
+            return
+
+        # serial and serialx-backed schemes (e.g. /dev/..., esphome://...)
+        try:
+            (
+                _transport,
+                _protocol,
+            ) = await serialx.create_serial_connection(
+                asyncio.get_running_loop(),
+                lambda: self._protocol,
+                url=destination,
+                baudrate=38400,
+                byte_size=serialx.EIGHTBITS,
+                parity=serialx.Parity.NONE,
+                stopbits=serialx.StopBits.ONE,
+                xonxoff=0,
+                rtscts=1,
+            )
+        except (FileNotFoundError, serialx.SerialException) as err:
+            raise VelbusConnectionFailed from err
 
     async def start(self) -> None:
         """Start the controller."""
