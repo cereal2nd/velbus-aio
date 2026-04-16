@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import importlib.resources
+import json
 import os
 from pathlib import Path
 import re
@@ -69,6 +71,24 @@ def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) ->
                     val = multi
                 result[int(res["Channel"])] = {res["Value"]: val}
     return result
+
+
+def get_property_key_map() -> dict[str, str]:
+    """Return a mapping of property spec key to class name for all module properties.
+
+    Example: {"selected_program": "SelectedProgram", "memo_text": "MemoText"}
+    """
+    spec_path = Path(
+        str(importlib.resources.files("velbusaio").joinpath("module_spec"))
+    )
+    mapping: dict[str, str] = {}
+    for spec_file in spec_path.glob("*.json"):
+        data = json.loads(spec_file.read_text())
+        for key, prop_data in data.get("Properties", {}).items():
+            type_ = prop_data.get("Type")
+            if type_ and key not in mapping:
+                mapping[key] = type_
+    return mapping
 
 
 def get_cache_dir() -> str:
