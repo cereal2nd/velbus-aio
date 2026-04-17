@@ -78,11 +78,11 @@ def get_property_key_map() -> dict[str, str]:
 
     Example: {"selected_program": "SelectedProgram", "memo_text": "MemoText"}
     """
-    spec_path = Path(
-        str(importlib.resources.files("velbusaio").joinpath("module_spec"))
-    )
+    spec_path = importlib.resources.files("velbusaio").joinpath("module_spec")
     mapping: dict[str, str] = {}
-    for spec_file in spec_path.glob("*.json"):
+    for spec_file in spec_path.iterdir():
+        if not spec_file.is_file() or not spec_file.name.endswith(".json"):
+            continue
         data = json.loads(spec_file.read_text())
         for key, prop_data in data.get("Properties", {}).items():
             type_ = prop_data.get("Type")
