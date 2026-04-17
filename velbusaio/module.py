@@ -988,11 +988,18 @@ class Module:
         await self._trigger_load_finished_callbacks()
 
     async def _get_cache(self):
+        cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
         try:
-            cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
             async with async_open(cfile, "r") as fl:
                 cache = json.loads(await fl.read())
         except OSError:
+            cache = {}
+        except (json.JSONDecodeError, KeyError, ValueError):
+            self._log.warning(
+                "Cache file for module %s is corrupt, removing it",
+                self._address,
+            )
+            cfile.unlink(missing_ok=True)
             cache = {}
         return cache
 
