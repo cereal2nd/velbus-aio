@@ -44,7 +44,7 @@ class BlindStatusNgMessage(Message):
         json_dict["channel"] = self.channel
         json_dict["timeout"] = self.timeout
         json_dict["position"] = self.position
-        json_dict["status"] = (DSTATUS[self.status[0]],DSTATUS[self.status[1]])
+        json_dict["status"] = (DSTATUS[self.status[0]], DSTATUS[self.status[1]])
         return json.dumps(json_dict)
 
     def is_moving_up(self) -> bool:
