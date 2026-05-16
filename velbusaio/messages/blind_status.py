@@ -44,7 +44,7 @@ class BlindStatusNgMessage(Message):
         json_dict["channel"] = self.channel
         json_dict["timeout"] = self.timeout
         json_dict["position"] = self.position
-        json_dict["status"] = (DSTATUS[self.status[0]], DSTATUS[self.status[1]])
+        json_dict["status"] = DSTATUS[self.status]
         return json.dumps(json_dict)
 
     def is_moving_up(self) -> bool:
@@ -92,6 +92,15 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         channel2_status = (data[0] >> 4) & 0x03
         self.status = (channel1_status, channel2_status)
         self.position = (data[1], data[2])  # 0..100 (0=open, 100=closed)
+
+    def to_json(self):
+        """To json."""
+        json_dict = self.to_json_basic()
+        json_dict["channel"] = self.channel
+        json_dict["timeout"] = self.timeout
+        json_dict["position"] = self.position
+        json_dict["status"] = (DSTATUS[self.status[0]], DSTATUS[self.status[1]])
+        return json.dumps(json_dict)
 
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
