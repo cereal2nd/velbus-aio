@@ -155,6 +155,19 @@ class Velbus:
         """Return connection state."""
         return self._is_connected
 
+    async def _reconnect_loop(self) -> None:
+        """Keep retrying connect() until it succeeds or auto_reconnect is disabled."""
+        retry_delay = 10
+        while self._auto_reconnect and not self._closing:
+            try:
+                await self.connect()
+            except VelbusConnectionFailed:
+                self._log.debug("Reconnect failed, retrying in %ds", retry_delay)
+                await asyncio.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 300)
+            else:
+                return
+
     async def _on_connection_state(self, is_connected: bool) -> None:
         """Respond to Protocol connection state changes."""
         self._is_connected = is_connected
@@ -166,7 +179,7 @@ class Velbus:
                 await callback()
             if self._auto_reconnect and not self._closing:
                 self._log.debug("Reconnecting to transport")
-                task = asyncio.ensure_future(self.connect())
+                task = asyncio.ensure_future(self._reconnect_loop())
                 self._background_tasks.add(task)
                 task.add_done_callback(self._background_tasks.discard)
         for mod in self._modules.values():
