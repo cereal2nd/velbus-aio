@@ -192,6 +192,8 @@ class VelbusProtocol(asyncio.BufferedProtocol):
             msg_info: RawMessage | None = await self._send_queue.get()
             if msg_info is None:
                 self._restart_writer = False
+                if self._write_transport_lock.locked():
+                    self._write_transport_lock.release()
                 return
             message_sent = False
             try:
