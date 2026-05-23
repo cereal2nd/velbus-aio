@@ -162,7 +162,7 @@ class Velbus:
             try:
                 await self.connect()
             except VelbusConnectionFailed:
-                self._log.debug("Reconnect failed, retrying in %ds", retry_delay)
+                self._log.warning("Reconnect failed, retrying in %ds", retry_delay)
                 await asyncio.sleep(retry_delay)
                 retry_delay = min(retry_delay * 2, 300)
             else:
