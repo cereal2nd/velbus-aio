@@ -95,6 +95,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
     def connection_lost(self, exc: Exception | None) -> None:
         """Called when the Velbus connection is lost."""
         self.transport = None
+        self.pause_writing()
 
         if self._closing:
             return  # Connection loss was expected, nothing to do here...
@@ -103,8 +104,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         else:
             self._log.error(f"Velbus connection lost: {exc!r}")
 
-        self.transport = None
-        self.pause_writing()
+        self._notify_connection_state_callbacks(False)
 
     # Everything read-related
 

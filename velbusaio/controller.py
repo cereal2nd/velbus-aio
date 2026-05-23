@@ -164,6 +164,11 @@ class Velbus:
         else:
             for callback in self._on_disconnect_callbacks:
                 await callback()
+            if self._auto_reconnect and not self._closing:
+                self._log.debug("Reconnecting to transport")
+                task = asyncio.ensure_future(self.connect())
+                self._background_tasks.add(task)
+                task.add_done_callback(self._background_tasks.discard)
         for mod in self._modules.values():
             for chan in mod.get_channels().values():
                 await chan.status_update()
@@ -175,14 +180,6 @@ class Velbus:
     async def _on_message_received(self, msg: RawMessage) -> None:
         """On message received function."""
         await self._handler.handle(msg)
-
-    def _on_connection_lost(self, exc: Exception) -> None:
-        """Respond to Protocol connection lost."""
-        if self._auto_reconnect and not self._closing:
-            self._log.debug("Reconnecting to transport")
-            task = asyncio.ensure_future(self.connect())
-            self._background_tasks.add(task)
-            task.add_done_callback(self._background_tasks.discard)
 
     async def add_module(
         self,
