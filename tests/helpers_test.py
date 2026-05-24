@@ -4,17 +4,18 @@ from velbusaio.helpers import get_property_key_map
 
 
 def test_get_property_key_map_known_entries() -> None:
-    """Test that get_property_key_map returns known property entries."""
+    """Test that get_property_key_map returns known display name entries."""
     mapping = get_property_key_map()
     assert isinstance(mapping, dict)
-    # Verify a few well-known property keys are present with correct class names
-    assert mapping.get("selected_program") == "SelectedProgram"
-    assert mapping.get("memo_text") == "MemoText"
+    assert mapping.get("Selected program") == "SelectedProgram"
+    assert mapping.get("Memo Text") == "MemoText"
 
 
-def test_get_property_key_map_no_duplicates() -> None:
-    """Test that get_property_key_map handles duplicate keys consistently."""
+def test_get_property_key_map_uses_display_names() -> None:
+    """Test that get_property_key_map keys are display names, not spec keys."""
     mapping = get_property_key_map()
-    # Keys should be unique (dict guarantees this), just verify it returns a dict
     assert isinstance(mapping, dict)
     assert len(mapping) > 0
+    # Spec keys must not appear; display names must
+    assert "selected_program" not in mapping
+    assert "Selected program" in mapping

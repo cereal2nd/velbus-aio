@@ -74,9 +74,13 @@ def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) ->
 
 
 def get_property_key_map() -> dict[str, str]:
-    """Return a mapping of property spec key to class name for all module properties.
+    """Return a mapping of property display name to class name for all module properties.
 
-    Example: {"selected_program": "SelectedProgram", "memo_text": "MemoText"}
+    The display name is what Property.get_name() returns (the "Name" field from the
+    module spec, falling back to the spec key). This matches the original_name stored
+    in the HA entity registry.
+
+    Example: {"Selected program": "SelectedProgram", "Light value": "LightValue"}
     """
     spec_path = importlib.resources.files("velbusaio").joinpath("module_spec")
     mapping: dict[str, str] = {}
@@ -86,8 +90,9 @@ def get_property_key_map() -> dict[str, str]:
         data = json.loads(spec_file.read_text())
         for key, prop_data in data.get("Properties", {}).items():
             type_ = prop_data.get("Type")
-            if type_ and key not in mapping:
-                mapping[key] = type_
+            name = prop_data.get("Name", key)
+            if type_ and name not in mapping:
+                mapping[name] = type_
     return mapping
 
 
