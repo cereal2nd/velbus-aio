@@ -823,17 +823,11 @@ class Module:
 
     async def _handle_blind_status_ng20(self, message: BlindStatusNg20Message) -> None:
         """Handle blind status NG20 messages."""
-        if message.status == 0:
-            # stopped messages contain the position for both channels, so we need to update both channels
-            for i in range(2):
-                channel = self._translate_channel_name(message.channel[i])
-                await self._update_channel(
-                    channel, {"state": message.status, "position": message.position[i]}
-                )
-        else:
-            channel = self._translate_channel_name(message.channel)
+        # The messages contain the status for both channels, so we need to update both channels
+        for i in range(2):
+            channel = self._translate_channel_name(message.channel[i])
             await self._update_channel(
-                channel, {"state": message.status, "position": message.position}
+                channel, {"state": message.status[i], "position": message.position[i]}
             )
 
     async def _handle_blind_status(self, message: BlindStatusMessage) -> None:
