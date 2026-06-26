@@ -41,7 +41,6 @@ class PacketHandler:
     ) -> None:
         """Initialize the PacketHandler class."""
         self._log = logging.getLogger("velbus-handler")
-        self._log.setLevel(logging.DEBUG)
         self._velbus = velbus
         self._one_address = one_address
         self._typeResponseReceived = asyncio.Event()
