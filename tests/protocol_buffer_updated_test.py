@@ -64,12 +64,12 @@ class TestVelbusProtocolBufferUpdated:
         assert protocol._last_activity_time > 0
 
     @pytest.mark.asyncio
-    async def test_buffer_updated_creates_new_buffer(self):
-        """Test that buffer_updated creates new buffer with remaining data."""
+    async def test_buffer_updated_keeps_remaining_data(self):
+        """Test that data left after a parsed message is kept for the next read."""
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)
 
-        # Valid message with some remaining data
+        # Valid message followed by the start of a second (incomplete) message
         valid_message = b"\x0f\xf8\x01\x00\x00\x00\x00\x00\x06\x04"
         remaining = b"\x0f\xf8\x02"
         combined = valid_message + remaining
@@ -80,26 +80,23 @@ class TestVelbusProtocolBufferUpdated:
             mock_msg = Mock(spec=RawMessage)
             mock_create.return_value = (mock_msg, remaining)
 
-            old_buffer = protocol._buffer
             protocol.buffer_updated(len(combined))
 
             await asyncio.sleep(0.1)
 
-            # Buffer should be renewed
-            assert protocol._buffer is not old_buffer
-            assert protocol._buffer_pos == len(remaining)
+            # The leftover (partial second message) must be preserved, not dropped,
+            # so it can be completed by the next read.
+            assert protocol._serial_buf == remaining
 
     @pytest.mark.asyncio
-    async def test_buffer_updated_position_tracking(self):
-        """Test that buffer position is tracked correctly."""
+    async def test_buffer_updated_accumulates_partial_data(self):
+        """Test that bytes below the minimum size are accumulated, not processed."""
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)
 
-        initial_pos = protocol._buffer_pos
-        bytes_received = 2  # Use small number to avoid triggering message processing
+        bytes_received = 2  # Less than MINIMUM_MESSAGE_SIZE, so no processing occurs
 
         protocol.buffer_updated(bytes_received)
 
-        # Should have added bytes_received to position (if no message processing triggered)
-        # Since we're using 2 bytes which is less than MINIMUM_MESSAGE_SIZE, no processing occurs
-        assert protocol._buffer_pos == initial_pos + bytes_received
+        # The received bytes are accumulated in _serial_buf awaiting more data.
+        assert len(protocol._serial_buf) == bytes_received

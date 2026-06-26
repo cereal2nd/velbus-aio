@@ -34,9 +34,12 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         self._connection_state_callback = connection_state_callback
 
         # everything for reading from Velbus
+        # _buffer is a fixed scratch buffer the transport writes into on the
+        # BufferedProtocol (get_buffer/buffer_updated) read path. buffer_updated()
+        # copies the received bytes into _serial_buf, so both read paths converge
+        # on the same framing logic in data_received().
         self._buffer = bytearray(MAXIMUM_MESSAGE_SIZE)
         self._buffer_view = memoryview(self._buffer)
-        self._buffer_pos = 0
 
         self._serial_buf = b""
         self.transport = None
@@ -109,8 +112,13 @@ class VelbusProtocol(asyncio.BufferedProtocol):
     # Everything read-related
 
     def get_buffer(self, sizehint: int) -> memoryview:
-        """Provide buffer for Buffered Streaming protocol."""
-        return self._buffer_view[self._buffer_pos :]
+        """Provide a writable buffer for the BufferedProtocol read path.
+
+        Returns the whole scratch buffer; the received bytes are copied out and
+        accumulated in data_received(), so the transport may reuse it freely on
+        the next read.
+        """
+        return self._buffer_view
 
     def data_received(self, data: bytes) -> None:
         """Receive data from the Streaming protocol.
@@ -127,44 +135,35 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         )
         _recheck = True
 
-        while len(self._serial_buf) > MINIMUM_MESSAGE_SIZE and _recheck:
-            # try to construct a Velbus message from the buffer
+        while len(self._serial_buf) >= MINIMUM_MESSAGE_SIZE and _recheck:
+            # create_message_info() / _parse() reject buffers larger than one
+            # maximum-size packet, so only feed it the first MAXIMUM_MESSAGE_SIZE
+            # bytes. The bytes beyond that (a second packet that arrived in the
+            # same read) must be preserved as the tail, otherwise they are
+            # silently dropped on a busy bus where reads bundle multiple packets.
+            head = bytearray(self._serial_buf[:MAXIMUM_MESSAGE_SIZE])
+            tail = self._serial_buf[MAXIMUM_MESSAGE_SIZE:]
 
-            msg, remaining_data = create_message_info(
-                bytearray(self._serial_buf[:MAXIMUM_MESSAGE_SIZE])
-            )
+            msg, remaining_data = create_message_info(head)
 
             if msg is not None:
                 asyncio.ensure_future(self._process_message(msg))  # noqa: RUF006
                 _recheck = True
             else:
                 _recheck = False
-            self._serial_buf = bytes(remaining_data)
+            self._serial_buf = bytes(remaining_data) + tail
 
     def buffer_updated(self, nbytes: int) -> None:
-        """Receive data from the Buffered Streaming protocol.
+        """Receive data from the BufferedProtocol read path.
 
-        Called when asyncio.BufferedProtocol detects received data from network.
+        Called when asyncio.BufferedProtocol detects received data. This path is
+        used by the network transport and by serialx for serial ports. Delegate
+        to data_received() so both read paths converge on the same robust framing
+        logic. The previous implementation parsed a fixed-size buffer in place and
+        swapped it mid-stream, which misframed the byte stream depending on how the
+        transport chunked its reads (intact payloads but corrupt STX/ETX bytes).
         """
-        self._last_activity_time = time.time()
-        self._buffer_pos += nbytes
-        if self._buffer_pos > MINIMUM_MESSAGE_SIZE:
-            # try to construct a Velbus message from the buffer
-            msg, remaining_data = create_message_info(self._buffer)
-
-            if msg is not None:
-                asyncio.ensure_future(self._process_message(msg))  # noqa: RUF006
-
-            self._new_buffer(remaining_data)
-
-    def _new_buffer(self, remaining_data=None) -> None:
-        new_buffer = bytearray(MAXIMUM_MESSAGE_SIZE)
-        if remaining_data:
-            new_buffer[: len(remaining_data)] = remaining_data
-
-        self._buffer = new_buffer
-        self._buffer_pos = len(remaining_data) if remaining_data else 0
-        self._buffer_view = memoryview(self._buffer)
+        self.data_received(bytes(self._buffer_view[:nbytes]))
 
     async def _process_message(self, msg: RawMessage) -> None:
         # self._log.debug(f"RX: {msg}")

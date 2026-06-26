@@ -14,7 +14,6 @@ class TestVelbusProtocolInit:
         protocol = VelbusProtocol(callback)
 
         assert protocol._message_received_callback == callback
-        assert protocol._buffer_pos == 0
         assert protocol._serial_buf == b""
         assert protocol.transport is None
         assert not protocol._closing
@@ -40,4 +39,4 @@ class TestVelbusProtocolInit:
 
         assert len(protocol._buffer) > 0
         assert protocol._buffer_view is not None
-        assert protocol._buffer_pos == 0
+        assert protocol._serial_buf == b""
