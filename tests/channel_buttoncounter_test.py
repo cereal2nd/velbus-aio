@@ -1,5 +1,7 @@
 """Test cases for the ButtonCounter channel class"""
 
+import pytest
+
 from velbusaio.channels import ButtonCounter
 from velbusaio.const import (
     ENERGY_KILO_WATT_HOUR,
@@ -54,6 +56,18 @@ class TestButtonCounter:
         )
         button._counter = 0
         assert button.is_counter_channel()
+
+    @pytest.mark.asyncio
+    async def test_is_long_pressed(self, mock_module, mock_writer):
+        """Test inherited long-press state accessor."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        await button.update({"long": True})
+        assert button.is_long_pressed()
+
+        await button.update({"long": False})
+        assert not button.is_long_pressed()
 
     def test_get_sensor_type_counter(self, mock_module, mock_writer):
         """Test getting sensor type for counter."""

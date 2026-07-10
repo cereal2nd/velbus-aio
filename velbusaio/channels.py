@@ -346,6 +346,10 @@ class Button(Channel):
         """Return if this button is on."""
         return self._closed
 
+    def is_long_pressed(self) -> bool:
+        """Return if this button is currently long pressed."""
+        return self._long
+
     def is_on(self) -> bool:
         """Return if this relay is on."""
         if self._led_state == "on":
