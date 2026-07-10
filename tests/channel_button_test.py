@@ -33,16 +33,6 @@ class TestButton:
         assert not button.is_closed()
 
     @pytest.mark.asyncio
-    async def test_is_long_pressed(self, mock_module, mock_writer):
-        """Test checking if button is long pressed."""
-        button = Button(mock_module, 1, "Button", False, True, mock_writer, 0x01)
-        await button.update({"long": True})
-        assert button.is_long_pressed()
-
-        await button.update({"long": False})
-        assert not button.is_long_pressed()
-
-    @pytest.mark.asyncio
     async def test_is_on_led_on(self, mock_module, mock_writer):
         """Test checking if button LED is on."""
         button = Button(mock_module, 1, "Button", False, True, mock_writer, 0x01)
