@@ -24,17 +24,20 @@ class TestVelbusProtocolWriting:
 
         assert protocol._restart_writer is False
 
-    def test_restart_writing(self):
+    @pytest.mark.asyncio
+    async def test_restart_writing(self):
         """Test restarting writing."""
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)
 
         protocol._restart_writer = True
+        protocol.restart_writing()
 
-        with patch("asyncio.ensure_future") as mock_ensure_future:
-            protocol.restart_writing()
+        assert protocol._writer_task is not None
+        assert not protocol._writer_task.done()
 
-            mock_ensure_future.assert_called_once()
+        protocol.pause_writing()
+        await asyncio.wait_for(protocol._writer_task, timeout=1.0)
 
     def test_restart_writing_when_locked(self):
         """Test restarting writing when lock is held."""

@@ -5,6 +5,14 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 
 
+def pytest_configure(config):
+    """Filter third-party deprecation warnings that are not actionable here."""
+    config.addinivalue_line(
+        "filterwarnings",
+        "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning:backoff.*",
+    )
+
+
 @pytest.fixture
 def mock_module():
     """Create a mock module for testing."""
