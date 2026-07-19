@@ -119,7 +119,7 @@ class Module:
         cls,
         module_address: int,
         module_type: int,
-        serial: int | None = None,
+        serial: int | str | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
@@ -154,7 +154,7 @@ class Module:
         self,
         module_address: int,
         module_type: int,
-        serial: int | None = None,
+        serial: int | str | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
@@ -171,7 +171,8 @@ class Module:
             int, str
         ] = {}  # temporary buffer while assembling name from memory blocks
         self._sub_address = {}
-        self.serial = serial
+        # the bus reports the serial as an int, a vlp file as a str => normalize
+        self.serial = str(serial) if serial is not None else None
         self.memory_map_version = memorymap
         self.build_year = build_year
         self.build_week = build_week
@@ -1288,7 +1289,7 @@ class VmbDali(Module):
         self,
         module_address: int,
         module_type: int,
-        serial: int | None = None,
+        serial: int | str | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
         build_week: int | None = None,

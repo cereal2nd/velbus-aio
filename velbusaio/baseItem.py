@@ -67,7 +67,7 @@ class BaseItem(ABC):
         return self._module.get_type_name()
 
     @final
-    def get_module_serial(self) -> str:
+    def get_module_serial(self) -> str | None:
         """Return module serial number."""
         return self._module.get_serial()
 
