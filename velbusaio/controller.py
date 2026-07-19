@@ -198,7 +198,7 @@ class Velbus:
         self,
         addr: int,
         typ: int,
-        serial: int | None = None,
+        serial: int | str | None = None,
         memorymap: int | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
