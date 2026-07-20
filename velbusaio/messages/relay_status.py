@@ -5,10 +5,13 @@
 
 from __future__ import annotations
 
-import struct
-
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import (
+    ByteField,
+    ChannelField,
+    DeclarativeMessage,
+    Int24Field,
+)
 
 COMMAND_CODE = 0xFB
 CHANNEL_NORMAL = 0x00
@@ -26,30 +29,17 @@ LED_VERY_FAST_BLINKING = 1 << 4
 
 
 @register(COMMAND_CODE)
-class RelayStatusMessage(Message):
+class RelayStatusMessage(DeclarativeMessage):
     """Relay Status Message."""
 
-    def __init__(self, address=None):
-        """Initialize Relay Status Message Object."""
-        Message.__init__(self)
-        self.channel = 0
-        self.disable_inhibit_forced = 0
-        self.status = 0
-        self.led_status = 0
-        self.delay_time = 0
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 7
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.channel = self.byte_to_channel(data[0])
-        self.disable_inhibit_forced = data[1]
-        self.status = data[2]
-        self.led_status = data[3]
-        (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[4:])
+    channel = ChannelField(0)
+    disable_inhibit_forced = ByteField(1)
+    status = ByteField(2)
+    led_status = ByteField(3)
+    delay_time = Int24Field(4)
 
     def is_normal(self):
         """:return: bool"""
@@ -75,21 +65,6 @@ class RelayStatusMessage(Message):
         """:return: bool"""
         return self.status == INTERVAL_TIMER_ON
 
-    def data_to_binary(self):
-        """:return: bytes"""
-        return (
-            bytes(
-                [
-                    COMMAND_CODE,
-                    self.channels_to_byte([self.channel]),
-                    self.disable_inhibit_forced,
-                    self.status,
-                    self.led_status,
-                ]
-            )
-            + struct.pack(">L", self.delay_time)[-3:]
-        )
-
 
 @register(COMMAND_CODE, ["VMB4RY"])
 class RelayStatusMessage2(RelayStatusMessage):
@@ -103,32 +78,20 @@ class RelayStatusMessage2(RelayStatusMessage):
 
 
 @register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20"])
-class RelayStatusMessage3(Message):
+class RelayStatusMessage3(DeclarativeMessage):
     """Relay Status Message."""
 
-    def __init__(self, address=None):
-        """Initialize Relay Status Message Object."""
-        Message.__init__(self)
-        self.status_bits = 0
-        self.inhibited_bits = 0
-        self.forced_on_bits = 0
-        self.forced_off_bits = 0
-        self.program_disabled_bits = 0
-        self.interval_timer_bits = 0
+    _command_code = COMMAND_CODE
+    _data_length = 7
+    _generates_data_to_binary = False
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.status_bits = data[0]
-        self.inhibited_bits = data[1]
-        self.forced_on_bits = data[2]
-        self.forced_off_bits = data[3]
-        self.program_disabled_bits = data[4]
-        self.interval_timer_bits = data[5]
-        self.alarm_bits = data[6]
+    status_bits = ByteField(0)
+    inhibited_bits = ByteField(1)
+    forced_on_bits = ByteField(2)
+    forced_off_bits = ByteField(3)
+    program_disabled_bits = ByteField(4)
+    interval_timer_bits = ByteField(5)
+    alarm_bits = ByteField(6)
 
     def is_on(self, channel):
         """:return: bool"""

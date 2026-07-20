@@ -5,17 +5,19 @@
 
 from __future__ import annotations
 
-import struct
-
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xA3
 
 
 @register(COMMAND_CODE, ["VMBPSUMNGR-20"])
-class PsuValuesMessage(Message):
+class PsuValuesMessage(DeclarativeMessage):
     """PSU Values Message."""
+
+    _command_code = COMMAND_CODE
+    _data_length = 7
 
     def __init__(self, address=None):
         """Initialize PSU Values Message Object."""
@@ -29,7 +31,7 @@ class PsuValuesMessage(Message):
         """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
-        self.needs_data(data, 3)
+        self.needs_data(data, 7)
         self.set_attributes(priority, address, rtr)
         self.channel = (data[0] & 0xF0) >> 4
         self.watt = ((data[0] & 0x0F) << 16 | data[1] << 8 | data[2]) / 1000
@@ -38,15 +40,18 @@ class PsuValuesMessage(Message):
 
     def data_to_binary(self):
         """:return: bytes"""
-        return (
-            bytes(
-                [
-                    COMMAND_CODE,
-                    self.mode,
-                    self.load_1,
-                    self.load_2,
-                    self.out,
-                ]
-            )
-            + struct.pack(">L", self.delay_time)[-3:]
+        watt = int(round(self.watt * 1000))
+        volt = int(round(self.volt * 1000))
+        amp = int(round(self.amp * 1000))
+        return bytes(
+            [
+                COMMAND_CODE,
+                ((self.channel & 0x0F) << 4) | ((watt >> 16) & 0x0F),
+                (watt >> 8) & 0xFF,
+                watt & 0xFF,
+                (volt >> 8) & 0xFF,
+                volt & 0xFF,
+                (amp >> 8) & 0xFF,
+                amp & 0xFF,
+            ]
         )

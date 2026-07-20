@@ -6,32 +6,21 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ByteField, DeclarativeMessage, RawTailField
 
 COMMAND_CODE = 0xCA
 
 
 @register(COMMAND_CODE)
-class WriteMemoryBlockMessage(Message):
+class WriteMemoryBlockMessage(DeclarativeMessage):
     """Write Memory Block message class."""
 
-    def __init__(self, address=None):
-        """WriteMemoryBlockMessage constructor."""
-        Message.__init__(self)
-        self.high_address = 0x00
-        self.low_address = 0x00
-        self.data = ""
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 6
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 6)
-        self.set_attributes(priority, address, rtr)
-        self.high_address = data[0]
-        self.low_address = data[1]
-        self.data = data[2:]
+    high_address = ByteField(0)
+    low_address = ByteField(1)
+    data = RawTailField(2, default=b"")
 
     def data_to_binary(self):
         """:return: bytes"""

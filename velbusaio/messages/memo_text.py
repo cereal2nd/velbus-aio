@@ -6,21 +6,22 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xAC
 
 
 @register(COMMAND_CODE)
-class MemoTextMessage(Message):
+class MemoTextMessage(DeclarativeMessage):
     """Memo Text Message."""
+
+    _command_code = COMMAND_CODE
 
     def __init__(self, address=None):
         """Initialize Memo Text Message object."""
-        Message.__init__(self)
+        super().__init__(address)
         self.start = 0x00
         self.memo_text = ""
-        self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -28,10 +29,11 @@ class MemoTextMessage(Message):
         self.needs_no_rtr(rtr)
         self.set_attributes(priority, address, rtr)
         self.start = data[1]
-        self.name = "".join([chr(x) for x in data[2:]])
+        self.name = "".join(chr(x) for x in data[2:])
 
     def data_to_binary(self):
         """:return: bytes"""
-        while len(self.memo_text) < 5:
-            self.memo_text += chr(0)
-        return bytes([COMMAND_CODE, 0x00, self.start]) + bytes(self.memo_text, "utf-8")
+        memo_text = self.memo_text
+        while len(memo_text) < 5:
+            memo_text += chr(0)
+        return bytes([COMMAND_CODE, 0x00, self.start]) + bytes(memo_text, "utf-8")

@@ -6,21 +6,13 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xE9
 
 
 @register(COMMAND_CODE)
-class TempSensorSettingsPart2(Message):
+class TempSensorSettingsPart2(DeclarativeMessage):
     """TempSensorSettingsPart2 message class."""
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE])
+    _command_code = COMMAND_CODE

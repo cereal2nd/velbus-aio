@@ -6,24 +6,17 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xDF
 
 
 @register(COMMAND_CODE)
-class TempSetCoolingMessage(Message):
+class TempSetCoolingMessage(DeclarativeMessage):
     """Temp Set Cooling Message."""
 
-    def __init__(self, address=None):
-        """Initialize TempSetCoolingMessage class."""
-        Message.__init__(self)
-        self.set_defaults(address)
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
+    _command_code = COMMAND_CODE
+    _priority = None
 
     def data_to_binary(self):
         """:return: bytes"""

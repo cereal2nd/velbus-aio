@@ -6,57 +6,46 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import (
+    ByteField,
+    ChannelIndexField,
+    ChannelsField,
+    DeclarativeMessage,
+    Field,
+)
 
 COMMAND_CODE = 0x07
+
+
+def _parse_transition(data: bytes) -> int:
+    return int.from_bytes(data[2:3], byteorder="big", signed=False)
+
+
+def _serialize_transition(value: int) -> bytes:
+    return value.to_bytes(2, byteorder="big", signed=False)
 
 
 @register(
     COMMAND_CODE,
     ["VMB1DM", "VMBDME", "VMB4DC", "VMB1LED"],
 )
-class SetDimmerMessage(Message):
+class SetDimmerMessage(DeclarativeMessage):
     """Set Dimmer Message.
 
     with this message the channel numbering is a bitnumber
     """
 
-    def __init__(self, address=None):
-        """Initialize Set Dimmer Message Object."""
-        Message.__init__(self)
-        self.dimmer_channels = []
-        self.dimmer_state = 0
-        self.dimmer_transitiontime = 0
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _priority = "high"
+    _data_length = 4
 
-    def set_defaults(self, address):
-        """Set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_high_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 4)
-        self.set_attributes(priority, address, rtr)
-        self.dimmer_channels = self.byte_to_channels(data[0])
-        self.dimmer_state = data[1]
-        self.dimmer_transitiontime = int.from_bytes(
-            data[2:3], byteorder="big", signed=False
-        )
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes(
-            [
-                COMMAND_CODE,
-                self.channels_to_byte(self.dimmer_channels),
-                self.dimmer_state,
-            ]
-        ) + self.dimmer_transitiontime.to_bytes(2, byteorder="big", signed=False)
+    dimmer_channels = ChannelsField(0)
+    dimmer_state = ByteField(1)
+    dimmer_transitiontime = Field(
+        default=0,
+        parser=_parse_transition,
+        serializer=_serialize_transition,
+    )
 
 
 @register(
@@ -77,9 +66,7 @@ class SetDimmerMessage2(SetDimmerMessage):
     This with this message the channel numbering is an integer
     """
 
-    def byte_to_channels(self, byte: int) -> list[int]:
-        """Byte to channels."""
-        return [byte]
+    dimmer_channels = ChannelIndexField(0)
 
     def channels_to_byte(self, channels) -> int:
         """Channels to byte."""

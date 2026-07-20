@@ -6,25 +6,28 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ByteField, DeclarativeMessage
 
 COMMAND_CODE = 0xD4
 
 
 @register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO"])
-class EdgeSetCustomColor(Message):
+class EdgeSetCustomColor(DeclarativeMessage):
     """Edge Set Custom Color message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
+
+    pallet = ByteField(0, default=31)
+    red = ByteField(2)
+    green = ByteField(3)
+    blue = ByteField(4)
 
     def __init__(self, address=None):
         """Initialize Edge Set Custom Color message."""
-        Message.__init__(self)
-        self.set_defaults(address)
-        self.pallet = 31
+        super().__init__(address)
         self.rgb = False
         self.saturation = 0
-        self.red = 0
-        self.green = 0
-        self.blue = 0
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

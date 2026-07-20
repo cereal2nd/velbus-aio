@@ -7,13 +7,19 @@ from __future__ import annotations
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xA9
 
 
 @register(COMMAND_CODE, ["VMBMETEO"])
-class MeteoRawMessage(Message):
+class MeteoRawMessage(DeclarativeMessage):
     """Meteo Raw Message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
+    _data_length = 6
+    _generates_data_to_binary = False
 
     def __init__(self, address=None):
         """Initialize Meteo Raw Message Object."""
@@ -40,8 +46,13 @@ class MeteoRawMessage(Message):
 
 
 @register(COMMAND_CODE, ["VMB4AN"])
-class SensorRawMessage(Message):
+class SensorRawMessage(DeclarativeMessage):
     """Sensor Raw Message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
+    _data_length = 5
+    _generates_data_to_binary = False
 
     def __init__(self, address=None):
         """Initialize Sensor Raw Message Object."""

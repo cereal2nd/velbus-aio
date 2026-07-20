@@ -5,10 +5,8 @@
 
 from __future__ import annotations
 
-import struct
-
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ByteField, DeclarativeMessage, Int24Field
 
 COMMAND_CODE = 0xEE
 MODE_START_STOP = 0x00
@@ -38,33 +36,25 @@ LED_VERY_FAST_BLINKING = 1 << 4
         "VMB4LEDPWM-20",
     ],
 )
-class DimmerStatusMessage(Message):
+class DimmerStatusMessage(DeclarativeMessage):
     """Dimmer Status message."""
+
+    _command_code = COMMAND_CODE
+    _data_length = 7
+
+    dimmer_mode = ByteField(0)
+    dimmer_state = ByteField(1)
+    led_status = ByteField(2)
+    delay_time = Int24Field(4)
+    dimmer_config = ByteField(6, serializable=False)
 
     def __init__(self, address=None):
         """Initialize Dimmer Status message."""
-        Message.__init__(self)
+        super().__init__(address)
         self.channel = 1
-        self.disable_inhibit_forced = 0
-        self.dimmer_mode = 0
-        self.dimmer_state = 0
-        self.led_status = 0
-        self.delay_time = 0
-        self.set_defaults(address)
-        self.dimmer_config = 0
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.dimmer_mode = data[0]
+    def _post_populate(self, data: bytes) -> None:
         self.channel = 1
-        self.dimmer_state = int.from_bytes([data[1]], byteorder="big", signed=False)
-        self.led_status = data[2]
-        (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[4:])
-        self.dimmer_config = data[6]
 
     def is_start_stop(self):
         """:return: bool"""
@@ -104,14 +94,11 @@ class DimmerStatusMessage(Message):
 
     def data_to_binary(self):
         """:return: bytes"""
-        return (
-            bytes(
-                [
-                    COMMAND_CODE,
-                    self.dimmer_mode,
-                    self.dimmer_state,
-                    self.led_status,
-                ]
-            )
-            + struct.pack(">L", self.delay_time)[-3:]
-        )
+        return bytes(
+            [
+                COMMAND_CODE,
+                self.dimmer_mode,
+                self.dimmer_state,
+                self.led_status,
+            ]
+        ) + Int24Field(4).serialize(self.delay_time)

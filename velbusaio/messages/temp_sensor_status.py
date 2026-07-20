@@ -8,7 +8,13 @@ from __future__ import annotations
 import json
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import (
+    BitField,
+    ComputedField,
+    DeclarativeMessage,
+    Field,
+    Int16Field,
+)
 
 COMMAND_CODE = 0xEA
 DSTATUS = {0: "run", 2: "manual", 4: "sleep", 6: "disable"}
@@ -16,82 +22,54 @@ DMODE = {0: "safe", 16: "night", 32: "day", 64: "comfort"}
 
 
 @register(COMMAND_CODE)
-class TempSensorStatusMessage(Message):
+class TempSensorStatusMessage(DeclarativeMessage):
     """TempSensorStatus message class."""
 
-    def __init__(self, address=None):
-        """Initialize TempSensorStatus message class."""
-        Message.__init__(self)
-        self.local_control = 0  # 0=unlocked, 1 =locked
-        self.status_mode = 0  # DSTATUS
-        self.status_str = "run"
-        self.auto_send = 0  # 0=disabled
-        self.mode = 0  # DMODE
-        self.mode_str = "safe"
-        self.cool_mode = False
-        self.heater = False
-        self.boost = False
-        self.pump = False
-        self.cooler = False
-        self.alarm1 = False
-        self.alarm2 = False
-        self.alarm3 = False
-        self.alarm4 = False
-        self.current_temp = None
-        self.target_temp = None
-        self.sleep_timer = None
+    _command_code = COMMAND_CODE
+    _priority = None
+    _data_length = 7
+    _generates_data_to_binary = False
+
+    local_control = BitField(0, 0x01, default=0, serializable=False)
+    status_mode = BitField(0, 0x06, default=0, serializable=False)
+    status_str = ComputedField(
+        parser=lambda data: DSTATUS[data[0] & 0x06],
+        default="run",
+        serializable=False,
+    )
+    auto_send = BitField(0, 0x08, default=0, serializable=False)
+    mode = BitField(0, 0x70, default=0, serializable=False)
+    mode_str = ComputedField(
+        parser=lambda data: DMODE[data[0] & 0x70],
+        default="safe",
+        serializable=False,
+    )
+    cool_mode = BitField(0, 0x80, default=False, as_bool=True, serializable=False)
+    heater = BitField(2, 0x01, default=False, as_bool=True, serializable=False)
+    boost = BitField(2, 0x02, default=False, as_bool=True, serializable=False)
+    pump = BitField(2, 0x04, default=False, as_bool=True, serializable=False)
+    cooler = BitField(2, 0x08, default=False, as_bool=True, serializable=False)
+    alarm1 = BitField(2, 0x10, default=False, as_bool=True, serializable=False)
+    alarm2 = BitField(2, 0x20, default=False, as_bool=True, serializable=False)
+    alarm3 = BitField(2, 0x40, default=False, as_bool=True, serializable=False)
+    alarm4 = BitField(2, 0x80, default=False, as_bool=True, serializable=False)
+    current_temp = Field(
+        byte_index=3,
+        default=None,
+        parser=lambda data: data[3] / 2,
+        serializable=False,
+    )
+    target_temp = Field(
+        byte_index=4,
+        default=None,
+        parser=lambda data: data[4] / 2,
+        serializable=False,
+    )
+    sleep_timer = Int16Field(5, default=None, serializable=False)
 
     def getCurTemp(self):
         """Get current temperature."""
         return self.current_temp
-
-    def populate(self, priority, address, rtr, data):
-        """Populate message attributes.
-
-        -DB1    last bit        = local_control
-        -DB1    bit 2+3         = status_mode
-        -DB1    bit 4           = auto send
-        -DB1    bit 5+6+7       = mode
-        -DB1    bit 8           = cool/heat
-        -DB2                    = program (not used)
-        -DB3    last bit        = heater
-        -DB3    bit 2           = boost
-        -DB3    bit 3           = pump
-        -DB3    bit 4           = cooler
-        -DB4    bit 5           = alarm 1
-        -DB4    bit 6           = alarm 2
-        -DB4    bit 7           = alarm 3
-        -DB4    bit 8           = alarm 4
-        -DB5    current temp    = current temp
-        -DB6    target temp     = target temp
-        -DB7-8  sleep timer     = 0=off >0=x min
-        :return: None
-        """
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-
-        self.local_control = data[0] & 0x01
-        self.status_mode = data[0] & 0x06
-        self.status_str = DSTATUS[self.status_mode]
-        self.auto_send = data[0] & 0x08
-        self.mode = data[0] & 0x70
-        self.mode_str = DMODE[self.mode]
-        self.cool_mode = (data[0] & 0x80) == 0x80
-
-        self.heater = (data[2] & 0x01) == 0x01
-        self.boost = (data[2] & 0x02) == 0x02
-        self.pump = (data[2] & 0x04) == 0x04
-        self.cooler = (data[2] & 0x08) == 0x08
-        self.alarm1 = (data[2] & 0x10) == 0x10
-        self.alarm2 = (data[2] & 0x20) == 0x20
-        self.alarm3 = (data[2] & 0x40) == 0x40
-        self.alarm4 = (data[2] & 0x80) == 0x80
-
-        self.current_temp = data[3] / 2
-        self.target_temp = data[4] / 2
-
-        self.sleep_timer = (data[5] << 8) + data[6]
 
     def to_json(self):
         """:return: str"""

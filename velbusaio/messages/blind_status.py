@@ -9,34 +9,30 @@ import json
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import (
+    BlindChannelField,
+    BlindStatusField,
+    ByteField,
+    ChannelField,
+    DeclarativeMessage,
+)
 
 COMMAND_CODE = 0xEC
 DSTATUS = {0: "off", 1: "up", 2: "down"}
 
 
 @register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
-class BlindStatusNgMessage(Message):
+class BlindStatusNgMessage(DeclarativeMessage):
     """Blind Status NG message."""
 
-    def __init__(self, address=None):
-        """Initialize BlindStatusNgMessage class."""
-        Message.__init__(self)
-        self.channel = 0
-        self.timeout = 0
-        self.status = 0
-        self.position = None
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 7
+    _generates_data_to_binary = False
 
-    def populate(self, priority, address, rtr, data):
-        """Populate message fields."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.channel = self.byte_to_channel(data[0])
-        self.timeout = data[1]  # Omzetter seconden ????
-        self.status = data[2]
-        self.position = data[4]  # 0..255 (0=open, 255=closed)
+    channel = ChannelField(0)
+    timeout = ByteField(1)
+    status = ByteField(2)
+    position = ByteField(4, default=None)
 
     def to_json(self):
         """To json."""
@@ -59,25 +55,19 @@ class BlindStatusNgMessage(Message):
         """Is stopped."""
         return self.status == 0x00
 
-    def data_to_binary(self):
-        """To binary data."""
-        return bytes(
-            [
-                COMMAND_CODE,
-                self.channels_to_byte([self.channel]),
-                self.timeout,
-                self.status,
-                self.led_status,
-                self.blind_position,
-                self.locked_inhibit_forced,
-                self.alarm_auto_mode_selection,
-            ]
-        )
-
 
 @register(COMMAND_CODE, ["VMB2BLE-20"])
 class BlindStatusNg20Message(BlindStatusNgMessage):
     """Blind Status NG20 message."""
+
+    def __init__(self, address=None):
+        """Initialize BlindStatusNg20Message class."""
+        Message.__init__(self)
+        self.channel = (1, 2)
+        self.timeout = 0
+        self.status = 0
+        self.position = None
+        self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
         """Populate message fields."""
@@ -85,13 +75,11 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
         self.set_attributes(priority, address, rtr)
-
-        # Each message contains status and position of both channels.
         self.channel = (1, 2)
         channel1_status = data[0] & 0x03
         channel2_status = (data[0] >> 4) & 0x03
         self.status = (channel1_status, channel2_status)
-        self.position = (data[1], data[2])  # 0..100 (0=open, 100=closed)
+        self.position = (data[1], data[2])
 
     def to_json(self):
         """To json."""
@@ -104,31 +92,16 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
 
 
 @register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
-class BlindStatusMessage(Message):
+class BlindStatusMessage(DeclarativeMessage):
     """Blind Status message."""
 
-    def __init__(self, address=None):
-        """Initialize BlindStatusMessage class."""
-        Message.__init__(self)
-        self.channel = 0
-        self.timeout = 0
-        self.status = 0
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 7
+    _generates_data_to_binary = False
 
-    def populate(self, priority, address, rtr, data):
-        """Populate message fields."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        # 00000011 = channel 1
-        # 00001100 = channel 2
-        # so shift 1 bit to the right + and with 03
-        tmp = (data[0] >> 1) & 0x03
-        self.channel = self.byte_to_channel(tmp)
-        self.timeout = data[1]  # Omzetter seconden ????
-        # 2 bits per channel used
-        self.status = (data[2] >> ((self.channel - 1) * 2)) & 0x03
+    channel = BlindChannelField(0)
+    timeout = ByteField(1)
+    status = BlindStatusField(2)
 
     def to_json(self):
         """To json."""

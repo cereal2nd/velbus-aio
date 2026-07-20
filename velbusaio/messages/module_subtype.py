@@ -9,6 +9,7 @@ import struct
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xB0
 COMMAND_CODE_2 = 0xA7
@@ -18,8 +19,11 @@ COMMAND_CODE_3 = 0xA6
 @register(COMMAND_CODE)
 @register(COMMAND_CODE_2)
 @register(COMMAND_CODE_3)
-class ModuleSubTypeMessage(Message):
+class ModuleSubTypeMessage(DeclarativeMessage):
     """Module SubType Message."""
+
+    _command_code = COMMAND_CODE
+    _generates_data_to_binary = False
 
     def __init__(self, address=None, sub_address_offset: int = 0) -> None:
         """Initialize Module SubType Message object."""
@@ -41,7 +45,6 @@ class ModuleSubTypeMessage(Message):
         """:return: None"""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
-        # self.needs_data(data, 6)
         self.set_attributes(priority, address, rtr)
         self.module_type = data[0]
         (self.serial,) = struct.unpack(">L", bytes([0, 0, data[1], data[2]]))

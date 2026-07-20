@@ -6,25 +6,22 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xDE
 
 
 @register(COMMAND_CODE)
-class SwitchToSafeMessage(Message):
+class SwitchToSafeMessage(DeclarativeMessage):
     """Switch to safe message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
 
     def __init__(self, address=None, sleep=0):
         """Initialize SwitchToSafeMessage class."""
-        Message.__init__(self)
+        super().__init__(address)
         self.sleep = sleep
-        self.set_defaults(address)
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
 
     def data_to_binary(self):
         """:return: bytes"""

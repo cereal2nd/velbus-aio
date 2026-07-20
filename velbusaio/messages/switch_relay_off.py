@@ -3,39 +3,20 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 
 COMMAND_CODE = 0x01
 
 
 @register(COMMAND_CODE)
-class SwitchRelayOffMessage(Message):
+class SwitchRelayOffMessage(DeclarativeMessage):
     """Switch Relay Off Message."""
 
-    def __init__(self, address=None):
-        """Initialize SwitchRelayOffMessage class."""
-        Message.__init__(self)
-        self.relay_channels = []
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _priority = "high"
+    _data_length = 1
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_high_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 1)
-        self.set_attributes(priority, address, rtr)
-        self.relay_channels = self.byte_to_channels(data[0])
-
-    def set_defaults(self, address):
-        """Set default values for the message."""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE, self.channels_to_byte(self.relay_channels)])
+    relay_channels = ChannelsField(0)
 
 
 @register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20", "VMB1RYS-20"])
@@ -44,7 +25,6 @@ class SwitchRelayOffMessage20(SwitchRelayOffMessage):
 
     def data_to_binary(self):
         """:return: bytes"""
-        # For these modules, we send the channel index (1-8), not a bitmask
         if self.relay_channels:
             return bytes([COMMAND_CODE, self.relay_channels[0]])
         return bytes([COMMAND_CODE, 0])

@@ -6,6 +6,7 @@ from enum import IntEnum
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xD4
 
@@ -19,8 +20,11 @@ class CustomColorPriority(IntEnum):
 
 
 @register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO", "VMBELO-20"])
-class SetEdgeColorMessage(Message):
+class SetEdgeColorMessage(DeclarativeMessage):
     """Set Edge Color message (DLC=4 variant)."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
 
     def __init__(self, address=None):
         """Iniatialize Set Edge Color message object."""
@@ -79,8 +83,11 @@ class SetEdgeColorMessage(Message):
         return bytes([COMMAND_CODE, byte_2, byte_3, byte_4])
 
 
-class SetCustomColorMessage(Message):
+class SetCustomColorMessage(DeclarativeMessage):
     """Set Custom Color (Palette) message (DLC=6 variant)."""
+
+    _command_code = COMMAND_CODE
+    _auto_register = False
 
     def __init__(self, address=None):
         """Iniatialize Set Custom Color message object."""

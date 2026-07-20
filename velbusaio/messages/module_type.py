@@ -9,6 +9,7 @@ import struct
 
 from velbusaio.command_registry import MODULE_DIRECTORY, register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xFF
 MODULES_WITHOUT_SERIAL = {
@@ -89,8 +90,11 @@ MODULES_WITHOUT_SERIAL = {
         "VMBDALI",
     ],
 )
-class ModuleTypeMessage(Message):
+class ModuleTypeMessage(DeclarativeMessage):
     """Module Type Message."""
+
+    _command_code = COMMAND_CODE
+    _generates_data_to_binary = False
 
     def __init__(self, address=None) -> None:
         """Initialize Module Type Message object."""
@@ -147,8 +151,11 @@ class ModuleTypeMessage(Message):
         "VMB1RYS-20",
     ],
 )
-class ModuleType2Message(Message):
+class ModuleType2Message(DeclarativeMessage):
     """Module Type Message."""
+
+    _command_code = COMMAND_CODE
+    _generates_data_to_binary = False
 
     def __init__(self, address=None) -> None:
         """Initialize Module Type Message object."""

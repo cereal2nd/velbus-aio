@@ -5,11 +5,16 @@
 
 from __future__ import annotations
 
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 
-class ModuleTypeRequestMessage(Message):
+class ModuleTypeRequestMessage(DeclarativeMessage):
     """Module Type Request Message."""
+
+    _priority = "low"
+    _rtr = True
+    _data_length = 0
+    _generates_data_to_binary = False
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -17,13 +22,6 @@ class ModuleTypeRequestMessage(Message):
         self.needs_rtr(rtr)
         self.needs_no_data(data)
         self.set_attributes(priority, address, rtr)
-
-    def set_defaults(self, address):
-        """Set defaults."""
-        if address is not None:
-            self.set_address(address)
-        self.set_low_priority()
-        self.set_rtr()
 
     def data_to_binary(self):
         """:return: bytes"""

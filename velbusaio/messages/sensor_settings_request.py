@@ -6,21 +6,20 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xE7
 
 
 @register(COMMAND_CODE)
-class SensorSettingsRequestMessage(Message):
+class SensorSettingsRequestMessage(DeclarativeMessage):
     """Sensor Settings Request Message."""
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_rtr(rtr)
-        self.needs_no_data(data)
-        self.set_attributes(priority, address, rtr)
+    _command_code = COMMAND_CODE
+    _priority = "low"
+    _rtr = True
+    _data_length = 0
+    _generates_data_to_binary = False
 
     def set_defaults(self, address):
         """Set default values."""

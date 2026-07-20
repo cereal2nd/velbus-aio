@@ -7,13 +7,19 @@ from __future__ import annotations
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xBE
 
 
 @register(COMMAND_CODE)
-class KwhStatusMessage(Message):
+class KwhStatusMessage(DeclarativeMessage):
     """Kwh Status message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
+    _data_length = 7
+    _generates_data_to_binary = False
 
     def __init__(self, address=None):
         """Initialize Kwh Status message."""

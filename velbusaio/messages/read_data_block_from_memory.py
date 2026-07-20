@@ -6,31 +6,17 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ByteField, DeclarativeMessage
 
 COMMAND_CODE = 0xC9
 
 
 @register(COMMAND_CODE)
-class ReadDataBlockFromMemoryMessage(Message):
+class ReadDataBlockFromMemoryMessage(DeclarativeMessage):
     """Read Data Block From Memory Message."""
 
-    def __init__(self, address=None):
-        """Initialize Read Data Block From Memory Message Object."""
-        Message.__init__(self)
-        self.high_address = 0x00
-        self.low_address = 0x00
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 2
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 2)
-        self.set_attributes(priority, address, rtr)
-        self.low_address = data[1]
-        self.high_address = data[0]
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE, self.high_address, self.low_address])
+    high_address = ByteField(0)
+    low_address = ByteField(1)

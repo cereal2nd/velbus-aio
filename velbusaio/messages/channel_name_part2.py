@@ -6,21 +6,23 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xF1
 
 
 @register(COMMAND_CODE)
-class ChannelNamePart2Message(Message):
+class ChannelNamePart2Message(DeclarativeMessage):
     """Channel Name Part 2 message."""
+
+    _command_code = COMMAND_CODE
+    _priority = "low"
 
     def __init__(self, address=None):
         """Initialize Channel Name Part 2 message."""
-        Message.__init__(self)
+        super().__init__(address)
         self.channel = 0
         self.name = ""
-        self.set_defaults(address)
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""

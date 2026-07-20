@@ -6,48 +6,28 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ByteField, DeclarativeMessage, Int16Field
 
 COMMAND_CODE = 0xB7
 
 
 @register(COMMAND_CODE)
-class SetDate(Message):
+class SetDate(DeclarativeMessage):
     """Set Date Message."""
+
+    _command_code = COMMAND_CODE
+    _data_length = 4
+
+    _day = ByteField(0, default=None)
+    _mon = ByteField(1, default=None)
+    _year = Int16Field(2, default=None)
 
     def __init__(self, address=0x00, day=None, mon=None, year=None) -> None:
         """Initialize Set Date Message Object."""
-        Message.__init__(self)
-        self._day = day
-        self._mon = mon
-        self._year = year
-        self.set_defaults(address)
-
-    def set_defaults(self, address) -> None:
-        """Set default values."""
-        if address is not None:
-            self.set_address(address)
-        self.set_low_priority()
-        self.set_no_rtr()
-
-    def populate(self, priority, address, rtr, data) -> None:
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 4)
-        self.set_attributes(priority, address, rtr)
-        self._day = data[0]
-        self._mon = data[1]
-        self._year = (data[2] << 8) + data[3]
-
-    def data_to_binary(self) -> bytes:
-        """:return: bytes"""
-        return bytes(
-            [
-                COMMAND_CODE,
-                self._day,
-                self._mon,
-                (self._year >> 8),
-                (self._year & 0x00FF),
-            ]
-        )
+        super().__init__(address)
+        if day is not None:
+            self._day = day
+        if mon is not None:
+            self._mon = mon
+        if year is not None:
+            self._year = year

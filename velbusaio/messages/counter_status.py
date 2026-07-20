@@ -7,13 +7,19 @@ from __future__ import annotations
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xBE
 
 
 @register(COMMAND_CODE, ["VMB7IN"])
-class CounterStatusMessage(Message):
+class CounterStatusMessage(DeclarativeMessage):
     """Counter Status message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
+    _data_length = 7
+    _generates_data_to_binary = False
 
     def __init__(self, address=None):
         """Initialize Counter Status message."""

@@ -8,7 +8,7 @@ from __future__ import annotations
 import enum
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 from velbusaio.messages.dali_device_settings import DaliDeviceSetting
 
 COMMAND_CODE = 0xE7
@@ -22,16 +22,18 @@ class DataSource(enum.Enum):
 
 
 @register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
-class DaliDeviceSettingsRequest(Message):
+class DaliDeviceSettingsRequest(DeclarativeMessage):
     """Dali Device Settings Request message."""
+
+    _command_code = COMMAND_CODE
+    _data_length = 2
 
     def __init__(self, address: int | None = None):
         """Initialize Dali Device Settings Request message."""
-        super().__init__()
+        super().__init__(address)
         self.channel: int = None
         self.data_source: DataSource = None
         self.settings: DaliDeviceSetting = None
-        self.set_defaults(address)
 
     def populate(self, priority, address: int, rtr: int, data: bytes) -> None:
         """Populate message attributes."""

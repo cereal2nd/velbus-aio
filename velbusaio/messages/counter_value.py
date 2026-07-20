@@ -7,13 +7,19 @@ from __future__ import annotations
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
+from velbusaio.message_fields import DeclarativeMessage
 
 COMMAND_CODE = 0xA4
 
 
 @register(COMMAND_CODE, ["VMB8IN-20"])
-class CounterValueMessage(Message):
+class CounterValueMessage(DeclarativeMessage):
     """Counter Value message."""
+
+    _command_code = COMMAND_CODE
+    _priority = None
+    _data_length = 7
+    _generates_data_to_binary = False
 
     def __init__(self, address=None):
         """Initialize Counter Value message."""
@@ -39,11 +45,8 @@ class CounterValueMessage(Message):
         self.needs_no_rtr(rtr)
         self.needs_data(data, 7)
         self.set_attributes(priority, address, rtr)
-        # Channel is in high nibble of data[0], value 0..7
         self.channel = (data[0] >> 4) + 1
-        # Power is 20-bit: low nibble of data[0] + data[1] + data[2]
         self.power = ((data[0] & 0x0F) << 16) + (data[1] << 8) + data[2]
-        # Energy is 32-bit: data[3] to data[6]
         self.energy = (data[3] << 24) + (data[4] << 16) + (data[5] << 8) + data[6]
 
     def get_channels(self):

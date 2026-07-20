@@ -6,51 +6,23 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 
 COMMAND_CODE = 0x00
 
 
 @register(COMMAND_CODE)
-class PushButtonStatusMessage(Message):
+class PushButtonStatusMessage(DeclarativeMessage):
     """Push Button Status Message."""
 
-    def __init__(self, address=None):
-        """Initialize Push Button Status Message Object."""
-        Message.__init__(self)
-        self.closed = []
-        self.opened = []
-        self.closed_long = []
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _priority = "high"
+    _data_length = 3
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_high_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 3)
-        self.set_attributes(priority, address, rtr)
-        self.closed = self.byte_to_channels(data[0])
-        self.opened = self.byte_to_channels(data[1])
-        self.closed_long = self.byte_to_channels(data[2])
-
-    def set_defaults(self, address):
-        """:return: None"""
-        if address is not None:
-            self.set_address(address)
-        self.set_high_priority()
-        self.set_no_rtr()
+    closed = ChannelsField(0)
+    opened = ChannelsField(1)
+    closed_long = ChannelsField(2)
 
     def get_channels(self):
         """:return: list"""
         return self.closed + self.opened
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes(
-            [
-                COMMAND_CODE,
-                self.channels_to_byte(self.closed),
-                self.channels_to_byte(self.opened),
-                self.channels_to_byte(self.closed_long),
-            ]
-        )

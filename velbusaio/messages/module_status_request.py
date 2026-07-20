@@ -6,29 +6,20 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 
 COMMAND_CODE = 0xFA
 
 
 @register(COMMAND_CODE)
-class ModuleStatusRequestMessage(Message):
+class ModuleStatusRequestMessage(DeclarativeMessage):
     """Module Status Request Message."""
 
-    def __init__(self, address=None):
-        """Initialize Module Status Request Message object."""
-        Message.__init__(self)
-        self.channels: list | str = []
-        self.wait_after_send = 500
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 1
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 1)
-        self.set_attributes(priority, address, rtr)
-        self.channels = self.byte_to_channels(data[0])
+    wait_after_send = 500
+    channels = ChannelsField(0)
 
     def data_to_binary(self):
         """:return: bytes"""

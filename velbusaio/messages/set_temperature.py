@@ -6,32 +6,22 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ComputedField, DeclarativeMessage, Field
 
 COMMAND_CODE = 0xE4
 
 
 @register(COMMAND_CODE)
-class SetTemperatureMessage(Message):
+class SetTemperatureMessage(DeclarativeMessage):
     """Set Temperature Message."""
 
-    def __init__(self, address=None):
-        """Initialize Set Temperature Message Object."""
-        Message.__init__(self)
-        self.temp_type = 0x00
-        self.temp = 0x00
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 1
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 1)
-        self.set_attributes(priority, address, rtr)
-
-        self.temp_type = 0x00
-        self.temp = data[1] * 2
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return bytes([COMMAND_CODE, int(self.temp_type), int(self.temp)])
+    temp_type = ComputedField(parser=lambda data: 0, default=0, serializable=True)
+    temp = Field(
+        byte_index=1,
+        default=0,
+        parser=lambda data: data[1] * 2,
+        serializer=lambda value: bytes([int(value)]),
+    )

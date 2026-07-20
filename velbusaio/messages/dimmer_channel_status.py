@@ -5,10 +5,13 @@
 
 from __future__ import annotations
 
-import struct
-
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import (
+    ByteField,
+    ChannelField,
+    DeclarativeMessage,
+    Int24Field,
+)
 
 COMMAND_CODE = 0xB8
 CHANNEL_NORMAL = 0x00
@@ -27,30 +30,17 @@ LED_VERY_FAST_BLINKING = 1 << 4
     COMMAND_CODE,
     ["VMB4DC", "VMBDMI", "VMBDMI-R", "VMB8DC-20", "VMB4LEDPWM-20", "VMB2DC-20"],
 )
-class DimmerChannelStatusMessage(Message):
+class DimmerChannelStatusMessage(DeclarativeMessage):
     """Dimmer Channel Status message."""
 
-    def __init__(self, address=None):
-        """Initialize Dimmer Channel Status message."""
-        Message.__init__(self)
-        self.channel = 1
-        self.disable_inhibit_forced = 0
-        self.dimmer_state = 0
-        self.led_status = 0
-        self.delay_time = 0
-        self.set_defaults(address)
+    _command_code = COMMAND_CODE
+    _data_length = 7
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.channel = self.byte_to_channel(data[0])
-        self.disable_inhibit_forced = data[1]
-        self.dimmer_state = int.from_bytes([data[2]], byteorder="big", signed=False)
-        self.led_status = data[3]
-        (self.delay_time,) = struct.unpack(">L", bytes([0]) + data[4:])
+    channel = ChannelField(0, default=1)
+    disable_inhibit_forced = ByteField(1)
+    dimmer_state = ByteField(2)
+    led_status = ByteField(3)
+    delay_time = Int24Field(4)
 
     def is_normal(self):
         """:return: bool"""
@@ -71,18 +61,3 @@ class DimmerChannelStatusMessage(Message):
     def cur_dimmer_state(self):
         """:return: int"""
         return self.dimmer_state
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        return (
-            bytes(
-                [
-                    COMMAND_CODE,
-                    self.channels_to_byte([self.channel]),
-                    self.disable_inhibit_forced,
-                    self.dimmer_state,
-                    self.led_status,
-                ]
-            )
-            + struct.pack(">L", self.delay_time)[-3:]
-        )
