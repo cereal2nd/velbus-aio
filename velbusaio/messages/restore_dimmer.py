@@ -18,7 +18,7 @@ COMMAND_CODE = 0x11
 
 
 def _parse_transition(data: bytes) -> int:
-    return int.from_bytes(data[2:3], byteorder="big", signed=False)
+    return int.from_bytes(data[2:4], byteorder="big", signed=False)
 
 
 def _serialize_transition(value: int) -> bytes:
@@ -44,7 +44,7 @@ class RestoreDimmerMessage(DeclarativeMessage):
 
     _command_code = COMMAND_CODE
     _priority = "high"
-    _data_length = 3
+    _data_length = 4
 
     dimmer_channels = ChannelsField(0)
     _padding = ByteField(1, default=0)

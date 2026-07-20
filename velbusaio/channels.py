@@ -648,7 +648,7 @@ class Temperature(Channel):
         """Set the target temperature."""
         cls = commandRegistry.get_command(0xE4, self._module.get_type())
         msg = cls(self._address)
-        msg.temp = temp * 2  # TODO: int()
+        msg.temp = temp
         await self._writer(msg)
 
     async def _switch_mode(self) -> None:

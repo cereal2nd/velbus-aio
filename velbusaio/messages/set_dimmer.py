@@ -18,7 +18,7 @@ COMMAND_CODE = 0x07
 
 
 def _parse_transition(data: bytes) -> int:
-    return int.from_bytes(data[2:3], byteorder="big", signed=False)
+    return int.from_bytes(data[2:4], byteorder="big", signed=False)
 
 
 def _serialize_transition(value: int) -> bytes:

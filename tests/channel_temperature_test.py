@@ -108,7 +108,7 @@ class TestTemperature:
             await temp.set_temp(22.5)
 
             mock_registry.get_command.assert_called_once_with(0xE4, 0x01)
-            assert mock_msg.temp == 45.0  # 22.5 * 2
+            assert mock_msg.temp == 22.5
             mock_writer.assert_called_once()
 
     @pytest.mark.asyncio

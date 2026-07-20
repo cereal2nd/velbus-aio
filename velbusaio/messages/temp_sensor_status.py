@@ -56,13 +56,13 @@ class TempSensorStatusMessage(DeclarativeMessage):
     current_temp = Field(
         byte_index=3,
         default=None,
-        parser=lambda data: data[3] / 2,
+        parser=lambda data: (data[3] - 256 if data[3] & 0x80 else data[3]) / 2,
         serializable=False,
     )
     target_temp = Field(
         byte_index=4,
         default=None,
-        parser=lambda data: data[4] / 2,
+        parser=lambda data: (data[4] - 256 if data[4] & 0x80 else data[4]) / 2,
         serializable=False,
     )
     sleep_timer = Int16Field(5, default=None, serializable=False)

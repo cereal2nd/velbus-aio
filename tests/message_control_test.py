@@ -233,7 +233,7 @@ class TestSetDimmerMessage:
     def test_populate(self):
         """Test Populate."""
         msg = SetDimmerMessage()
-        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x01, 100, 5, 0]))
+        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x01, 100, 0, 5]))
         assert msg.dimmer_channels == [1]
         assert msg.dimmer_state == 100
         assert msg.dimmer_transitiontime == 5
@@ -277,14 +277,14 @@ class TestRestoreDimmerMessage:
     def test_populate(self):
         """Test Populate."""
         msg = RestoreDimmerMessage()
-        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x01, 0x00, 0x05, 0x00]))
+        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x01, 0x00, 0x00, 0x05]))
         assert msg.dimmer_channels == [1]
         assert msg.dimmer_transitiontime == 5
 
     def test_data_to_binary(self):
         """Test Data to binary."""
         msg = RestoreDimmerMessage()
-        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x01, 0x00, 0x05, 0x00]))
+        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x01, 0x00, 0x00, 0x05]))
         assert msg.data_to_binary() == bytes([0x11, 0x01, 0, 0, 5])
 
 
@@ -294,13 +294,13 @@ class TestRestoreDimmerMessage2:
     def test_populate(self):
         """Test Populate."""
         msg = RestoreDimmerMessage2()
-        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x05, 0x00, 0x05, 0x00]))
+        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x05, 0x00, 0x00, 0x05]))
         assert msg.dimmer_channels == [5]
 
     def test_data_to_binary(self):
         """Test Data to binary."""
         msg = RestoreDimmerMessage2()
-        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x05, 0x00, 0x05, 0x00]))
+        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x05, 0x00, 0x00, 0x05]))
         assert msg.data_to_binary() == bytes([0x11, 5, 0, 0, 5])
 
 

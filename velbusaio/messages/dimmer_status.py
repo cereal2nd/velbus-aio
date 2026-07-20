@@ -45,7 +45,7 @@ class DimmerStatusMessage(DeclarativeMessage):
     dimmer_mode = ByteField(0)
     dimmer_state = ByteField(1)
     led_status = ByteField(2)
-    delay_time = Int24Field(4)
+    delay_time = Int24Field(3)
     dimmer_config = ByteField(6, serializable=False)
 
     def __init__(self, address=None):
@@ -101,4 +101,4 @@ class DimmerStatusMessage(DeclarativeMessage):
                 self.dimmer_state,
                 self.led_status,
             ]
-        ) + Int24Field(4).serialize(self.delay_time)
+        ) + Int24Field(3).serialize(self.delay_time)

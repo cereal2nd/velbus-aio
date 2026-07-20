@@ -74,14 +74,27 @@ class TestSetTemperatureMessage:
         msg = SetTemperatureMessage()
         msg.populate(PRIORITY_LOW, 0x01, False, bytes([0x00, 0x0A]))
         assert msg.temp_type == 0
-        assert msg.temp == 20
+        assert msg.temp == 5.0
+
+    def test_populate_negative(self):
+        """Test Populate with a negative temperature (two's complement)."""
+        msg = SetTemperatureMessage()
+        msg.populate(PRIORITY_LOW, 0x01, False, bytes([0x00, 0xC0]))
+        assert msg.temp == -32.0
 
     def test_data_to_binary(self):
         """Test Data to binary."""
         msg = SetTemperatureMessage()
         msg.temp_type = 0
         msg.temp = 20
-        assert msg.data_to_binary() == bytes([0xE4, 0, 20])
+        assert msg.data_to_binary() == bytes([0xE4, 0, 40])
+
+    def test_data_to_binary_negative(self):
+        """Test Data to binary with a negative temperature."""
+        msg = SetTemperatureMessage()
+        msg.temp_type = 0
+        msg.temp = -32
+        assert msg.data_to_binary() == bytes([0xE4, 0, 0xC0])
 
 
 class TestTempSetCoolingMessage:
