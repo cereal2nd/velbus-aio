@@ -14,7 +14,7 @@ import sys
 import time
 from typing import TYPE_CHECKING
 
-from aiofile import async_open
+import anyio
 
 from velbusaio.command_registry import commandRegistry
 from velbusaio.const import (
@@ -67,15 +67,15 @@ class PacketHandler:
             with importlib.resources.path(
                 __name__, "module_spec/broadcast.json"
             ) as fspath:
-                async with async_open(fspath) as protocol_file:
+                async with await anyio.open_file(fspath) as protocol_file:
                     self.broadcast = json.loads(await protocol_file.read())
             with importlib.resources.path(
                 __name__, "module_spec/ignore.json"
             ) as fspath:
-                async with async_open(fspath) as protocol_file:
+                async with await anyio.open_file(fspath) as protocol_file:
                     self.ignore = json.loads(await protocol_file.read())
         else:
-            async with async_open(
+            async with await anyio.open_file(
                 str(
                     importlib.resources.files(__name__.split(".")[0]).joinpath(
                         "module_spec/broadcast.json"
@@ -83,7 +83,7 @@ class PacketHandler:
                 )
             ) as protocol_file:
                 self.broadcast = json.loads(await protocol_file.read())
-            async with async_open(
+            async with await anyio.open_file(
                 str(
                     importlib.resources.files(__name__.split(".")[0]).joinpath(
                         "module_spec/ignore.json"
@@ -126,11 +126,11 @@ class PacketHandler:
             self.__scan_found_addresses = {}
             for address in range(start_address, max_address):
                 cfile = pathlib.Path(f"{self._velbus.get_cache_dir()}/{address}.json")
-                if reload_cache and cfile.is_file():
+                if reload_cache and await anyio.Path(cfile).is_file():
                     self._log.info(
                         f"Reloading cache for address {address} ({address:#02x})"
                     )
-                    cfile.unlink()
+                    await anyio.Path(cfile).unlink()
 
                 self.__scan_found_addresses[address] = None
                 async with self._scanLock:

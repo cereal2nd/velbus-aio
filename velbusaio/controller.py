@@ -8,13 +8,13 @@ from dataclasses import dataclass
 import datetime
 import itertools
 import logging
-import pathlib
 import re
 import ssl
 import time
 import typing as t
 from urllib.parse import urlparse
 
+import anyio
 import serialx
 
 from velbusaio.channels import (
@@ -358,7 +358,7 @@ class Velbus:
                     await module.wait_for_status_messages()
         else:
             # make sure the cachedir exists
-            pathlib.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
+            await anyio.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
             # scan the bus
             await self._handler.scan()
 

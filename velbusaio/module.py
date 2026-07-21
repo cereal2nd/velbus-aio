@@ -13,7 +13,7 @@ import struct
 import sys
 from typing import TYPE_CHECKING
 
-from aiofile import async_open
+import anyio
 
 if TYPE_CHECKING:
     from velbusaio.controller import Controller
@@ -219,10 +219,10 @@ class Module:
                     with importlib.resources.path(
                         __name__, "module_spec/global.json"
                     ) as fspath:
-                        async with async_open(fspath) as global_file:
+                        async with await anyio.open_file(fspath) as global_file:
                             global_data = json.loads(await global_file.read())
                 else:
-                    async with async_open(
+                    async with await anyio.open_file(
                         str(
                             importlib.resources.files(__name__.split(".")[0]).joinpath(
                                 "module_spec/global.json"
@@ -239,10 +239,10 @@ class Module:
                 with importlib.resources.path(
                     __name__, f"module_spec/{h2(self._type)}.json"
                 ) as fspath:
-                    async with async_open(fspath) as protocol_file:
+                    async with await anyio.open_file(fspath) as protocol_file:
                         self._data = json.loads(await protocol_file.read())
             else:
-                async with async_open(
+                async with await anyio.open_file(
                     str(
                         importlib.resources.files(__name__.split(".")[0]).joinpath(
                             f"module_spec/{h2(self._type)}.json"
@@ -294,7 +294,7 @@ class Module:
         if not self._use_cache:
             return
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
-        async with async_open(cfile, "w") as fl:
+        async with await anyio.open_file(cfile, "w") as fl:
             await fl.write(json.dumps(self.to_cache(), indent=4))
 
     def __getstate__(self) -> dict:
@@ -608,12 +608,22 @@ class Module:
                 message.current_temp, 1 / 2
             )
 
-        # Update thermostat channels
+        # Update thermostat channels.
+        # The spec channel names differ between module generations: the older
+        # modules (VMBEL1/2/4, VMBGP*, VMBGPO, ...) use the short names
+        # ("Boost", "Alarm 1"), while the "-20" variants use the long names
+        # ("Boost heater/cooler", "Temperature alarm 1"). Map both so the
+        # boost/alarm binary sensors stay in sync on every module.
         channel_name_to_msg_prop_map = {
             "Heater": "heater",
+            "Boost": "boost",
             "Boost heater/cooler": "boost",
             "Pump": "pump",
             "Cooler": "cooler",
+            "Alarm 1": "alarm1",
+            "Alarm 2": "alarm2",
+            "Alarm 3": "alarm3",
+            "Alarm 4": "alarm4",
             "Temperature alarm 1": "alarm1",
             "Temperature alarm 2": "alarm2",
             "Temperature alarm 3": "alarm3",
@@ -985,7 +995,7 @@ class Module:
     async def _get_cache(self):
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
         try:
-            async with async_open(cfile, "r") as fl:
+            async with await anyio.open_file(cfile, "r") as fl:
                 cache = json.loads(await fl.read())
         except OSError:
             return {}
@@ -996,7 +1006,7 @@ class Module:
                 "Cache file for module %s is corrupt, removing it",
                 self._address,
             )
-            cfile.unlink(missing_ok=True)
+            await anyio.Path(cfile).unlink(missing_ok=True)
             return {}
         return cache
 

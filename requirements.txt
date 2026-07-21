@@ -1,4 +1,4 @@
-aiofile
+anyio
 backoff>=1.10.0
 beautifulsoup4
 lxml

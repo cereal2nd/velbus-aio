@@ -8,7 +8,7 @@ import json
 import logging
 import sys
 
-from aiofile import async_open
+import anyio
 from bs4 import BeautifulSoup
 
 from velbusaio.command_registry import MODULE_DIRECTORY
@@ -30,7 +30,7 @@ class VlpFile:
 
     async def read(self) -> None:
         """Read and parse the VLP file."""
-        async with async_open(self._file_path) as file:
+        async with await anyio.open_file(self._file_path) as file:
             xml_content = await file.read()
         _soup = BeautifulSoup(xml_content, "xml")
         for module in _soup.find_all("Module"):
@@ -268,10 +268,10 @@ class vlpModule:
             with importlib.resources.path(
                 __name__, f"module_spec/{h2(memmap_id)}.json"
             ) as fspath:
-                async with async_open(fspath) as protocol_file:
+                async with await anyio.open_file(fspath) as protocol_file:
                     self._spec = json.loads(await protocol_file.read())
         else:
-            async with async_open(
+            async with await anyio.open_file(
                 str(
                     importlib.resources.files(__name__.split(".")[0]).joinpath(
                         f"module_spec/{h2(memmap_id)}.json"

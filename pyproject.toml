@@ -30,7 +30,7 @@ requires-python = ">=3.11.0"
 dependencies = [
     "serialx",
     "backoff>=1.10.0",
-    "aiofile",
+    "anyio",
     "beautifulsoup4",
     "lxml",
 ]
@@ -69,7 +69,7 @@ push = true
 ]
 
 [tool.ruff]
-required-version = ">=0.13.0"
+required-version = ">=0.15.22"
 
 [tool.ruff.lint]
 select = [

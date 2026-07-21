@@ -128,7 +128,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         self._last_activity_time = time.time()
         self._serial_buf += data
         self._log.debug(
-            "Received {nbytes} bytes from Velbus: {data_hex}".format(
+            "RX: {nbytes} bytes: {data_hex}".format(
                 nbytes=len(data),
                 data_hex=binascii.hexlify(self._serial_buf[: len(data)], " "),
             )
