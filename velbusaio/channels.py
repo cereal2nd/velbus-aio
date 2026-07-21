@@ -26,6 +26,12 @@ from velbusaio.messages.edge_set_color import (
     SetCustomColorMessage,
     SetEdgeColorMessage,
 )
+from velbusaio.messages.sensor_temp_request import (
+    TEMP_AUTOSEND_DISABLED,
+    TEMP_AUTOSEND_INTERVAL_MAX,
+    TEMP_AUTOSEND_INTERVAL_MIN,
+    TEMP_AUTOSEND_ON_CHANGE,
+)
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
@@ -649,6 +655,39 @@ class Temperature(Channel):
         cls = commandRegistry.get_command(0xE4, self._module.get_type())
         msg = cls(self._address)
         msg.temp = temp
+        await self._writer(msg)
+
+    async def set_temperature_autosend(
+        self, mode: str, seconds: int | None = None
+    ) -> None:
+        """Configure how often the module sends its temperature on the bus.
+
+        :param mode: one of ``"never"`` (auto send disabled),
+            ``"on_change"`` (auto send on every temperature change) or
+            ``"interval"`` (a fixed interval, requires ``seconds``).
+        :param seconds: the interval in seconds (10..255), only used and
+            required when ``mode`` is ``"interval"``.
+        """
+        if mode == "never":
+            interval = TEMP_AUTOSEND_DISABLED
+        elif mode == "on_change":
+            interval = TEMP_AUTOSEND_ON_CHANGE
+        elif mode == "interval":
+            if seconds is None:
+                raise ValueError("seconds is required when mode is 'interval'")
+            if not TEMP_AUTOSEND_INTERVAL_MIN <= seconds <= TEMP_AUTOSEND_INTERVAL_MAX:
+                raise ValueError(
+                    "seconds must be between "
+                    f"{TEMP_AUTOSEND_INTERVAL_MIN} and {TEMP_AUTOSEND_INTERVAL_MAX}"
+                )
+            interval = seconds
+        else:
+            raise ValueError(
+                f"Unknown temperature autosend mode: {mode!r} "
+                "(expected 'never', 'on_change' or 'interval')"
+            )
+        cls = commandRegistry.get_command(0xE5, self._module.get_type())
+        msg = cls(self._address, interval)
         await self._writer(msg)
 
     async def _switch_mode(self) -> None:

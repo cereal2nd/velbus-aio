@@ -25,7 +25,11 @@ from velbusaio.messages.module_type_request import ModuleTypeRequestMessage
 from velbusaio.messages.realtime_clock_status_request import RealtimeClockStatusRequest
 from velbusaio.messages.receive_buffer_full import ReceiveBufferFullMessage
 from velbusaio.messages.receive_ready import ReceiveReadyMessage
-from velbusaio.messages.sensor_temp_request import SensorTempRequest
+from velbusaio.messages.sensor_temp_request import (
+    TEMP_AUTOSEND_DISABLED,
+    TEMP_AUTOSEND_ON_CHANGE,
+    SensorTempRequest,
+)
 from velbusaio.messages.temp_sensor_settings_part1 import TempSensorSettingsPart1
 from velbusaio.messages.temp_sensor_settings_part2 import TempSensorSettingsPart2
 from velbusaio.messages.temp_sensor_settings_part3 import TempSensorSettingsPart3
@@ -109,6 +113,21 @@ class TestSensorTempRequest:
     def test_data_to_binary(self):
         """Test Data to binary."""
         assert SensorTempRequest().data_to_binary() == bytes([0xE5])
+
+    def test_data_to_binary_disabled(self):
+        """Test autosend disabled ('never')."""
+        msg = SensorTempRequest(0x10, TEMP_AUTOSEND_DISABLED)
+        assert msg.data_to_binary() == bytes([0xE5, 0x01])
+
+    def test_data_to_binary_on_change(self):
+        """Test autosend on temperature change."""
+        msg = SensorTempRequest(0x10, TEMP_AUTOSEND_ON_CHANGE)
+        assert msg.data_to_binary() == bytes([0xE5, 0x05])
+
+    def test_data_to_binary_fixed_interval(self):
+        """Test autosend with a fixed interval in seconds."""
+        msg = SensorTempRequest(0x10, 60)
+        assert msg.data_to_binary() == bytes([0xE5, 60])
 
 
 class TestLightValueRequest:
