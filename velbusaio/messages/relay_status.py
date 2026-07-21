@@ -72,9 +72,7 @@ class RelayStatusMessage2(RelayStatusMessage):
 
     def is_on(self):
         """:return: bool"""
-        if (self.status >> (self.channel - 1)) & 1 != 0:
-            return True
-        return False
+        return (self.status >> (self.channel - 1)) & 1 != 0
 
 
 @register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20"])

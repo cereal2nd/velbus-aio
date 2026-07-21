@@ -630,22 +630,24 @@ class Module:
             "Temperature alarm 4": "alarm4",
         }
         for channel_str in self._data["Channels"]:
-            if keys_exists(self._data, "Channels", channel_str, "Type"):
-                if self._data["Channels"][channel_str]["Type"] == "ThermostatChannel":
-                    channel = self._translate_channel_name(channel_str)
-                    channel_name = self._data["Channels"][channel_str]["Name"]
-                    if (
-                        channel in self._channels
-                        and channel_name in channel_name_to_msg_prop_map
-                    ):
-                        await self._update_channel(
-                            channel,
-                            {
-                                "closed": getattr(
-                                    message, channel_name_to_msg_prop_map[channel_name]
-                                )
-                            },
-                        )
+            if (
+                keys_exists(self._data, "Channels", channel_str, "Type")
+                and self._data["Channels"][channel_str]["Type"] == "ThermostatChannel"
+            ):
+                channel = self._translate_channel_name(channel_str)
+                channel_name = self._data["Channels"][channel_str]["Name"]
+                if (
+                    channel in self._channels
+                    and channel_name in channel_name_to_msg_prop_map
+                ):
+                    await self._update_channel(
+                        channel,
+                        {
+                            "closed": getattr(
+                                message, channel_name_to_msg_prop_map[channel_name]
+                            )
+                        },
+                    )
 
     async def _handle_push_button_status(
         self, message: PushButtonStatusMessage, channel_offset: int
@@ -653,15 +655,16 @@ class Module:
         """Handle push button status messages."""
         _update_buttons = False
         for channel_types in self._data["Channels"]:
-            if keys_exists(self._data, "Channels", channel_types, "Type"):
-                if self._data["Channels"][channel_types]["Type"] in (
-                    "Button",
-                    "Sensor",
-                    "ButtonCounter",
-                    "Relay",
-                ):
-                    _update_buttons = True
-                    break
+            if keys_exists(
+                self._data, "Channels", channel_types, "Type"
+            ) and self._data["Channels"][channel_types]["Type"] in (
+                "Button",
+                "Sensor",
+                "ButtonCounter",
+                "Relay",
+            ):
+                _update_buttons = True
+                break
         if _update_buttons:
             for channel_id in range(1, 9):
                 channel = self._translate_channel_name(channel_id + channel_offset)
@@ -1281,11 +1284,13 @@ class Module:
                 writer=self._writer,
                 address=self._address,
             )
-            if chan_data["Type"] == "Temperature":
-                if "Thermostat" in self._data or (
+            if chan_data["Type"] == "Temperature" and (
+                "Thermostat" in self._data
+                or (
                     "ThermostatAddr" in self._data and self._data["ThermostatAddr"] != 0
-                ):
-                    await self._update_channel(chan_num, {"thermostat": True})
+                )
+            ):
+                await self._update_channel(chan_num, {"thermostat": True})
             if chan_data["Type"] == "Dimmer" and "sliderScale" in self._data:
                 self._channels[chan_num].slider_scale = self._data["sliderScale"]
 

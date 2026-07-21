@@ -163,18 +163,20 @@ class CommandRegistry:
 
     def has_command(self, command_value: int, module_type: int = 0) -> bool:
         """Find a command."""
-        if module_type in self._overrides:
-            if command_value in self._overrides[module_type]:
-                return True
-        if command_value in self._default_commands:
+        if (
+            module_type in self._overrides
+            and command_value in self._overrides[module_type]
+        ):
             return True
-        return False
+        return command_value in self._default_commands
 
     def get_command(self, command_value: int, module_type: int = 0) -> None | type:
         """Search a command in the registry."""
-        if module_type in self._overrides:
-            if command_value in self._overrides[module_type]:
-                return self._overrides[module_type][command_value]
+        if (
+            module_type in self._overrides
+            and command_value in self._overrides[module_type]
+        ):
+            return self._overrides[module_type][command_value]
         if command_value in self._default_commands:
             return self._default_commands[command_value]
         return None

@@ -63,9 +63,9 @@ class ScheduledTask:
                 await self.callback()
             except asyncio.CancelledError:
                 break
-            except (RuntimeError, ValueError, TypeError, AttributeError) as e:
-                logging.getLogger("velbus-scheduler").error(
-                    "Error in scheduled task '%s': %s", self.name, e
+            except (RuntimeError, ValueError, TypeError, AttributeError):
+                logging.getLogger("velbus-scheduler").exception(
+                    "Error in scheduled task '%s'", self.name
                 )
 
     def start(self) -> None:

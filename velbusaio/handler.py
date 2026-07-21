@@ -95,9 +95,7 @@ class PacketHandler:
     def empty_cache(self) -> bool:
         """Check if the cache is empty."""
         cache_dir = pathlib.Path(self._velbus.get_cache_dir())
-        if len([name for name in cache_dir.iterdir() if name.is_file()]) == 0:
-            return True
-        return False
+        return len([name for name in cache_dir.iterdir() if name.is_file()]) == 0
 
     async def scan(self, reload_cache: bool = False) -> None:
         """Scan the Velbus bus for connected modules."""

@@ -74,7 +74,7 @@ def create(rawmessage: bytearray) -> tuple[RawMessage | None, bytearray]:
         try:
             return _parse(rawmessage)
         except ParseError:
-            logger.error(
+            logger.exception(
                 "Could not parse the message %s. Truncating invalid data.",
                 binascii.hexlify(rawmessage),
             )

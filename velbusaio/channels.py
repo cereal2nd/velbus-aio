@@ -358,9 +358,7 @@ class Button(Channel):
 
     def is_on(self) -> bool:
         """Return if this relay is on."""
-        if self._led_state == "on":
-            return True
-        return False
+        return self._led_state == "on"
 
     async def set_led_state(self, state: str) -> None:
         """Set led."""
@@ -427,13 +425,11 @@ class ButtonCounter(Button):
 
     def is_counter_channel(self) -> bool:
         """Return if this channel is a counter channel."""
-        if (
+        return (
             self._counter is not None
             or self._power is not None
             or self._energy is not None
-        ):
-            return True
-        return False
+        )
 
     def get_sensor_type(self) -> str | None:
         """Return the sensor type."""
@@ -501,9 +497,7 @@ class ButtonCounter(Button):
 
     def is_water(self) -> bool:
         """Return if this channel is a water channel."""
-        if self._counter and self._Unit == VOLUME_LITERS_HOUR:
-            return True
-        return False
+        return bool(self._counter and self._Unit == VOLUME_LITERS_HOUR)
 
 
 class Sensor(Button):
@@ -556,9 +550,7 @@ class Dimmer(Channel):
 
     def is_on(self) -> bool:
         """Check if a dimmer is turned on."""
-        if self._state == 0:
-            return False
-        return True
+        return self._state != 0
 
     def get_dimmer_state(self) -> int:
         """Return the dimmer state."""
@@ -725,10 +717,7 @@ class Temperature(Channel):
 
     async def set_mode(self, mode: str) -> None:
         """Set the heat/cool mode."""
-        if mode == "cool":
-            code = 0xDF
-        else:  # "heat"
-            code = 0xE0
+        code = 0xDF if mode == "cool" else 0xE0  # 0xE0 = heat
         cls = commandRegistry.get_command(code, self._module.get_type())
         msg = cls(self._address)
         await self._writer(msg)
