@@ -1346,7 +1346,10 @@ class VmbDali(Module):
                 if message.data.device_type == DaliDeviceType.NoDevicePresent:
                     if message.channel in self._channels:
                         del self._channels[message.channel]
-                elif message.data.device_type == DaliDeviceType.LedModule:
+                else:
+                    # Any present DALI device (LedModule, Dimmer, and the other
+                    # lamp types) is exposed as a dimmable channel. Only
+                    # NoDevicePresent slots are removed above.
                     cache = self._loaded_cache
                     if (
                         "channels" in cache
