@@ -507,12 +507,12 @@ class Module:
     ) -> None:
         """Handle bus error counter status messages."""
         await self._update_property(
-            "BusErrorTx", {"_cur": message.transmit_error_counter}
+            "bus_error_tx", {"cur": message.transmit_error_counter}
         )
         await self._update_property(
-            "BusErrorRx", {"_cur": message.receive_error_counter}
+            "bus_error_rx", {"cur": message.receive_error_counter}
         )
-        await self._update_property("BusOffCounter", {"_cur": message.bus_off_counter})
+        await self._update_property("bus_error_off", {"cur": message.bus_off_counter})
 
     async def _handle_relay_status(
         self, message: RelayStatusMessage | RelayStatusMessage2
