@@ -30,17 +30,15 @@ def _serialize_transition(value: int) -> bytes:
     [
         "VMB1DM",
         "VMBDME",
-        "VMBDMI-R",
-        "VMBDMI",
         "VMB1LED",
         "VMB4DC",
-        "VMB8DC-20",
-        "VMB2DC-20",
-        "VMB4LEDPWM-20",
     ],
 )
 class RestoreDimmerMessage(DeclarativeMessage):
-    """Restore Dimmer Message."""
+    """Restore Dimmer Message.
+
+    With this message the channel numbering is a bitnumber.
+    """
 
     _command_code = COMMAND_CODE
     _priority = "high"
@@ -55,8 +53,22 @@ class RestoreDimmerMessage(DeclarativeMessage):
     )
 
 
-@register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
+@register(
+    COMMAND_CODE,
+    [
+        "VMBDALI",
+        "VMBDALI-20",
+        "VMBDMI",
+        "VMBDMI-R",
+        "VMB8DC-20",
+        "VMB2DC-20",
+        "VMB4LEDPWM-20",
+    ],
+)
 class RestoreDimmerMessage2(RestoreDimmerMessage):
-    """Restore Dimmer Message."""
+    """Restore Dimmer Message.
+
+    With this message the channel numbering is an integer.
+    """
 
     dimmer_channels = ChannelIndexField(0)
