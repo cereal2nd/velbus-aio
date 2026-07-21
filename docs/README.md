@@ -8,6 +8,7 @@ talks to a Velbus home-automation bus.
 | [message-receiving.md](./message-receiving.md) | How an incoming bus frame is received, parsed, dispatched and turned into channel/property updates. |
 | [classes.md](./classes.md)                     | Description of the main classes and how they relate to each other.                                  |
 | [module-scanning.md](./module-scanning.md)     | How modules are discovered and built during a bus scan.                                             |
+| [message-registry.md](./message-registry.md)   | How command bytes map to message classes, and how messages parse/serialize.                         |
 
 ## Big picture
 
