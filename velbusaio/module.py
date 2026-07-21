@@ -988,14 +988,16 @@ class Module:
             async with async_open(cfile, "r") as fl:
                 cache = json.loads(await fl.read())
         except OSError:
-            cache = {}
+            return {}
         except (json.JSONDecodeError, KeyError, ValueError):
+            cache = None
+        if not isinstance(cache, dict):
             self._log.warning(
                 "Cache file for module %s is corrupt, removing it",
                 self._address,
             )
             cfile.unlink(missing_ok=True)
-            cache = {}
+            return {}
         return cache
 
     def _load(self) -> None:
