@@ -66,7 +66,7 @@ class RelayStatusMessage(DeclarativeMessage):
         return self.status == INTERVAL_TIMER_ON
 
 
-@register(COMMAND_CODE, ["VMB4RY"])
+@register(COMMAND_CODE)
 class RelayStatusMessage2(RelayStatusMessage):
     """Relay Status Message."""
 
@@ -75,7 +75,7 @@ class RelayStatusMessage2(RelayStatusMessage):
         return (self.status >> (self.channel - 1)) & 1 != 0
 
 
-@register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20"])
+@register(COMMAND_CODE)
 class RelayStatusMessage3(DeclarativeMessage):
     """Relay Status Message."""
 

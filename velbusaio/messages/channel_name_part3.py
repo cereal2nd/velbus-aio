@@ -42,52 +42,7 @@ class ChannelNamePart3Message(DeclarativeMessage):
         )
 
 
-@register(
-    COMMAND_CODE,
-    [
-        "VMBGP1",
-        "VMBEL1",
-        "VMBGP1-2",
-        "VMBGP2",
-        "VMBEL2",
-        "VMBGP2-2",
-        "VMBGP4",
-        "VMBEL4",
-        "VMBGP4-2",
-        "VMBGPO",
-        "VMBGPOD",
-        "VMBGPOD-2",
-        "VMBELO",
-        "VMBGP4PIR",
-        "VMBGP4PIR-2",
-        "VMBDMI",
-        "VMBDMI-R",
-        "VMBIN",
-        "VMBKP",
-        "VMBELPIR",
-        "VMBDALI",
-        "VMB4AN",
-        "VMB6PB-20",
-        "VMBEL1-20",
-        "VMBEL2-20",
-        "VMBEL4-20",
-        "VMBELO-20",
-        "VMBGP1-20",
-        "VMBGP2-20",
-        "VMBGP4-20",
-        "VMBGPO-20",
-        "VMBDALI-20",
-        "VMBEL4PIR-20",
-        "VMBGP4PIR-20",
-        "VMB8DC-20",
-        "VMB2DC-20",
-        "VMB8IN-20",
-        "VMB4LEDPWM-20",
-        "VMBPSUMNGR-20",
-        "VMB4RYLD-20",
-        "VMB4RYNO-20",
-    ],
-)
+@register(COMMAND_CODE)
 class ChannelNamePart3Message2(ChannelNamePart3Message):
     """Channel Name Part 3 message."""
 
@@ -101,7 +56,7 @@ class ChannelNamePart3Message2(ChannelNamePart3Message):
         self.name = "".join([chr(x) for x in data[1:]])
 
 
-@register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
+@register(COMMAND_CODE)
 class ChannelNamePart3Message3(ChannelNamePart3Message):
     """Channel Name Part 3 message."""
 

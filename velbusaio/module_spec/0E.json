@@ -39,6 +39,30 @@
       "Type": "ThermostatChannel"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "C6": "TempSensorSettingsPart3",
+    "D7": "RealtimeClockStatusRequest",
+    "D8": "SetRealtimeClock",
+    "DB": "SwitchToComfortMessage",
+    "DC": "SwitchToDayMessage",
+    "DD": "SwitchToNightMessage",
+    "DE": "SwitchToSafeMessage",
+    "DF": "TempSetCoolingMessage",
+    "E0": "TempSetHeatingMessage",
+    "E4": "SetTemperatureMessage",
+    "E5": "SensorTempRequest",
+    "E6": "SensorTemperatureMessage",
+    "E7": "TempSensorSettingsRequest",
+    "E8": "TempSensorSettingsPart1",
+    "E9": "TempSensorSettingsPart2",
+    "EA": "TempSensorStatusMessage",
+    "EF": "ChannelNameRequestMessage",
+    "F0": "ChannelNamePart1Message",
+    "F1": "ChannelNamePart2Message",
+    "F2": "ChannelNamePart3Message",
+    "FF": "ModuleTypeMessage"
+  },
   "Memory": {
     "Channels": {
       "01": "0060-006F"

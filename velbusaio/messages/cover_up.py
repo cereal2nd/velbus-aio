@@ -16,7 +16,7 @@ from velbusaio.message_fields import (
 COMMAND_CODE = 0x05
 
 
-@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10", "VMB2BLE-20"])
+@register(COMMAND_CODE)
 class CoverUpMessage(DeclarativeMessage):
     """Cover Up message."""
 
@@ -28,7 +28,7 @@ class CoverUpMessage(DeclarativeMessage):
     delay_time = Int24Field(1)
 
 
-@register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
+@register(COMMAND_CODE)
 class CoverUpMessage2(CoverUpMessage):
     """Cover Up message."""
 

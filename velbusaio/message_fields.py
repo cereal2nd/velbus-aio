@@ -10,7 +10,7 @@ from collections.abc import Callable
 import json
 from typing import Any, ClassVar
 
-from velbusaio.command_registry import commandRegistry
+from velbusaio.command_registry import CommandRegistryError, commandRegistry
 from velbusaio.message import Message
 
 
@@ -599,13 +599,12 @@ class DeclarativeMessage(Message):
 
         if cls._auto_register and hasattr(cls, "_command_code"):
             module_types = cls._module_types
-            if module_types:
-                for module_type in module_types:
-                    commandRegistry.register_command(
-                        cls._command_code, cls, module_type
-                    )
-            else:
-                commandRegistry.register_command(cls._command_code, cls)
+            if not module_types:
+                raise CommandRegistryError(
+                    f"{cls.__name__} has _auto_register enabled but no _module_types"
+                )
+            for module_type in module_types:
+                commandRegistry.register_command(cls._command_code, cls, module_type)
 
         if "__init__" not in cls.__dict__ and fields:
             cls.__init__ = _make_init(cls, fields)  # type: ignore[method-assign]

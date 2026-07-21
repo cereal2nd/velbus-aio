@@ -13,6 +13,34 @@
       "Type": "Blind"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "04": "CoverOffMessage",
+    "05": "CoverUpMessage",
+    "06": "CoverDownMessage",
+    "12": "ForcedOff",
+    "13": "CancelForcedOff",
+    "14": "ForcedOn",
+    "15": "CancelForcedOn",
+    "16": "Inhibit",
+    "17": "CancelInhibit",
+    "1C": "CoverPosMessage",
+    "6A": "WriteModuleAddressAndSerialNumberMessage",
+    "AF": "SetDaylightSaving",
+    "B3": "SelectProgramMessage",
+    "B7": "SetDate",
+    "D7": "RealtimeClockStatusRequest",
+    "D8": "SetRealtimeClock",
+    "EC": "BlindStatusNg20Message",
+    "EF": "ChannelNameRequestMessage",
+    "F0": "ChannelNamePart1Message",
+    "F1": "ChannelNamePart2Message",
+    "F2": "ChannelNamePart3Message",
+    "F5": "ClearLedMessage",
+    "F6": "SetLedMessage",
+    "F8": "FastBlinkingLedMessage",
+    "FF": "ModuleType2Message"
+  },
   "Memory": {
     "Channels": {
       "01": "0000-000F",

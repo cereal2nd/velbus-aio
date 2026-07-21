@@ -25,10 +25,7 @@ def _serialize_transition(value: int) -> bytes:
     return value.to_bytes(2, byteorder="big", signed=False)
 
 
-@register(
-    COMMAND_CODE,
-    ["VMB1DM", "VMBDME", "VMB4DC", "VMB1LED"],
-)
+@register(COMMAND_CODE)
 class SetDimmerMessage(DeclarativeMessage):
     """Set Dimmer Message.
 
@@ -48,18 +45,7 @@ class SetDimmerMessage(DeclarativeMessage):
     )
 
 
-@register(
-    COMMAND_CODE,
-    [
-        "VMBDALI",
-        "VMBDALI-20",
-        "VMBDMI",
-        "VMBDMI-R",
-        "VMB8DC-20",
-        "VMB4LEDPWM-20",
-        "VMB2DC-20",
-    ],
-)
+@register(COMMAND_CODE)
 class SetDimmerMessage2(SetDimmerMessage):
     """Set Dimmer Message.
 

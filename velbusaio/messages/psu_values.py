@@ -12,7 +12,7 @@ from velbusaio.message_fields import DeclarativeMessage
 COMMAND_CODE = 0xA3
 
 
-@register(COMMAND_CODE, ["VMBPSUMNGR-20"])
+@register(COMMAND_CODE)
 class PsuValuesMessage(DeclarativeMessage):
     """PSU Values Message."""
 

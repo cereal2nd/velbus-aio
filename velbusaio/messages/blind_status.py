@@ -21,7 +21,7 @@ COMMAND_CODE = 0xEC
 DSTATUS = {0: "off", 1: "up", 2: "down"}
 
 
-@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10"])
+@register(COMMAND_CODE)
 class BlindStatusNgMessage(DeclarativeMessage):
     """Blind Status NG message."""
 
@@ -56,7 +56,7 @@ class BlindStatusNgMessage(DeclarativeMessage):
         return self.status == 0x00
 
 
-@register(COMMAND_CODE, ["VMB2BLE-20"])
+@register(COMMAND_CODE)
 class BlindStatusNg20Message(BlindStatusNgMessage):
     """Blind Status NG20 message."""
 
@@ -91,7 +91,7 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         return json.dumps(json_dict)
 
 
-@register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
+@register(COMMAND_CODE)
 class BlindStatusMessage(DeclarativeMessage):
     """Blind Status message."""
 

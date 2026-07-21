@@ -11,7 +11,7 @@ from velbusaio.message_fields import ByteField, DeclarativeMessage
 COMMAND_CODE = 0xD4
 
 
-@register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO"])
+@register(COMMAND_CODE)
 class EdgeSetCustomColor(DeclarativeMessage):
     """Edge Set Custom Color message."""
 

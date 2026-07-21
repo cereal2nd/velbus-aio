@@ -11,7 +11,7 @@ from velbusaio.message_fields import BlindChannelField, ChannelField, Declarativ
 COMMAND_CODE = 0x04
 
 
-@register(COMMAND_CODE, ["VMB1BLE", "VMB2BLE", "VMB1BLS", "VMB2BLE-10", "VMB2BLE-20"])
+@register(COMMAND_CODE)
 class CoverOffMessage(DeclarativeMessage):
     """Cover Off message."""
 
@@ -22,7 +22,7 @@ class CoverOffMessage(DeclarativeMessage):
     channel = ChannelField(0, default=0)
 
 
-@register(COMMAND_CODE, ["VMB1BL", "VMB2BL"])
+@register(COMMAND_CODE)
 class CoverOffMessage2(CoverOffMessage):
     """Cover Off message."""
 

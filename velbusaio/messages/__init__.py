@@ -222,3 +222,7 @@ __all__ = [
     "WriteMemoryBlockMessage",
     "WriteModuleAddressAndSerialNumberMessage",
 ]
+
+from velbusaio.messages._loader import load_all_messages
+
+load_all_messages()

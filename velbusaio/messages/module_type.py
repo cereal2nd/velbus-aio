@@ -27,69 +27,7 @@ MODULES_WITHOUT_SERIAL = {
 }
 
 
-@register(
-    COMMAND_CODE,
-    [
-        "VMB1BL",
-        "VMB6IN",
-        "VMB1DM",
-        "VMB4RY",
-        "VMB2BL",
-        "VMB8IR",
-        "VMB4PD",
-        "VMB1TS",
-        "VMB1TC",
-        "VMB1LED",
-        "VMB4RYLD",
-        "VMB4RYNO",
-        "VMB4DC",
-        "VMBLCDWB",
-        "VMBDME",
-        "VMBDMI",
-        "VMB8PBU",
-        "VMB6PBN",
-        "VMB2PBN",
-        "VMB6PBB",
-        "VMB4RF",
-        "VMB1RYNO",
-        "VMB1BLE",
-        "VMB2BLE",
-        "VMBGP1",
-        "VMBGP2",
-        "VMBGP4",
-        "VMBGPO",
-        "VMB7IN",
-        "VMBGPOD",
-        "VMB1RYNOS",
-        "VMBPIRM",
-        "VMBPIRC",
-        "VMBPIRO",
-        "VMBGP4PIR",
-        "VMB1BLS",
-        "VMBDMI-R",
-        "VMBMETEO",
-        "VMB4AN",
-        "VMBVP01",
-        "VMBEL1",
-        "VMBEL2",
-        "VMBEL4",
-        "VMBELO",
-        "VMBELPIR",
-        "VMBSIG",
-        "VMBGP1-2",
-        "VMBGP2-2",
-        "VMBGP4-2",
-        "VMBGPOD-2",
-        "VMBGP4PIR-2",
-        "VMCM3",
-        "VMBUSBIP",
-        "VMB1RYS",
-        "VMBKP",
-        "VMBIN",
-        "VMB4PB",
-        "VMBDALI",
-    ],
-)
+@register(COMMAND_CODE)
 class ModuleTypeMessage(DeclarativeMessage):
     """Module Type Message."""
 
@@ -126,31 +64,7 @@ class ModuleTypeMessage(DeclarativeMessage):
         self.build_week = data[-1]
 
 
-@register(
-    COMMAND_CODE,
-    [
-        "VMB4RYLD-10",
-        "VMB4RYNO-10",
-        "VMB2BLE-10",
-        "VMB2BLE-20",
-        "VMB6PB-20",
-        "VMBEL1-20",
-        "VMBEL2-20",
-        "VMBEL4-20",
-        "VMBELO-20",
-        "VMBGP1-20",
-        "VMBGP2-20",
-        "VMBGP4-20",
-        "VMBGPO-20",
-        "VMBEL4PIR-20",
-        "VMBGP4PIR-20",
-        "VMB4LEDPWM-20",
-        "VMB8IN-20",
-        "VMB8DC-20",
-        "VMB2DC-20",
-        "VMB1RYS-20",
-    ],
-)
+@register(COMMAND_CODE)
 class ModuleType2Message(DeclarativeMessage):
     """Module Type Message."""
 

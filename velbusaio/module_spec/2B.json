@@ -29,6 +29,25 @@
       "Type": "Sensor"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "12": "ForcedOff",
+    "13": "CancelForcedOff",
+    "AA": "LightValueRequest",
+    "AF": "SetDaylightSaving",
+    "B3": "SelectProgramMessage",
+    "B7": "SetDate",
+    "D7": "RealtimeClockStatusRequest",
+    "D8": "SetRealtimeClock",
+    "ED": "ModuleStatusPirMessage",
+    "F4": "UpdateLedStatusMessage",
+    "F5": "ClearLedMessage",
+    "F6": "SetLedMessage",
+    "F7": "SlowBlinkingLedMessage",
+    "F8": "FastBlinkingLedMessage",
+    "F9": "VeryFastBlinkingLedMessage",
+    "FF": "ModuleTypeMessage"
+  },
   "Memory": {
     "ModuleName": "00B0-00EF"
   },

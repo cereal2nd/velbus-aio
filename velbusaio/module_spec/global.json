@@ -1,4 +1,16 @@
 {
+  "CommandToClass": {
+    "C9": "ReadDataBlockFromMemoryMessage",
+    "CA": "WriteMemoryBlockMessage",
+    "CB": "MemoryDumpRequestMessage",
+    "CC": "MemoryDataBlockMessage",
+    "D9": "BusErrorStatusRequestMessage",
+    "DA": "BusErrorCounterStatusMessage",
+    "FA": "ModuleStatusRequestMessage",
+    "FC": "WriteDataToMemoryMessage",
+    "FD": "ReadDataFromMemoryMessage",
+    "FE": "MemoryDataMessage"
+  },
   "Properties": {
     "bus_error_off": {
       "Name": "Bus Error Off",

@@ -14,7 +14,7 @@ BOOST = 0x02
 BACKUP = 0x03
 
 
-@register(COMMAND_CODE, ["VMBPSUMNGR-20"])
+@register(COMMAND_CODE)
 class PsuLoadMessage(DeclarativeMessage):
     """PSU Load Message."""
 

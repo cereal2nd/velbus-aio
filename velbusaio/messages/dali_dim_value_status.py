@@ -11,9 +11,7 @@ from velbusaio.message_fields import ByteField, DeclarativeMessage, Field
 COMMAND_CODE = 0xA5
 
 
-@register(
-    COMMAND_CODE, ["VMBDALI", "VMBDALI-20", "VMB8DC-20", "VMB4LEDPWM-20", "VMB2DC-20"]
-)
+@register(COMMAND_CODE)
 class DimValueStatus(DeclarativeMessage):
     """Dali Dim Value Status message."""
 

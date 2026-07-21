@@ -21,7 +21,7 @@ class DataSource(enum.Enum):
     FromDaliDevice = 1
 
 
-@register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
+@register(COMMAND_CODE)
 class DaliDeviceSettingsRequest(DeclarativeMessage):
     """Dali Device Settings Request message."""
 

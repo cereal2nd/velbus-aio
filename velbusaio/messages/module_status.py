@@ -50,41 +50,7 @@ class ModuleStatusMessage(Message):
         )
 
 
-@register(
-    COMMAND_CODE,
-    [
-        "VMB8PBU",
-        "VMB6PBN",
-        "VMB2PBN",
-        "VMB6PBB",
-        "VMBGP1",
-        "VMBEL1",
-        "VMBGP1-2",
-        "VMBGP2",
-        "VMBEL2",
-        "VMBGP2-2",
-        "VMBGP4",
-        "VMBEL4",
-        "VMBGP4-2",
-        "VMBGPO",
-        "VMBGPOD",
-        "VMBGPOD-2",
-        "VMBELO",
-        "VMB7IN",
-        "VMB6PB-20",
-        "VMBEL1-20",
-        "VMBEL2-20",
-        "VMBEL4-20",
-        "VMBELO-20",
-        "VMBGP1-20",
-        "VMBGP2-20",
-        "VMBGP4-20",
-        "VMBGPO-20",
-        "VMBEL4PIR-20",
-        "VMBPSUMNGR-20",
-        "VMB8IN-20",
-    ],
-)
+@register(COMMAND_CODE)
 class ModuleStatusMessage2(Message):
     """Module Status Message for specific modules."""
 
@@ -126,7 +92,7 @@ class ModuleStatusMessage2(Message):
         )
 
 
-@register(COMMAND_CODE, ["VMBPIRO", "VMBPIRM", "VMBPIRC", "VMBELPIR"])
+@register(COMMAND_CODE)
 class ModuleStatusPirMessage(Message):
     """Module Status PIR Message."""
 
@@ -171,7 +137,7 @@ class ModuleStatusPirMessage(Message):
         raise NotImplementedError
 
 
-@register(COMMAND_CODE, ["VMBGP4PIR", "VMBGP4PIR-2", "VMBGP4PIR-20"])
+@register(COMMAND_CODE)
 class ModuleStatusGP4PirMessage(Message):
     """Module Status GP4 PIR Message."""
 

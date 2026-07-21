@@ -21,10 +21,18 @@ from pathlib import Path
 import sys
 from typing import Any
 
-# Add parent directory to path to import velbusaio
-# sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# Add parent directory to path to import velbusaio and sibling scripts
+_SCRIPTS_DIR = Path(__file__).resolve().parent
+_REPO_ROOT = _SCRIPTS_DIR.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from velbusaio.command_registry import MODULE_DIRECTORY
+from velbusaio.command_registry import MESSAGE_CATALOG, MODULE_DIRECTORY  # noqa: E402
+import velbusaio.messages  # noqa: F401,E402 - populate MESSAGE_CATALOG
+
+from validate_command_specs import validate_all  # noqa: E402
 
 # How many directory levels to walk up from this script to try to find the repo root
 _MAX_UP_LEVELS = 6
@@ -147,6 +155,24 @@ def validate_spec(path: Path) -> list[str]:
     return errors
 
 
+def validate_command_to_class(path: Path, spec: dict) -> list[str]:
+    """Validate CommandToClass entries reference known message classes."""
+    errors: list[str] = []
+    mapping = spec.get("CommandToClass")
+    if not mapping:
+        return errors
+    for command_hex, class_name in mapping.items():
+        try:
+            int(command_hex, 16)
+        except ValueError:
+            errors.append(f"{path}: invalid CommandToClass key {command_hex}")
+        if class_name not in MESSAGE_CATALOG:
+            errors.append(
+                f"{path}: CommandToClass {command_hex} references unknown class {class_name}"
+            )
+    return errors
+
+
 def check_module_directory_coverage(module_spec_dir: Path) -> list[str]:
     """Check that every module in MODULE_DIRECTORY has a corresponding spec file."""
     errors: list[str] = []
@@ -227,8 +253,23 @@ def main(argv: list[str] | None = None) -> int:
     # Validate individual spec files
     print(f"\nValidating {len(spec_files)} module spec files...")
     for p in spec_files:
+        try:
+            spec = load_json(p)
+        except Exception as exc:
+            all_errors.append(f"{p}: failed to load JSON: {exc}")
+            continue
         all_errors.extend(validate_spec(p))
+        all_errors.extend(validate_command_to_class(p, spec))
         all_errors.extend(check_json_sorted(p))
+
+    # Validate CommandToClass coverage for basic messages
+    print("\nValidating CommandToClass coverage...")
+    command_errors = validate_all(module_spec_dir)
+    all_errors.extend(command_errors)
+    if command_errors:
+        print(f"Found {len(command_errors)} CommandToClass problems.")
+    else:
+        print("All CommandToClass entries are complete and consistent.")
 
     if all_errors:
         print("\nModule spec validation failed. Problems found:")
@@ -239,7 +280,9 @@ def main(argv: list[str] | None = None) -> int:
     print("\nModule spec validation passed:")
     print(" - All modules in MODULE_DIRECTORY have spec files")
     print(" - All editable channels have memory locations")
+    print(" - All CommandToClass entries reference known message classes")
     print(" - All JSON files have alphabetically sorted keys")
+    print(" - All CommandToClass entries are complete and consistent")
     return 0
 
 

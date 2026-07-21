@@ -19,7 +19,7 @@ class CustomColorPriority(IntEnum):
     HIGH_PRIORITY = 3
 
 
-@register(COMMAND_CODE, ["VMBEL1", "VMBEL2", "VMBEL4", "VMBELO", "VMBELO-20"])
+@register(COMMAND_CODE)
 class SetEdgeColorMessage(DeclarativeMessage):
     """Set Edge Color message (DLC=4 variant)."""
 

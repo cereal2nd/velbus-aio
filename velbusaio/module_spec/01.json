@@ -41,6 +41,20 @@
       "Type": "Button"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "ED": "ModuleStatusMessage",
+    "EF": "ChannelNameRequestMessage",
+    "F0": "ChannelNamePart1Message",
+    "F1": "ChannelNamePart2Message",
+    "F2": "ChannelNamePart3Message",
+    "F4": "UpdateLedStatusMessage",
+    "F5": "ClearLedMessage",
+    "F6": "SetLedMessage",
+    "F7": "SlowBlinkingLedMessage",
+    "F8": "FastBlinkingLedMessage",
+    "F9": "VeryFastBlinkingLedMessage"
+  },
   "Memory": {
     "Channels": {
       "01": "0000-000E",

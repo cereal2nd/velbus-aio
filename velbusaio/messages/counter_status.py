@@ -12,7 +12,7 @@ from velbusaio.message_fields import DeclarativeMessage
 COMMAND_CODE = 0xBE
 
 
-@register(COMMAND_CODE, ["VMB7IN"])
+@register(COMMAND_CODE)
 class CounterStatusMessage(DeclarativeMessage):
     """Counter Status message."""
 

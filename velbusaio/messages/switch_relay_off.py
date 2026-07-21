@@ -19,7 +19,7 @@ class SwitchRelayOffMessage(DeclarativeMessage):
     relay_channels = ChannelsField(0)
 
 
-@register(COMMAND_CODE, ["VMB4RYLD-20", "VMB4RYNO-20", "VMB1RYS-20"])
+@register(COMMAND_CODE)
 class SwitchRelayOffMessage20(SwitchRelayOffMessage):
     """Switch Relay Off Message for -20 series."""
 

@@ -56,7 +56,6 @@ from velbusaio.messages.channel_name_part3 import (
 )
 from velbusaio.messages.channel_name_request import (
     COMMAND_CODE as CHANNEL_NAME_REQUEST_COMMAND_CODE,
-    ChannelNameRequestMessage,
 )
 from velbusaio.messages.clear_led import ClearLedMessage
 from velbusaio.messages.counter_status import CounterStatusMessage
@@ -263,6 +262,15 @@ class Module:
         except FileNotFoundError:
             self._log.warning(f"No module spec for {h2(self._type)}")
             self._data = {}
+            for key, value in global_data.items():
+                if key not in self._data:
+                    self._data[key] = value
+                elif isinstance(value, dict) and isinstance(self._data[key], dict):
+                    self._data[key] = {**value, **self._data[key]}
+
+        commandRegistry.register_module_commands(
+            self._type, self._data.get("CommandToClass", {})
+        )
 
         # set some params from the velbus controller
         self._writer = writer
@@ -1165,19 +1173,18 @@ class Module:
 
     async def _request_channel_name(self) -> None:
         # request the module channel names
+        msg_type = commandRegistry.get_command(
+            CHANNEL_NAME_REQUEST_COMMAND_CODE, self.get_type()
+        )
+        if msg_type is None:
+            return
+        msg = msg_type(self._address)
+        msg.priority = PRIORITY_LOW
         if keys_exists(self._data, "AllChannelStatus"):
-            msg = ChannelNameRequestMessage(self._address)
-            msg.priority = PRIORITY_LOW
             msg.channels = 0xFF
-            await self._writer(msg)
         else:
-            msg_type = commandRegistry.get_command(
-                CHANNEL_NAME_REQUEST_COMMAND_CODE, self.get_type()
-            )
-            msg = msg_type(self._address)
-            msg.priority = PRIORITY_LOW
             msg.channels = list(range(1, (self.number_of_channels() + 1)))
-            await self._writer(msg)
+        await self._writer(msg)
 
     async def __load_memory(self) -> None:
         """Request all needed memory addresses."""
@@ -1452,6 +1459,8 @@ class VmbDali(Module):
         msg_type = commandRegistry.get_command(
             CHANNEL_NAME_REQUEST_COMMAND_CODE, self.get_type()
         )
+        if msg_type is None:
+            return
         msg = msg_type(self._address)
         msg.priority = PRIORITY_LOW
         msg.channels = channel_num

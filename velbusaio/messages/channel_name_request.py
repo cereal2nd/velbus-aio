@@ -38,7 +38,7 @@ class ChannelNameRequestMessage(DeclarativeMessage):
         return bytes([0xEF, 0xFF])
 
 
-@register(COMMAND_CODE, ["VMB2BL"])
+@register(COMMAND_CODE)
 class ChannelNameRequestMessage2(ChannelNameRequestMessage):
     """Channel Name Request message."""
 
@@ -61,7 +61,7 @@ class ChannelNameRequestMessage2(ChannelNameRequestMessage):
         return bytes([COMMAND_CODE, tmp])
 
 
-@register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
+@register(COMMAND_CODE)
 class ChannelNameRequestMessage3(ChannelNameRequestMessage):
     """Channel Name Request message."""
 

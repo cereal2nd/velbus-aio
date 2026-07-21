@@ -13,7 +13,7 @@ class TestMemo:
     @pytest.mark.asyncio
     async def test_set_short_text(self, mock_module, mock_writer):
         """Test setting short memo text."""
-        with patch("velbusaio.channels.commandRegistry") as mock_registry:
+        with patch("velbusaio.properties.commandRegistry") as mock_registry:
             mock_msg_class = Mock()
             mock_registry.get_command.return_value = mock_msg_class
             mock_msg = Mock()
@@ -29,7 +29,7 @@ class TestMemo:
     @pytest.mark.asyncio
     async def test_set_long_text(self, mock_module, mock_writer):
         """Test setting long memo text."""
-        with patch("velbusaio.channels.commandRegistry") as mock_registry:
+        with patch("velbusaio.properties.commandRegistry") as mock_registry:
             mock_msg_class = Mock()
             mock_registry.get_command.return_value = mock_msg_class
 

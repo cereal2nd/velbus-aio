@@ -1,3 +1,7 @@
 {
+  "CommandToClass": {
+    "6A": "WriteModuleAddressAndSerialNumberMessage",
+    "ED": "ModuleStatusMessage"
+  },
   "Type": "VMBSIG-21"
 }

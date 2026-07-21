@@ -1,4 +1,16 @@
 {
+  "CommandToClass": {
+    "09": "BusOffMessage",
+    "0A": "BusActiveMessage",
+    "0B": "ReceiveBufferFullMessage",
+    "0C": "ReceiveReadyMessage",
+    "0E": "InterfaceStatusRequestMessage",
+    "AF": "SetDaylightSaving",
+    "B7": "SetDate",
+    "D7": "RealtimeClockStatusRequest",
+    "D8": "SetRealtimeClock",
+    "FF": "ModuleTypeMessage"
+  },
   "Memory": {
     "ModuleName": "0000-003F"
   },

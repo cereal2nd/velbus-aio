@@ -11,7 +11,7 @@ from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 COMMAND_CODE = 0xEB
 
 
-@register(COMMAND_CODE, ["VMB8IR"])
+@register(COMMAND_CODE)
 class IRReceiverStatusMessage(DeclarativeMessage):
     """IR Receiver Status message."""
 

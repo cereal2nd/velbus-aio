@@ -15,7 +15,7 @@ from velbusaio.message import Message
 COMMAND_CODE = 0xE8
 
 
-@register(COMMAND_CODE, ["VMBDALI", "VMBDALI-20"])
+@register(COMMAND_CODE)
 class DaliDeviceSettingMsg(Message):
     """Dali Device Setting message."""
 

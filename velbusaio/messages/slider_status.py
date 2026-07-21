@@ -11,20 +11,7 @@ from velbusaio.message_fields import ByteField, ChannelField, DeclarativeMessage
 COMMAND_CODE = 0x0F
 
 
-@register(
-    COMMAND_CODE,
-    [
-        "VMB1DM",
-        "VMBDME",
-        "VMB4DC",
-        "VMBDMI",
-        "VMBDMI-R",
-        "VMB1LED",
-        "VMB8DC-20",
-        "VMB2DC-20",
-        "VMB4LEDPWM-20",
-    ],
-)
+@register(COMMAND_CODE)
 class SliderStatusMessage(DeclarativeMessage):
     """Slider Status Message."""
 

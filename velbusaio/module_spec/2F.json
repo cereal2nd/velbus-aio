@@ -6,6 +6,28 @@
       "Type": "Dimmer"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "07": "SetDimmerMessage2",
+    "0F": "SliderStatusMessage",
+    "11": "RestoreDimmerMessage2",
+    "12": "ForcedOff",
+    "13": "CancelForcedOff",
+    "14": "ForcedOn",
+    "15": "CancelForcedOn",
+    "16": "Inhibit",
+    "17": "CancelInhibit",
+    "B8": "DimmerChannelStatusMessage",
+    "EF": "ChannelNameRequestMessage",
+    "F0": "ChannelNamePart1Message2",
+    "F1": "ChannelNamePart2Message2",
+    "F2": "ChannelNamePart3Message2",
+    "F5": "ClearLedMessage",
+    "F6": "SetLedMessage",
+    "F7": "SlowBlinkingLedMessage",
+    "F8": "FastBlinkingLedMessage",
+    "FF": "ModuleTypeMessage"
+  },
   "Memory": {
     "Channels": {
       "01": "00F0-00FF"

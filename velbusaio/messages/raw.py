@@ -12,7 +12,7 @@ from velbusaio.message_fields import DeclarativeMessage
 COMMAND_CODE = 0xA9
 
 
-@register(COMMAND_CODE, ["VMBMETEO"])
+@register(COMMAND_CODE)
 class MeteoRawMessage(DeclarativeMessage):
     """Meteo Raw Message."""
 
@@ -45,7 +45,7 @@ class MeteoRawMessage(DeclarativeMessage):
         self.wind = (((data[4] << 8) | data[5]) / 32) * 0.1
 
 
-@register(COMMAND_CODE, ["VMB4AN"])
+@register(COMMAND_CODE)
 class SensorRawMessage(DeclarativeMessage):
     """Sensor Raw Message."""
 

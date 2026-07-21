@@ -81,6 +81,21 @@
       "Type": "Button"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "A2": "PsuLoadMessage",
+    "A3": "PsuValuesMessage",
+    "AF": "SetDaylightSaving",
+    "B0": "ModuleSubTypeMessage",
+    "B7": "SetDate",
+    "D7": "RealtimeClockStatusRequest",
+    "D8": "SetRealtimeClock",
+    "ED": "ModuleStatusMessage2",
+    "EF": "ChannelNameRequestMessage",
+    "F0": "ChannelNamePart1Message2",
+    "F1": "ChannelNamePart2Message2",
+    "F2": "ChannelNamePart3Message2"
+  },
   "Memory": {
     "ModuleName": "07BC-07FB"
   },

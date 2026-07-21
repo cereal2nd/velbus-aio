@@ -13,6 +13,23 @@
       "Type": "Blind"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "04": "CoverOffMessage2",
+    "05": "CoverUpMessage2",
+    "06": "CoverDownMessage2",
+    "EC": "BlindStatusMessage",
+    "EF": "ChannelNameRequestMessage2",
+    "F0": "ChannelNamePart1Message3",
+    "F1": "ChannelNamePart2Message3",
+    "F2": "ChannelNamePart3Message3",
+    "F4": "UpdateLedStatusMessage",
+    "F5": "ClearLedMessage",
+    "F6": "SetLedMessage",
+    "F8": "FastBlinkingLedMessage",
+    "F9": "VeryFastBlinkingLedMessage",
+    "FF": "ModuleTypeMessage"
+  },
   "Memory": {
     "Channels": {
       "01": "00F0-00FF",

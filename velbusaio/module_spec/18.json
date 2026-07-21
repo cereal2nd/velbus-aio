@@ -41,6 +41,28 @@
       "Type": "Button"
     }
   },
+  "CommandToClass": {
+    "00": "PushButtonStatusMessage",
+    "12": "ForcedOff",
+    "13": "CancelForcedOff",
+    "AF": "SetDaylightSaving",
+    "B3": "SelectProgramMessage",
+    "B7": "SetDate",
+    "D7": "RealtimeClockStatusRequest",
+    "D8": "SetRealtimeClock",
+    "ED": "ModuleStatusMessage2",
+    "EF": "ChannelNameRequestMessage",
+    "F0": "ChannelNamePart1Message",
+    "F1": "ChannelNamePart2Message",
+    "F2": "ChannelNamePart3Message",
+    "F4": "UpdateLedStatusMessage",
+    "F5": "ClearLedMessage",
+    "F6": "SetLedMessage",
+    "F7": "SlowBlinkingLedMessage",
+    "F8": "FastBlinkingLedMessage",
+    "F9": "VeryFastBlinkingLedMessage",
+    "FF": "ModuleTypeMessage"
+  },
   "Memory": {
     "Channels": {
       "01": "0000-000F",
