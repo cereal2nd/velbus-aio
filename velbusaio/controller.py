@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+import datetime
 import itertools
 import logging
 import pathlib
@@ -445,12 +446,28 @@ class Velbus:
             if class_name in chan.get_categories()
         ]
 
-    async def sync_clock(self) -> None:
-        """Will send all the needed messages to sync the clock."""
-        lclt = time.localtime()
-        await self.send(SetRealtimeClock(wday=lclt[6], hour=lclt[3], min=lclt[4]))
-        await self.send(SetDate(day=lclt[2], mon=lclt[1], year=lclt[0]))
-        await self.send(SetDaylightSaving(ds=not lclt[8]))
+    async def sync_clock(self, dt: datetime.datetime | None = None) -> None:
+        """Will send all the needed messages to sync the clock.
+
+        :param dt: The datetime to sync to. When omitted, the local time of the
+            machine running this process is used. Callers (e.g. Home Assistant)
+            should pass their own localized time to avoid relying on the clock
+            of the host running the connection.
+        """
+        if dt is None:
+            dt = datetime.datetime.now()
+        # Determine daylight saving. For timezone-aware datetimes we can derive
+        # it directly, otherwise fall back to the local time settings.
+        dst = dt.dst()
+        if dst is not None:
+            is_dst = dst != datetime.timedelta(0)
+        else:
+            is_dst = bool(time.localtime().tm_isdst)
+        await self.send(
+            SetRealtimeClock(wday=dt.weekday(), hour=dt.hour, min=dt.minute)
+        )
+        await self.send(SetDate(day=dt.day, mon=dt.month, year=dt.year))
+        await self.send(SetDaylightSaving(ds=not is_dst))
 
     async def wait_on_all_messages_sent_async(self) -> None:
         """Wait for all messages to be sent."""
