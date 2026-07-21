@@ -134,9 +134,9 @@ class SelectedProgram(Property):
         cls = commandRegistry.get_command(command_code, self._module.get_type())
         index = list(PROGRAM_SELECTION.values()).index(program_str)
         program = list(PROGRAM_SELECTION.keys())[index]
-        self._selected_program_str = program_str
         msg = cls(self.get_module_address(), program)
         await self._writer(msg)
+        await self.update({"selected_program_str": program_str})
 
 
 class LightValue(Property):
