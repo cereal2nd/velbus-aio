@@ -12,7 +12,7 @@ repos:
     rev: v3.21.2
     hooks:
       - id: pyupgrade
-        args: [--py311-plus]
+        args: [--py313-plus]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.3
     hooks:
@@ -59,7 +59,7 @@ repos:
       - id: python-typing-update
         stages: [manual]
         args:
-          - --py311-plus
+          - --py313-plus
           - --force
           - --keep-updates
   - repo: local

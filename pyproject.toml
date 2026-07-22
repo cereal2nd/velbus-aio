@@ -17,16 +17,13 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Home Automation",
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-requires-python = ">=3.11.0"
+requires-python = ">=3.13"
 dependencies = [
     "serialx",
     "backoff>=1.10.0",
@@ -70,6 +67,7 @@ push = true
 
 [tool.ruff]
 required-version = ">=0.15.22"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
@@ -199,10 +197,6 @@ ignore = [
   "TC002", # Move third-party import {} into a type-checking block
   "TC003", # Move standard library import {} into a type-checking block
   "TRY003", # Avoid specifying long messages outside the exception class
-
-  "UP046", # Non PEP 695 generic class
-  "UP047", # Non PEP 696 generic function
-  "UP049", # Avoid private type parameter names
 
   # May conflict with the formatter, https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
   "W191",

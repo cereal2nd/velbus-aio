@@ -6,7 +6,6 @@ Handles reading and parsing Velbus VLP files.
 import importlib.resources
 import json
 import logging
-import sys
 
 import anyio
 from bs4 import BeautifulSoup
@@ -264,20 +263,10 @@ class vlpModule:
                 f" => Load module spec for {self._type_id}, {self._build} => {memmap_id}"
             )
 
-        if sys.version_info >= (3, 13):
-            with importlib.resources.path(
-                __name__, f"module_spec/{h2(memmap_id)}.json"
-            ) as fspath:
-                async with await anyio.open_file(fspath) as protocol_file:
-                    self._spec = json.loads(await protocol_file.read())
-        else:
-            async with await anyio.open_file(
-                str(
-                    importlib.resources.files(__name__.split(".")[0]).joinpath(
-                        f"module_spec/{h2(memmap_id)}.json"
-                    )
-                )
-            ) as protocol_file:
+        with importlib.resources.path(
+            __name__, f"module_spec/{h2(memmap_id)}.json"
+        ) as fspath:
+            async with await anyio.open_file(fspath) as protocol_file:
                 self._spec = json.loads(await protocol_file.read())
 
     def _read_from_memory(self, address_range) -> str | None:

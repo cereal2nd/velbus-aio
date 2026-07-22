@@ -10,7 +10,6 @@ import json
 import logging
 import pathlib
 import struct
-import sys
 from typing import TYPE_CHECKING
 
 import anyio
@@ -214,40 +213,20 @@ class Module:
             # Load global.json first
             global_data = {}
             try:
-                if sys.version_info >= (3, 13):
-                    with importlib.resources.path(
-                        __name__, "module_spec/global.json"
-                    ) as fspath:
-                        async with await anyio.open_file(fspath) as global_file:
-                            global_data = json.loads(await global_file.read())
-                else:
-                    async with await anyio.open_file(
-                        str(
-                            importlib.resources.files(__name__.split(".")[0]).joinpath(
-                                "module_spec/global.json"
-                            )
-                        )
-                    ) as global_file:
+                with importlib.resources.path(
+                    __name__, "module_spec/global.json"
+                ) as fspath:
+                    async with await anyio.open_file(fspath) as global_file:
                         global_data = json.loads(await global_file.read())
                 self._log.debug("Global module spec loaded")
             except FileNotFoundError:
                 self._log.debug("No global module spec found")
 
             # Load module-specific data
-            if sys.version_info >= (3, 13):
-                with importlib.resources.path(
-                    __name__, f"module_spec/{h2(self._type)}.json"
-                ) as fspath:
-                    async with await anyio.open_file(fspath) as protocol_file:
-                        self._data = json.loads(await protocol_file.read())
-            else:
-                async with await anyio.open_file(
-                    str(
-                        importlib.resources.files(__name__.split(".")[0]).joinpath(
-                            f"module_spec/{h2(self._type)}.json"
-                        )
-                    )
-                ) as protocol_file:
+            with importlib.resources.path(
+                __name__, f"module_spec/{h2(self._type)}.json"
+            ) as fspath:
+                async with await anyio.open_file(fspath) as protocol_file:
                     self._data = json.loads(await protocol_file.read())
 
             # Merge global data into module data (module-specific takes precedence)

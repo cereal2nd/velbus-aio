@@ -10,7 +10,6 @@ import importlib.resources
 import json
 import logging
 import pathlib
-import sys
 import time
 from typing import TYPE_CHECKING
 
@@ -63,33 +62,11 @@ class PacketHandler:
 
     async def read_protocol_data(self):
         """Read the protocol data from the json files."""
-        if sys.version_info >= (3, 13):
-            with importlib.resources.path(
-                __name__, "module_spec/broadcast.json"
-            ) as fspath:
-                async with await anyio.open_file(fspath) as protocol_file:
-                    self.broadcast = json.loads(await protocol_file.read())
-            with importlib.resources.path(
-                __name__, "module_spec/ignore.json"
-            ) as fspath:
-                async with await anyio.open_file(fspath) as protocol_file:
-                    self.ignore = json.loads(await protocol_file.read())
-        else:
-            async with await anyio.open_file(
-                str(
-                    importlib.resources.files(__name__.split(".")[0]).joinpath(
-                        "module_spec/broadcast.json"
-                    )
-                )
-            ) as protocol_file:
+        with importlib.resources.path(__name__, "module_spec/broadcast.json") as fspath:
+            async with await anyio.open_file(fspath) as protocol_file:
                 self.broadcast = json.loads(await protocol_file.read())
-            async with await anyio.open_file(
-                str(
-                    importlib.resources.files(__name__.split(".")[0]).joinpath(
-                        "module_spec/ignore.json"
-                    )
-                )
-            ) as protocol_file:
+        with importlib.resources.path(__name__, "module_spec/ignore.json") as fspath:
+            async with await anyio.open_file(fspath) as protocol_file:
                 self.ignore = json.loads(await protocol_file.read())
 
     def empty_cache(self) -> bool:
