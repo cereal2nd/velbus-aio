@@ -21,12 +21,3 @@ class BusErrorCounterStatusMessage(DeclarativeMessage):
     transmit_error_counter = ByteField(0)
     receive_error_counter = ByteField(1)
     bus_off_counter = ByteField(2)
-
-    def populate(self, priority, address, rtr, data):
-        """Populate message fields without updating address attributes."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 3)
-        self.transmit_error_counter = data[0]
-        self.receive_error_counter = data[1]
-        self.bus_off_counter = data[2]

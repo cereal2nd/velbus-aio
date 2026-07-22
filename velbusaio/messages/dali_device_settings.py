@@ -10,29 +10,22 @@ import enum
 from typing import Self
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
+from velbusaio.message_fields import ByteField, DeclarativeMessage
 
 COMMAND_CODE = 0xE8
 
 
 @register(COMMAND_CODE)
-class DaliDeviceSettingMsg(Message):
+class DaliDeviceSettingMsg(DeclarativeMessage):
     """Dali Device Setting message."""
 
-    def __init__(self, address: int | None = None):
-        """Initialize Dali Device Setting message."""
-        super().__init__()
-        self.set_defaults(address)
-        self.channel: int = 0
+    _command_code = COMMAND_CODE
+    _data_length = 2
+    _generates_data_to_binary = False
 
-    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
-        """Populate message attributes."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
+    channel = ByteField(0)
 
-        self.needs_data(data, 2)
-        self.channel = data[0]
+    def _post_populate(self, data: bytes) -> None:
         message_subtype = data[1]
         # This received message repurposes the outgoing `data` buffer to hold the
         # parsed payload, which is either the raw bytes or a decoded sub-message.

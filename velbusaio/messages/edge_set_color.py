@@ -5,8 +5,7 @@ from __future__ import annotations
 from enum import IntEnum
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import BitField, DeclarativeMessage, Field
 
 COMMAND_CODE = 0xD4
 
@@ -26,40 +25,23 @@ class SetEdgeColorMessage(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _priority = None
 
-    def __init__(self, address=None):
-        """Iniatialize Set Edge Color message object."""
-        Message.__init__(self)
-        self.apply_background_color = False
-        self.apply_continuous_feedback_color = False
-        self.apply_slow_blinking_feedback_color = False
-        self.apply_fast_blinking_feedback_color = False
-        self.custom_color_palette = False
+    apply_background_color = BitField(0, 0x01, as_bool=True, default=False)
+    custom_color_palette = BitField(0, 0x80, as_bool=True, default=False)
+    apply_to_left_edge = BitField(1, 0x01, as_bool=True, default=False)
+    apply_to_top_edge = BitField(1, 0x02, as_bool=True, default=False)
+    apply_to_right_edge = BitField(1, 0x04, as_bool=True, default=False)
+    apply_to_bottom_edge = BitField(1, 0x08, as_bool=True, default=False)
+    color_idx = BitField(2, 0x1F, default=0)
 
-        self.apply_to_left_edge = False
-        self.apply_to_top_edge = False
-        self.apply_to_right_edge = False
-        self.apply_to_bottom_edge = False
-
-        self.apply_to_page: int | None = None
-        self.apply_to_all_pages = False
-
-        self.background_blinking = False
-        self.custom_color_priority = CustomColorPriority.LOW_PRIORITY
-
-        self.color_idx: int = 0
-        self.set_defaults(address)
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.apply_background_color = bool(data[0] & 0x01)
-        self.custom_color_palette = bool(data[0] & 0x80)
-        self.apply_to_left_edge = bool(data[1] & 0x01)
-        self.apply_to_top_edge = bool(data[1] & 0x02)
-        self.apply_to_right_edge = bool(data[1] & 0x04)
-        self.apply_to_bottom_edge = bool(data[1] & 0x08)
-        self.color_idx = data[2] & 0x1F
+    apply_continuous_feedback_color = Field(default=False, serializable=False)
+    apply_slow_blinking_feedback_color = Field(default=False, serializable=False)
+    apply_fast_blinking_feedback_color = Field(default=False, serializable=False)
+    apply_to_page = Field(default=None, serializable=False)
+    apply_to_all_pages = Field(default=False, serializable=False)
+    background_blinking = Field(default=False, serializable=False)
+    custom_color_priority = Field(
+        default=CustomColorPriority.LOW_PRIORITY, serializable=False
+    )
 
     def data_to_binary(self):
         """:return: bytes"""
@@ -89,16 +71,12 @@ class SetCustomColorMessage(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _auto_register = False
 
-    def __init__(self, address=None):
-        """Iniatialize Set Custom Color message object."""
-        Message.__init__(self)
-        self.palette_idx = 0
-        self.white_mode = False
-        self.saturation = 127
-        self.red = 0
-        self.green = 0
-        self.blue = 0
-        self.set_defaults(address)
+    palette_idx = Field(default=0, serializable=False)
+    white_mode = Field(default=False, serializable=False)
+    saturation = Field(default=127, serializable=False)
+    red = Field(default=0, serializable=False)
+    green = Field(default=0, serializable=False)
+    blue = Field(default=0, serializable=False)
 
     def data_to_binary(self):
         """:return: bytes"""

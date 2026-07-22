@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import ByteField, DeclarativeMessage, Field, StringField
 
 COMMAND_CODE = 0xAC
 
@@ -17,19 +17,9 @@ class MemoTextMessage(DeclarativeMessage):
 
     _command_code = COMMAND_CODE
 
-    def __init__(self, address=None):
-        """Initialize Memo Text Message object."""
-        super().__init__(address)
-        self.start = 0x00
-        self.memo_text = ""
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.start = data[1]
-        self.name = "".join(chr(x) for x in data[2:])
+    start = ByteField(1)
+    name = StringField(2)
+    memo_text = Field(default="", serializable=False)
 
     def data_to_binary(self):
         """:return: bytes"""

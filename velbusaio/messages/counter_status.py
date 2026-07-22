@@ -6,47 +6,38 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import (
+    ComputedField,
+    DeclarativeMessage,
+    Field,
+    Int16Field,
+    Int32Field,
+)
 
 COMMAND_CODE = 0xBE
 
 
 @register(COMMAND_CODE)
 class CounterStatusMessage(DeclarativeMessage):
-    """Counter Status message."""
+    """Counter Status message.
+
+    -DB1    last 2 bits   = channel
+    -DB1    first 6 bits  = pulses
+    -DB2-5                = pulse counter
+    -DB6-7                = ms/pulse
+    """
 
     _command_code = COMMAND_CODE
     _priority = None
     _data_length = 7
     _generates_data_to_binary = False
 
-    def __init__(self, address=None):
-        """Initialize Counter Status message."""
-        Message.__init__(self)
-        self.channel = 0
-        self.pulses = 0
-        self.counter = 0
-        self.kwh = 0
-        self.delay = 0
-        self.watt = 0
-
-    def populate(self, priority, address, rtr, data):
-        """Parses the received data.
-
-        -DB1    last 2 bits   = channel
-        -DB1    first 6 bist  = pulses
-        -DB2-5                = pulse counter
-        -DB6-7                = ms/pulse
-        :return: None
-        """
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.channel = (data[0] & 0x03) + 1
-        self.pulses = (data[0] >> 2) * 100
-        self.counter = (data[1] << 24) + (data[2] << 16) + (data[3] << 8) + data[4]
-        self.delay = (data[5] << 8) + data[6]
+    channel = ComputedField(parser=lambda data: (data[0] & 0x03) + 1, default=0)
+    pulses = ComputedField(parser=lambda data: (data[0] >> 2) * 100, default=0)
+    counter = Int32Field(1)
+    delay = Int16Field(5)
+    kwh = Field(default=0, serializable=False)
+    watt = Field(default=0, serializable=False)
 
     def get_channels(self):
         """:return: list"""

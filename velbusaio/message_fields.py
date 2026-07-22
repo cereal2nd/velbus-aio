@@ -325,6 +325,35 @@ class Int24Field(Field):
         return bytes([value >> 16, (value >> 8) & 0xFF, value & 0xFF])
 
 
+class Int32Field(Field):
+    """32-bit integer field (big-endian, 4 bytes)."""
+
+    def __init__(self, byte_index: int, default: int = 0, **kwargs: Any) -> None:
+        """Initialize 32-bit field."""
+        super().__init__(byte_index=byte_index, default=default, **kwargs)
+
+    def parse(self, data: bytes) -> int:
+        """Parse 32-bit value from four bytes."""
+        assert self.byte_index is not None
+        return (
+            (data[self.byte_index] << 24)
+            | (data[self.byte_index + 1] << 16)
+            | (data[self.byte_index + 2] << 8)
+            | data[self.byte_index + 3]
+        )
+
+    def serialize(self, value: int) -> bytes:
+        """Serialize to four bytes (big-endian)."""
+        return bytes(
+            [
+                (value >> 24) & 0xFF,
+                (value >> 16) & 0xFF,
+                (value >> 8) & 0xFF,
+                value & 0xFF,
+            ]
+        )
+
+
 class BlindChannelField(Field):
     """Channel field for VMB1BL/VMB2BL blind modules."""
 

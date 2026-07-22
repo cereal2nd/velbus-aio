@@ -8,7 +8,7 @@ from __future__ import annotations
 import enum
 
 from velbusaio.command_registry import register
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import ByteField, ComputedField, DeclarativeMessage
 from velbusaio.messages.dali_device_settings import DaliDeviceSetting
 
 COMMAND_CODE = 0xE7
@@ -28,25 +28,15 @@ class DaliDeviceSettingsRequest(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _data_length = 2
 
-    def __init__(self, address: int | None = None):
-        """Initialize Dali Device Settings Request message."""
-        super().__init__(address)
-        self.channel: int | None = None
-        self.data_source: DataSource | None = None
-        self.settings: DaliDeviceSetting | int | None = None
-
-    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
-        """Populate message attributes."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 2)
-        self.set_attributes(priority, address, rtr)
-        self.channel = data[0]
-        self.data_source = DataSource(data[1])
-        if len(data) >= 3:
-            self.settings = data[2]
-        else:
-            self.settings = None  # all
+    channel = ByteField(0, default=None)
+    data_source = ComputedField(
+        parser=lambda data: DataSource(data[1]), default=None, serializable=False
+    )
+    settings = ComputedField(
+        parser=lambda data: data[2] if len(data) >= 3 else None,
+        default=None,
+        serializable=False,
+    )
 
     def data_to_binary(self) -> bytes:
         """Generate binary data for the message."""

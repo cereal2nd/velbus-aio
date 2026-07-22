@@ -8,8 +8,7 @@ from __future__ import annotations
 import struct
 
 from velbusaio.command_registry import MODULE_DIRECTORY, register
-from velbusaio.message import Message
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import ByteField, ComputedField, DeclarativeMessage, Field
 
 COMMAND_CODE = 0xFF
 MODULES_WITHOUT_SERIAL = {
@@ -27,6 +26,14 @@ MODULES_WITHOUT_SERIAL = {
 }
 
 
+def _parse_serial(data: bytes) -> int:
+    """Parse the serial number when the module reports one."""
+    if data[0] in MODULES_WITHOUT_SERIAL:
+        return 0
+    (serial,) = struct.unpack(">L", bytes([0, 0, data[1], data[2]]))
+    return serial
+
+
 @register(COMMAND_CODE)
 class ModuleTypeMessage(DeclarativeMessage):
     """Module Type Message."""
@@ -34,34 +41,21 @@ class ModuleTypeMessage(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _generates_data_to_binary = False
 
-    def __init__(self, address=None) -> None:
-        """Initialize Module Type Message object."""
-        Message.__init__(self)
-        self.module_type = 0x00
-        self.led_on = []
-        self.led_slow_blinking = []
-        self.led_fast_blinking = []
-        self.serial = 0
-        self.memory_map_version = 0
-        self.build_year = 0
-        self.build_week = 0
-        self.set_defaults(address)
+    module_type = ByteField(0)
+    serial = ComputedField(parser=_parse_serial, default=0)
+    memory_map_version = ComputedField(
+        parser=lambda data: data[3] if data[0] not in MODULES_WITHOUT_SERIAL else 0,
+        default=0,
+    )
+    build_year = ComputedField(parser=lambda data: data[-2], default=0)
+    build_week = ComputedField(parser=lambda data: data[-1], default=0)
+    led_on = Field(default=[], serializable=False)
+    led_slow_blinking = Field(default=[], serializable=False)
+    led_fast_blinking = Field(default=[], serializable=False)
 
     def module_type_name(self) -> str:
         """:return: str"""
         return MODULE_DIRECTORY.get(self.module_type, "Unknown")
-
-    def populate(self, priority, address, rtr, data) -> None:
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.module_type = data[0]
-        if data[0] not in MODULES_WITHOUT_SERIAL:
-            (self.serial,) = struct.unpack(">L", bytes([0, 0, data[1], data[2]]))
-            self.memory_map_version = data[3]
-        self.build_year = data[-2]
-        self.build_week = data[-1]
 
 
 @register(COMMAND_CODE)
@@ -71,33 +65,19 @@ class ModuleType2Message(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _generates_data_to_binary = False
 
-    def __init__(self, address=None) -> None:
-        """Initialize Module Type Message object."""
-        Message.__init__(self)
-        self.module_type = 0x00
-        self.led_on = []
-        self.led_slow_blinking = []
-        self.led_fast_blinking = []
-        self.serial = 0
-        self.memory_map_version = 0
-        self.build_year = 0
-        self.build_week = 0
-        self.term = 0
-        self.set_defaults(address)
+    module_type = ByteField(0)
+    serial = ComputedField(parser=_parse_serial, default=0)
+    memory_map_version = ComputedField(
+        parser=lambda data: data[3] if data[0] not in MODULES_WITHOUT_SERIAL else 0,
+        default=0,
+    )
+    build_year = ComputedField(parser=lambda data: data[-3], default=0)
+    build_week = ComputedField(parser=lambda data: data[-2], default=0)
+    term = ComputedField(parser=lambda data: data[-1], default=0)
+    led_on = Field(default=[], serializable=False)
+    led_slow_blinking = Field(default=[], serializable=False)
+    led_fast_blinking = Field(default=[], serializable=False)
 
     def module_name(self) -> str:
         """:return: str"""
         return "Unknown"
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.module_type = data[0]
-        if data[0] not in MODULES_WITHOUT_SERIAL:
-            (self.serial,) = struct.unpack(">L", bytes([0, 0, data[1], data[2]]))
-            self.memory_map_version = data[3]
-        self.build_year = data[-3]
-        self.build_week = data[-2]
-        self.term = data[-1]

@@ -6,8 +6,7 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import ComputedField, DeclarativeMessage
 
 COMMAND_CODE = 0xA3
 
@@ -19,24 +18,13 @@ class PsuValuesMessage(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _data_length = 7
 
-    def __init__(self, address=None):
-        """Initialize PSU Values Message Object."""
-        Message.__init__(self)
-        self.channel = 0
-        self.watt = 0
-        self.volt = 0
-        self.amp = 0
-
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.channel = (data[0] & 0xF0) >> 4
-        self.watt = ((data[0] & 0x0F) << 16 | data[1] << 8 | data[2]) / 1000
-        self.volt = (data[3] << 8 | data[4]) / 1000
-        self.amp = (data[5] << 8 | data[6]) / 1000
+    channel = ComputedField(parser=lambda data: (data[0] & 0xF0) >> 4, default=0)
+    watt = ComputedField(
+        parser=lambda data: ((data[0] & 0x0F) << 16 | data[1] << 8 | data[2]) / 1000,
+        default=0,
+    )
+    volt = ComputedField(parser=lambda data: (data[3] << 8 | data[4]) / 1000, default=0)
+    amp = ComputedField(parser=lambda data: (data[5] << 8 | data[6]) / 1000, default=0)
 
     def data_to_binary(self):
         """:return: bytes"""

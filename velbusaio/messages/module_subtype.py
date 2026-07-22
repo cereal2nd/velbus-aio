@@ -9,7 +9,7 @@ import struct
 
 from velbusaio.command_registry import register
 from velbusaio.message import Message
-from velbusaio.message_fields import DeclarativeMessage
+from velbusaio.message_fields import ByteField, ComputedField, DeclarativeMessage
 
 COMMAND_CODE = 0xB0
 COMMAND_CODE_2 = 0xA7
@@ -24,6 +24,16 @@ class ModuleSubTypeMessage(DeclarativeMessage):
 
     _command_code = COMMAND_CODE
     _generates_data_to_binary = False
+
+    module_type = ByteField(0)
+    serial = ComputedField(
+        parser=lambda data: struct.unpack(">L", bytes([0, 0, data[1], data[2]]))[0],
+        default=0,
+    )
+    sub_address_1 = ByteField(3, default=0xFF)
+    sub_address_2 = ByteField(4, default=0xFF)
+    sub_address_3 = ByteField(5, default=0xFF)
+    sub_address_4 = ByteField(6, default=0xFF)
 
     def __init__(self, address=None, sub_address_offset: int = 0) -> None:
         """Initialize Module SubType Message object."""
@@ -40,15 +50,3 @@ class ModuleSubTypeMessage(DeclarativeMessage):
     def module_name(self) -> str:
         """:return: str"""
         return "Unknown"
-
-    def populate(self, priority, address, rtr, data) -> None:
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.set_attributes(priority, address, rtr)
-        self.module_type = data[0]
-        (self.serial,) = struct.unpack(">L", bytes([0, 0, data[1], data[2]]))
-        self.sub_address_1 = data[3]
-        self.sub_address_2 = data[4]
-        self.sub_address_3 = data[5]
-        self.sub_address_4 = data[6]

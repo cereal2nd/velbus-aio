@@ -150,7 +150,9 @@ class TestModuleStatusMessage2:
         msg.populate(
             PRIORITY_LOW, 0x01, False, bytes([0x01, 0x02, 0x04, 0x08, 0x10, 0x01])
         )
-        assert msg.data_to_binary() == bytes([0xED, 0x01, 0x02, 0x04, 0x08])
+        assert msg.data_to_binary() == bytes(
+            [0xED, 0x01, 0x02, 0x04, 0x08, 0x10, 0x01]
+        )
 
     def test_populate_four_byte_raises(self):
         """ModuleStatusMessage2 is strict: a 4-byte frame must raise ParserError."""
