@@ -8,8 +8,7 @@ from __future__ import annotations
 import struct
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
-from velbusaio.message_fields import ByteField, ComputedField, DeclarativeMessage
+from velbusaio.message_fields import ByteField, ComputedField, DeclarativeMessage, Field
 
 COMMAND_CODE = 0xB0
 COMMAND_CODE_2 = 0xA7
@@ -34,18 +33,7 @@ class ModuleSubTypeMessage(DeclarativeMessage):
     sub_address_2 = ByteField(4, default=0xFF)
     sub_address_3 = ByteField(5, default=0xFF)
     sub_address_4 = ByteField(6, default=0xFF)
-
-    def __init__(self, address=None, sub_address_offset: int = 0) -> None:
-        """Initialize Module SubType Message object."""
-        Message.__init__(self)
-        self.module_type = 0x00
-        self.sub_address_1 = 0xFF
-        self.sub_address_2 = 0xFF
-        self.sub_address_3 = 0xFF
-        self.sub_address_4 = 0xFF
-        self.set_defaults(address)
-        self.serial = 0
-        self.sub_address_offset = sub_address_offset
+    sub_address_offset = Field(default=0, serializable=False)
 
     def module_name(self) -> str:
         """:return: str"""

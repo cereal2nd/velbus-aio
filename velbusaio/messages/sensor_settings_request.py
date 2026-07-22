@@ -21,12 +21,6 @@ class SensorSettingsRequestMessage(DeclarativeMessage):
     _data_length = 0
     _generates_data_to_binary = False
 
-    def set_defaults(self, address):
-        """Set default values."""
-        self.set_address(address)
-        self.set_low_priority()
-        self.set_rtr()
-
     def data_to_binary(self):
         """:return: bytes"""
         return bytes([])

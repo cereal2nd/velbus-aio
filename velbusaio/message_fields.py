@@ -666,7 +666,7 @@ class DeclarativeMessage(Message):
         if "populate" not in cls.__dict__:
             if fields:
                 cls.populate = _make_populate(cls, fields)  # type: ignore[method-assign]
-            elif hasattr(cls, "_command_code"):
+            else:
                 cls.populate = _make_populate_no_fields(cls)  # type: ignore[method-assign]
 
         if (

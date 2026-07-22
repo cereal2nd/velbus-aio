@@ -16,13 +16,6 @@ class ModuleTypeRequestMessage(DeclarativeMessage):
     _data_length = 0
     _generates_data_to_binary = False
 
-    def populate(self, priority, address, rtr, data):
-        """:return: None"""
-        self.needs_low_priority(priority)
-        self.needs_rtr(rtr)
-        self.needs_no_data(data)
-        self.set_attributes(priority, address, rtr)
-
     def data_to_binary(self):
         """:return: bytes"""
         return bytes([])

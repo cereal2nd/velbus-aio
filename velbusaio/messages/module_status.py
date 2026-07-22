@@ -6,9 +6,9 @@
 from __future__ import annotations
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
 from velbusaio.message_fields import (
     BitField,
+    ByteField,
     ChannelsField,
     ComputedField,
     DeclarativeMessage,
@@ -79,44 +79,26 @@ class ModuleStatusPirMessage(DeclarativeMessage):
 
 
 @register(COMMAND_CODE)
-class ModuleStatusGP4PirMessage(Message):
+class ModuleStatusGP4PirMessage(DeclarativeMessage):
     """Module Status GP4 PIR Message."""
 
-    def __init__(self, address=None):
-        """Initialize Module Status GP4 PIR Message object."""
-        Message.__init__(self)
-        # in data[0]
-        self.closed = []
-        self.enabled = []  # only 4 bits
-        # self.normal = []
-        self.locked = []
-        self.programenabled = []
-        self.selected_program = 0
-        self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
+    _command_code = COMMAND_CODE
+    _data_length = 7
+    _generates_data_to_binary = False
 
-        # in data[1] and data[2]
-        self.light_value: int = 0
-        # in data[5]
-        self.selected_program = 0
-        self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
-        # in data[6]
-        self.light_value_send_interval = 0
-
-    def populate(self, priority, address, rtr, data):
-        """Populate the message from binary data."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.closed = self.byte_to_channels(data[0])
-        self.enabled = self.byte_to_channels(data[1])
-        self.locked = self.byte_to_channels(data[3])
-        self.light_value = ((data[1] & 0x30) << 4) + data[2]
-        self.programenabled = self.byte_to_channels(data[4])
-        self.selected_program = data[5] & 0x03
-        self.selected_program_str = PROGRAM_SELECTION[self.selected_program]
-        self.light_value_send_interval = data[6]
-
-    def data_to_binary(self):
-        """:return: bytes"""
-        raise NotImplementedError
+    closed = ChannelsField(0)  # data[0]
+    enabled = ChannelsField(1)  # data[1], only 4 bits
+    locked = ChannelsField(3)  # data[3]
+    light_value = ComputedField(
+        parser=lambda data: ((data[1] & 0x30) << 4) + data[2],
+        default=0,
+        serializable=False,
+    )  # data[1] and data[2]
+    programenabled = ChannelsField(4)  # data[4]
+    selected_program = BitField(5, 0x03)  # data[5]
+    selected_program_str = ComputedField(
+        parser=lambda data: PROGRAM_SELECTION[data[5] & 0x03],
+        default=PROGRAM_SELECTION[0],
+        serializable=False,
+    )
+    light_value_send_interval = ByteField(6, default=0)  # data[6]
