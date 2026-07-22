@@ -147,6 +147,10 @@
     "psu_voltage_out": {
       "Name": "Power Supply Output Voltage",
       "Type": "PSUVoltage"
+    },
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "Type": "VMBPSUMNGR-20"

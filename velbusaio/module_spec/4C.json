@@ -77,5 +77,11 @@
     },
     "ModuleName": "03BC-03FB"
   },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
+    }
+  },
   "Type": "VMB6PB-20"
 }

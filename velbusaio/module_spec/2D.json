@@ -45,7 +45,7 @@
       "Name": "Absence output",
       "Type": "Sensor"
     },
-    "09": {
+    "10": {
       "Editable": "yes",
       "Name": "Temperature",
       "Type": "Temperature"
@@ -96,7 +96,7 @@
       "02": "0014-0023",
       "03": "0028-0037",
       "04": "003C-004B",
-      "09": "00E1-00F0"
+      "10": "00E1-00F0"
     },
     "ModuleName": "03C0-03FF"
   },

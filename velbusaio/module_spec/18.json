@@ -76,5 +76,11 @@
     },
     "ModuleName": "03C0-03FF"
   },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
+    }
+  },
   "Type": "VMB2PBN"
 }

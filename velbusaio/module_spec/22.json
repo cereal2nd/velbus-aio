@@ -156,5 +156,11 @@
     },
     "ModuleName": "03AC-03EB"
   },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
+    }
+  },
   "Type": "VMB7IN"
 }

@@ -1000,7 +1000,10 @@ class Module:
         # load the channel names
         if "channels" in cache:
             for num, chan in cache["channels"].items():
-                chan_num = self._translate_channel_name(num)
+                # Cache keys are the canonical internal channel numbers, so they
+                # must not be run through the name-map translation (which only
+                # applies to channel identifiers reported in incoming messages).
+                chan_num = int(num)
                 if chan_num not in self._channels:
                     continue
                 self._channels[chan_num].set_name(chan["name"])
@@ -1307,7 +1310,10 @@ class Module:
                 )
                 continue
 
-            chan_num = self._translate_channel_name(chan)
+            # The spec's Channels keys are the canonical internal channel
+            # numbers. The name-map translation only applies to channel
+            # identifiers reported in incoming messages, not to creation.
+            chan_num = int(chan)
             self._channels[chan_num] = cls(
                 module=self,
                 num=chan_num,

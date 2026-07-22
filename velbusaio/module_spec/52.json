@@ -253,6 +253,10 @@
     "memo_text": {
       "Name": "Memo Text",
       "Type": "MemoText"
+    },
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "TemperatureChannel": "33",
