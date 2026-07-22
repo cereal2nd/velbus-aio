@@ -56,6 +56,10 @@
     "light_value": {
       "Name": "Light value",
       "Type": "LightValue"
+    },
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
     }
   },
   "Type": "VMBPIRM"
