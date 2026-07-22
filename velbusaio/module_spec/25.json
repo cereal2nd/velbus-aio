@@ -1,4 +1,204 @@
 {
+  "AllChannelStatus": "FF",
+  "ChannelNumbers": {
+    "Name": {
+      "Convert": "hex",
+      "Map": {
+        "21": "34"
+      }
+    }
+  },
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Editable": "yes",
+      "Name": "Virtual button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Virtual button 6",
+      "Type": "Button"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Virtual button 7",
+      "Type": "Button"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Virtual button 8",
+      "Type": "Button"
+    },
+    "09": {
+      "Editable": "yes",
+      "Name": "Virtual button 9",
+      "Type": "Button"
+    },
+    "10": {
+      "Editable": "yes",
+      "Name": "Virtual button 10",
+      "Type": "Button"
+    },
+    "11": {
+      "Editable": "yes",
+      "Name": "Virtual button 11",
+      "Type": "Button"
+    },
+    "12": {
+      "Editable": "yes",
+      "Name": "Virtual button 12",
+      "Type": "Button"
+    },
+    "13": {
+      "Editable": "yes",
+      "Name": "Virtual button 13",
+      "Type": "Button"
+    },
+    "14": {
+      "Editable": "yes",
+      "Name": "Virtual button 14",
+      "Type": "Button"
+    },
+    "15": {
+      "Editable": "yes",
+      "Name": "Virtual button 15",
+      "Type": "Button"
+    },
+    "16": {
+      "Editable": "yes",
+      "Name": "Virtual button 16",
+      "Type": "Button"
+    },
+    "17": {
+      "Editable": "yes",
+      "Name": "Virtual button 17",
+      "Type": "Button"
+    },
+    "18": {
+      "Editable": "yes",
+      "Name": "Virtual button 18",
+      "Type": "Button"
+    },
+    "19": {
+      "Editable": "yes",
+      "Name": "Virtual button 19",
+      "Type": "Button"
+    },
+    "20": {
+      "Editable": "yes",
+      "Name": "Virtual button 20",
+      "Type": "Button"
+    },
+    "21": {
+      "Editable": "yes",
+      "Name": "Virtual button 21",
+      "Type": "Button"
+    },
+    "22": {
+      "Editable": "yes",
+      "Name": "Virtual button 22",
+      "Type": "Button"
+    },
+    "23": {
+      "Editable": "yes",
+      "Name": "Virtual button 23",
+      "Type": "Button"
+    },
+    "24": {
+      "Editable": "yes",
+      "Name": "Virtual button 24",
+      "Type": "Button"
+    },
+    "25": {
+      "Editable": "yes",
+      "Name": "Virtual button 25",
+      "Type": "Button"
+    },
+    "26": {
+      "Editable": "yes",
+      "Name": "Virtual button 26",
+      "Type": "Button"
+    },
+    "27": {
+      "Editable": "yes",
+      "Name": "Virtual button 27",
+      "Type": "Button"
+    },
+    "28": {
+      "Editable": "yes",
+      "Name": "Virtual button 28",
+      "Type": "Button"
+    },
+    "29": {
+      "Editable": "yes",
+      "Name": "Virtual button 29",
+      "Type": "Button"
+    },
+    "30": {
+      "Editable": "yes",
+      "Name": "Virtual button 30",
+      "Type": "Button"
+    },
+    "31": {
+      "Editable": "yes",
+      "Name": "Virtual button 31",
+      "Type": "Button"
+    },
+    "32": {
+      "Editable": "yes",
+      "Name": "Virtual button 32",
+      "Type": "Button"
+    },
+    "34": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "35": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "36": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel"
+    },
+    "37": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "38": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "39": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "40": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel"
+    }
+  },
   "CommandToClass": {
     "00": "PushButtonStatusMessage",
     "12": "ForcedOff",
@@ -26,17 +226,68 @@
     "E8": "TempSensorSettingsPart1",
     "E9": "TempSensorSettingsPart2",
     "EA": "TempSensorStatusMessage",
-    "ED": "ModuleStatusMessage",
+    "ED": "ModuleStatusMessage2",
     "EF": "ChannelNameRequestMessage",
-    "F0": "ChannelNamePart1Message",
-    "F1": "ChannelNamePart2Message",
-    "F2": "ChannelNamePart3Message",
+    "F0": "ChannelNamePart1Message2",
+    "F1": "ChannelNamePart2Message2",
+    "F2": "ChannelNamePart3Message2",
     "F4": "UpdateLedStatusMessage",
     "F5": "ClearLedMessage",
     "F6": "SetLedMessage",
     "F7": "SlowBlinkingLedMessage",
     "F8": "FastBlinkingLedMessage",
-    "F9": "VeryFastBlinkingLedMessage"
+    "F9": "VeryFastBlinkingLedMessage",
+    "FF": "ModuleTypeMessage"
   },
+  "Memory": {
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0014-0023",
+      "03": "0028-0037",
+      "04": "003C-004B",
+      "05": "0050-005F",
+      "06": "0064-0073",
+      "07": "0078-0087",
+      "08": "008C-009B",
+      "09": "00A0-00AF",
+      "10": "00B4-00C3",
+      "11": "00C8-00D7",
+      "12": "00DC-00EB",
+      "13": "00F0-00FF",
+      "14": "0104-0113",
+      "15": "0118-0127",
+      "16": "012C-013B",
+      "17": "0140-014F",
+      "18": "0154-0163",
+      "19": "0168-0177",
+      "20": "017C-018B",
+      "21": "0190-019F",
+      "22": "01A4-01B3",
+      "23": "01B8-01C7",
+      "24": "01CC-01DB",
+      "25": "01E0-01EF",
+      "26": "01F4-0203",
+      "27": "0208-0217",
+      "28": "021C-022B",
+      "29": "0230-023F",
+      "30": "0244-0253",
+      "31": "0258-0267",
+      "32": "026C-027B",
+      "34": "02C1-02D0"
+    },
+    "ModuleName": "09BE-09FD"
+  },
+  "Properties": {
+    "memo_text": {
+      "Name": "Memo Text",
+      "Type": "MemoText"
+    },
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
+    }
+  },
+  "TemperatureChannel": "34",
+  "ThermostatAddr": "3",
   "Type": "VMBGPTC"
 }

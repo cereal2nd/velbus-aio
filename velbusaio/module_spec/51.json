@@ -2,32 +2,86 @@
   "AllChannelStatus": "FF",
   "Channels": {
     "01": {
-      "Name": "Dark output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
     },
     "02": {
-      "Name": "Light output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
     },
     "03": {
-      "Name": "Motion 1 output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
     },
     "04": {
-      "Name": "Light depending motion 1 output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
     },
     "05": {
-      "Name": "Motion 2 output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Virtual button 5",
+      "Type": "Button"
     },
     "06": {
-      "Name": "Light depending motion 2 output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Virtual button 6",
+      "Type": "Button"
     },
     "07": {
-      "Name": "Absence output",
-      "Type": "Sensor"
+      "Editable": "yes",
+      "Name": "Virtual button 7",
+      "Type": "Button"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Virtual button 8",
+      "Type": "Button"
+    },
+    "09": {
+      "Editable": "yes",
+      "Name": "Temperature",
+      "Type": "Temperature"
+    },
+    "10": {
+      "Name": "Heater",
+      "Type": "ThermostatChannel"
+    },
+    "11": {
+      "Name": "Boost",
+      "Type": "ThermostatChannel"
+    },
+    "12": {
+      "Name": "Pump",
+      "Type": "ThermostatChannel"
+    },
+    "13": {
+      "Name": "Cooler",
+      "Type": "ThermostatChannel"
+    },
+    "14": {
+      "Name": "Alarm 1",
+      "Type": "ThermostatChannel"
+    },
+    "15": {
+      "Name": "Alarm 2",
+      "Type": "ThermostatChannel"
+    },
+    "16": {
+      "Name": "Alarm 3",
+      "Type": "ThermostatChannel"
+    },
+    "17": {
+      "Name": "Alarm 4",
+      "Type": "ThermostatChannel"
+    },
+    "18": {
+      "Editable": "yes",
+      "Name": "Output",
+      "Type": "Relay"
     }
   },
   "CommandToClass": {
@@ -72,17 +126,21 @@
     "FF": "ModuleType2Message"
   },
   "Memory": {
-    "ModuleName": "03BC-03FB"
-  },
-  "Properties": {
-    "light_value": {
-      "Name": "Light value",
-      "Type": "LightValue"
+    "Channels": {
+      "01": "001C-002B",
+      "02": "0030-003F",
+      "03": "0044-0053",
+      "04": "0058-0067",
+      "05": "006C-007B",
+      "06": "0080-008F",
+      "07": "0094-00A3",
+      "08": "00A8-00B7",
+      "09": "0398-03A7",
+      "18": "03CC-03DB"
     },
-    "selected_program": {
-      "Name": "Selected program",
-      "Type": "SelectedProgram"
-    }
+    "ModuleName": "06C0-06FF"
   },
+  "TemperatureChannel": "09",
+  "ThermostatAddr": "0",
   "Type": "VMBEL4-20"
 }

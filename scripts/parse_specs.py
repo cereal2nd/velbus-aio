@@ -214,6 +214,68 @@ def check_module_directory_coverage(module_spec_dir: Path) -> list[str]:
     return errors
 
 
+# Spec files that are not module-type specs and therefore have no
+# MODULE_DIRECTORY entry.
+_NON_MODULE_SPECS = frozenset({"global", "broadcast", "ignore"})
+
+
+def check_orphan_specs(module_spec_dir: Path) -> list[str]:
+    """Check that every module-type spec file has a MODULE_DIRECTORY entry.
+
+    This is the reverse of check_module_directory_coverage: it reports spec files
+    that exist on disk but are not referenced by MODULE_DIRECTORY (orphan specs),
+    so the library would never instantiate them.
+    """
+    errors: list[str] = []
+    known_types = {h2(module_type).upper() for module_type in MODULE_DIRECTORY}
+
+    for spec_path in sorted(module_spec_dir.glob("*.json")):
+        stem = spec_path.stem
+        if stem.lower() in _NON_MODULE_SPECS:
+            continue
+        try:
+            int(stem, 16)
+        except ValueError:
+            # Not a hex-named module spec (e.g. a helper file); skip it.
+            continue
+        if stem.upper() not in known_types:
+            errors.append(
+                f"Spec file {spec_path.name} has no MODULE_DIRECTORY entry "
+                f"(orphan spec: 0x{stem.upper()} is not registered)"
+            )
+
+    return errors
+
+
+def check_empty_command_to_class(module_spec_dir: Path) -> list[str]:
+    """Check that every module-type spec defines a non-empty CommandToClass.
+
+    A module spec with a missing or empty CommandToClass cannot decode any bus
+    message, so it is almost certainly incomplete.
+    """
+    warnings: list[str] = []
+
+    for spec_path in sorted(module_spec_dir.glob("*.json")):
+        stem = spec_path.stem
+        if stem.lower() in _NON_MODULE_SPECS:
+            continue
+        try:
+            int(stem, 16)
+        except ValueError:
+            continue
+        try:
+            spec = load_json(spec_path)
+        except Exception as exc:
+            warnings.append(f"{spec_path.name}: failed to load JSON: {exc}")
+            continue
+        if not spec.get("CommandToClass"):
+            warnings.append(
+                f"Spec file {spec_path.name} has an empty or missing CommandToClass"
+            )
+
+    return warnings
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = argv or sys.argv[1:]
 
@@ -270,6 +332,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Found {len(command_errors)} CommandToClass problems.")
     else:
         print("All CommandToClass entries are complete and consistent.")
+
+    # Non-fatal warnings: orphan specs and empty CommandToClass.
+    all_warnings: list[str] = []
+    all_warnings.extend(check_orphan_specs(module_spec_dir))
+    all_warnings.extend(check_empty_command_to_class(module_spec_dir))
+    if all_warnings:
+        print(f"\nWarnings ({len(all_warnings)}):")
+        for w in all_warnings:
+            print(f" - {w}")
 
     if all_errors:
         print("\nModule spec validation failed. Problems found:")

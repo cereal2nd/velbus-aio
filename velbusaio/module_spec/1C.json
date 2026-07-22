@@ -1,4 +1,12 @@
 {
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Blind 1",
+      "Subdevice": "yes",
+      "Type": "Blind"
+    }
+  },
   "CommandToClass": {
     "00": "PushButtonStatusMessage",
     "04": "CoverOffMessage",
@@ -26,6 +34,12 @@
     "F6": "SetLedMessage",
     "F8": "FastBlinkingLedMessage",
     "FF": "ModuleTypeMessage"
+  },
+  "Memory": {
+    "Channels": {
+      "01": "0000-000F"
+    },
+    "ModuleName": "004C-008B"
   },
   "Type": "VMB1BLE"
 }

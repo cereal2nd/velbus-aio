@@ -1,4 +1,46 @@
 {
+  "Channels": {
+    "01": {
+      "Editable": "yes",
+      "Name": "Push button 1",
+      "Type": "Button"
+    },
+    "02": {
+      "Editable": "yes",
+      "Name": "Push button 2",
+      "Type": "Button"
+    },
+    "03": {
+      "Editable": "yes",
+      "Name": "Push button 3",
+      "Type": "Button"
+    },
+    "04": {
+      "Editable": "yes",
+      "Name": "Push button 4",
+      "Type": "Button"
+    },
+    "05": {
+      "Editable": "yes",
+      "Name": "Push button 5",
+      "Type": "Button"
+    },
+    "06": {
+      "Editable": "yes",
+      "Name": "Push button 6",
+      "Type": "Button"
+    },
+    "07": {
+      "Editable": "yes",
+      "Name": "Virtual button 7",
+      "Type": "Button"
+    },
+    "08": {
+      "Editable": "yes",
+      "Name": "Virtual button 8",
+      "Type": "Button"
+    }
+  },
   "CommandToClass": {
     "00": "PushButtonStatusMessage",
     "12": "ForcedOff",
@@ -20,6 +62,25 @@
     "F8": "FastBlinkingLedMessage",
     "F9": "VeryFastBlinkingLedMessage",
     "FF": "ModuleTypeMessage"
+  },
+  "Memory": {
+    "Channels": {
+      "01": "0000-000F",
+      "02": "0010-001F",
+      "03": "0020-002F",
+      "04": "0030-003F",
+      "05": "0040-004F",
+      "06": "0050-005F",
+      "07": "0060-006F",
+      "08": "0070-007F"
+    },
+    "ModuleName": "03C0-03FF"
+  },
+  "Properties": {
+    "selected_program": {
+      "Name": "Selected program",
+      "Type": "SelectedProgram"
+    }
   },
   "Type": "VMB6PBB"
 }
