@@ -11,9 +11,9 @@
 [![issues closed - velbus-aio](https://img.shields.io/github/issues-closed-raw/Cereal2nd/velbus-aio)](https://github.com/cereal2nd/velbus-aio/issues?q=is%3Aissue%20state%3Aclosed)
 [![Forks](https://img.shields.io/github/forks/Cereal2nd/velbus-aio?style=social)](https://github.com/cereal2nd/velbus-aio/forks)
 
-[![Downloads](https://pepy.tech/badge/velbus-aio)](https://pepy.tech/project/velbus-aio)
-[![Downloads](https://pepy.tech/badge/velbus-aio/month)](https://pepy.tech/project/velbus-aio)
-[![Downloads](https://pepy.tech/badge/velbus-aio/week)](https://pepy.tech/project/velbus-aio)
+[![Downloads](https://static.pepy.tech/badge/velbus-aio)](https://pepy.tech/project/velbus-aio)
+[![Downloads](https://static.pepy.tech/badge/velbus-aio/month)](https://pepy.tech/project/velbus-aio)
+[![Downloads](https://static.pepy.tech/badge/velbus-aio/week)](https://pepy.tech/project/velbus-aio)
 [![Ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 
 > This project requires financial support, but it is free for you to use. You can join those helping to keep the lights on at:
@@ -42,3 +42,5 @@ The latest version of the library is published as a python package on [pypi](htt
 # Development
 
 See the [contributing](https://github.com/Cereal2nd/velbus-aio/blob/master/CONTRIBUTING.md) guidelines.
+
+For more information, see the [documentation](https://github.com/Cereal2nd/velbus-aio/blob/master/docs/README.md).
