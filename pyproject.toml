@@ -42,7 +42,7 @@ zip-safe  = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["tests", "tests.*", "examples", "scripts"]
+include = ["velbusaio*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
