@@ -4,7 +4,7 @@ requires = ["setuptools", "wheel"]
 [project]
 name = "velbus-aio"
 license = {text = "MIT"}
-version = "2026.7.2"
+version = "2026.7.3"
 description = "Asyncio Python library to control the Velbus home automation system."
 readme = "README.md"
 authors = [
@@ -52,7 +52,7 @@ exclude_dirs = ["tests"]
 skips = ["B301", "B403", "B323", "B104", "B110"]
 
 [tool.bumpver]
-current_version = "2026.7.2"
+current_version = "2026.7.3"
 version_pattern = "YYYY.MM.INC0"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
