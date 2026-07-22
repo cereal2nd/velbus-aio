@@ -23,7 +23,7 @@ class VlpFile:
         self._modules = []
         self._log = logging.getLogger("velbus-vlpFile")
 
-    def get(self) -> dict:
+    def get(self) -> list:
         """Return the parsed modules."""
         return self._modules
 
@@ -33,13 +33,17 @@ class VlpFile:
             xml_content = await file.read()
         _soup = BeautifulSoup(xml_content, "xml")
         for module in _soup.find_all("Module"):
+            caption_tag = module.find("Caption")
+            memory_tag = module.find("Memory")
+            assert caption_tag is not None
+            assert memory_tag is not None
             mod = vlpModule(
-                module.find("Caption").get_text(),
+                caption_tag.get_text(),
                 module["address"],
                 module["build"],
                 module["serial"],
                 module["type"],
-                module.find("Memory").get_text(),
+                memory_tag.get_text(),
             )
             self._modules.append(mod)
             await mod.parse()
@@ -263,13 +267,14 @@ class vlpModule:
                 f" => Load module spec for {self._type_id}, {self._build} => {memmap_id}"
             )
 
+        assert memmap_id is not None
         with importlib.resources.path(
             __name__, f"module_spec/{h2(memmap_id)}.json"
         ) as fspath:
             async with await anyio.open_file(fspath) as protocol_file:
                 self._spec = json.loads(await protocol_file.read())
 
-    def _read_from_memory(self, address_range) -> str | None:
+    def _read_from_memory(self, address_range) -> str:
         """Read a range of bytes from the module memory."""
         # Check if there are multiple ranges separated by semicolons
         if ";" in address_range:

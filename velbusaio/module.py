@@ -8,14 +8,15 @@ import importlib.resources
 import inspect
 import json
 import logging
+import os
 import pathlib
 import struct
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import anyio
 
 if TYPE_CHECKING:
-    from velbusaio.controller import Controller
+    from velbusaio.controller import Velbus as Controller
 
 from velbusaio import channels as channels_module, properties as properties_module
 from velbusaio.channels import (
@@ -164,7 +165,7 @@ class Module:
         self._type = int(module_type)
         self._data = {}
 
-        self._name = None
+        self._name: str | dict[Any, Any] | None = None
         self._name_buffer: dict[
             int, str
         ] = {}  # temporary buffer while assembling name from memory blocks
@@ -183,6 +184,9 @@ class Module:
         self.loaded = False
         self._use_cache = True
         self._loaded_cache = {}
+        # serialize cache writes for this module to avoid concurrent
+        # coroutines interleaving writes to the same file
+        self._cache_lock = asyncio.Lock()
         self._on_module_found: Callable[[Module], Awaitable[None]] | None = (
             on_module_found
         )
@@ -281,13 +285,38 @@ class Module:
         if not self._use_cache:
             return
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
-        async with await anyio.open_file(cfile, "w") as fl:
-            await fl.write(json.dumps(self.to_cache(), indent=4))
+        data = json.dumps(self.to_cache(), indent=4)
+        # Serialize writes per module and write atomically: dump to a
+        # temp file in the same directory, then rename it onto the final
+        # path. This prevents concurrent coroutines from interleaving
+        # truncating writes and leaving trailing garbage behind.
+        async with self._cache_lock:
+            tmpfile = cfile.with_name(f"{self._address}.json.{os.getpid()}.tmp")
+            async with await anyio.open_file(tmpfile, "w") as fl:
+                await fl.write(data)
+            await anyio.Path(tmpfile).rename(cfile)
+
+    async def write_cache(self) -> None:
+        """Persist this module's cache to disk.
+
+        The internal cache writes are triggered by name/channel-name
+        completion and by ``is_loaded()`` flipping to ``True``. A module that
+        is discovered on the bus but never finishes loading (for example a
+        DALI module that does not answer all of its info requests within the
+        scan window) hits none of those paths and would otherwise leave no
+        ``{address}.json`` behind. This method lets the scanner guarantee a
+        cache file exists for every module it found.
+        """
+        await self._cache()
 
     def __getstate__(self) -> dict:
         """Get state for pickling."""
         d = self.__dict__
-        return {k: d[k] for k in d if k not in {"_writer", "_log", "_controller"}}
+        return {
+            k: d[k]
+            for k in d
+            if k not in {"_writer", "_log", "_controller", "_cache_lock"}
+        }
 
     def __setstate__(self, state: dict) -> None:
         """Set state for unpickling."""
@@ -303,18 +332,21 @@ class Module:
 
     def to_cache(self) -> dict:
         """Build cache dict."""
-        d = {
-            "name": self._name if isinstance(self._name, str) else "",
+        d: dict[str, Any] = {
+            # Fall back to the human-readable module type name when the module
+            # has no programmed name yet (e.g. it never finished loading). This
+            # keeps the cache entry meaningful instead of an empty string.
+            "name": self._name if isinstance(self._name, str) else self.get_type_name(),
             "channels": {},
             "sub_addresses": {},
             "properties": {},
         }
-        for num, chan in self._channels.items():
-            d["channels"][num] = chan.to_cache()
-        for num, address in self._sub_address.items():
-            d["sub_addresses"][num] = address
-        for num, prop in self._properties.items():
-            d["properties"][num] = prop.to_cache()
+        for chan_num, chan in self._channels.items():
+            d["channels"][chan_num] = chan.to_cache()
+        for sub_num, address in self._sub_address.items():
+            d["sub_addresses"][sub_num] = address
+        for prop_num, prop in self._properties.items():
+            d["properties"][prop_num] = prop.to_cache()
         return d
 
     def get_address(self) -> int:
@@ -367,9 +399,9 @@ class Module:
 
     def get_name(self) -> str:
         """Get the module name."""
-        if isinstance(self._name, dict):
-            return ""
-        return self._name
+        if isinstance(self._name, str):
+            return self._name
+        return ""
 
     def get_sw_version(self) -> str:
         """Get the module software version."""
@@ -474,17 +506,23 @@ class Module:
             PsuValuesMessage: self._handle_psu_values,
         }
 
-    async def _handle_channel_name_part1(self, message: Message) -> None:
+    async def _handle_channel_name_part1(
+        self, message: ChannelNamePart1Message
+    ) -> None:
         """Handle channel name part 1 messages."""
         await self._process_channel_name_message(1, message)
         await self._cache()
 
-    async def _handle_channel_name_part2(self, message: Message) -> None:
+    async def _handle_channel_name_part2(
+        self, message: ChannelNamePart2Message
+    ) -> None:
         """Handle channel name part 2 messages."""
         await self._process_channel_name_message(2, message)
         await self._cache()
 
-    async def _handle_channel_name_part3(self, message: Message) -> None:
+    async def _handle_channel_name_part3(
+        self, message: ChannelNamePart3Message
+    ) -> None:
         """Handle channel name part 3 messages."""
         await self._process_channel_name_message(3, message)
         await self._cache()
@@ -564,9 +602,9 @@ class Module:
     ) -> None:
         """Handle sensor temperature messages."""
         chan = self._translate_channel_name(self._data["TemperatureChannel"])
-        await self._channels[chan].maybe_update_temperature(
-            message.getCurTemp(), 1 / 64
-        )
+        temp_channel = self._channels.get(chan)
+        if isinstance(temp_channel, TemperatureChannelType):
+            await temp_channel.maybe_update_temperature(message.getCurTemp(), 1 / 64)
         await self._update_channel(
             chan,
             {
@@ -591,9 +629,9 @@ class Module:
                     "cool_mode": message.cool_mode,
                 },
             )
-            await self._channels[chan].maybe_update_temperature(
-                message.current_temp, 1 / 2
-            )
+            temp_channel = self._channels[chan]
+            if isinstance(temp_channel, TemperatureChannelType):
+                await temp_channel.maybe_update_temperature(message.current_temp, 1 / 2)
 
         # Update thermostat channels.
         # The spec channel names differ between module generations: the older
@@ -895,7 +933,7 @@ class Module:
         try:
             await self._channels[channel].update(updates)
         except KeyError:
-            self._log.info(
+            self._log.error(
                 f"channel {channel} does not exist for module @ address {self}"
             )
 
@@ -903,7 +941,7 @@ class Module:
         try:
             await self._properties[property_name].update(updates)
         except KeyError:
-            self._log.info(
+            self._log.error(
                 f"property {property_name} does not exist for module @ address {self}"
             )
 
@@ -971,7 +1009,9 @@ class Module:
                 else:
                     self._channels[chan_num].set_sub_device(False)
                 if "Unit" in chan:
-                    self._channels[chan_num].set_unit(chan["Unit"])
+                    unit_channel = self._channels[chan_num]
+                    if isinstance(unit_channel, ButtonCounter):
+                        unit_channel.set_unit(chan["Unit"])
                 self._channels[chan_num].set_loaded(True)
         else:
             await self._request_channel_name()
@@ -1014,9 +1054,10 @@ class Module:
 
     async def set_memo_text(self, txt: str) -> None:
         """Set memo text property."""
-        if "memo_text" not in self._properties:
+        memo_prop = self._properties.get("memo_text")
+        if not isinstance(memo_prop, properties_module.MemoText):
             return
-        await self._properties["memo_text"].set(txt)
+        await memo_prop.set(txt)
 
     async def _process_memory_data_block_message(
         self, message: MemoryDataBlockMessage
@@ -1087,14 +1128,20 @@ class Module:
                     data["pulses"] = new_pulses
                 await self._update_channel(chan, data)
 
-    async def _process_channel_name_message(self, part: int, message: Message) -> None:
+    async def _process_channel_name_message(
+        self,
+        part: int,
+        message: ChannelNamePart1Message
+        | ChannelNamePart2Message
+        | ChannelNamePart3Message,
+    ) -> None:
         channel = self._translate_channel_name(message.channel)
         if channel not in self._channels:
             return
         if self._channels[channel].set_name_part(part, message.name) and self.loaded:
             await self._channels[channel].status_update()
 
-    def _translate_channel_name(self, channel: str) -> int:
+    def _translate_channel_name(self, channel: str | int) -> int:
         if keys_exists(
             self._data,
             "ChannelNumbers",
@@ -1205,11 +1252,11 @@ class Module:
                         addr_start = struct.unpack(
                             ">BB", struct.pack(">h", current_addr)
                         )
-                        msg = ReadDataBlockFromMemoryMessage(self._address)
-                        msg.priority = PRIORITY_LOW
-                        msg.high_address = addr_start[0]
-                        msg.low_address = addr_start[1]
-                        await self._writer(msg)
+                        block_msg = ReadDataBlockFromMemoryMessage(self._address)
+                        block_msg.priority = PRIORITY_LOW
+                        block_msg.high_address = addr_start[0]
+                        block_msg.low_address = addr_start[1]
+                        await self._writer(block_msg)
                         current_addr = block_end + 1
 
     async def _load_properties(self) -> None:
@@ -1278,7 +1325,9 @@ class Module:
             ):
                 await self._update_channel(chan_num, {"thermostat": True})
             if chan_data["Type"] == "Dimmer" and "sliderScale" in self._data:
-                self._channels[chan_num].slider_scale = self._data["sliderScale"]
+                dimmer_channel = self._channels[chan_num]
+                if isinstance(dimmer_channel, Dimmer):
+                    dimmer_channel.slider_scale = self._data["sliderScale"]
 
 
 class VmbDali(Module):
@@ -1376,7 +1425,7 @@ class VmbDali(Module):
                         self._channels[message.channel] = Dimmer(
                             self,
                             message.channel,
-                            None,
+                            "",
                             True,
                             True,
                             self._writer,
@@ -1411,8 +1460,8 @@ class VmbDali(Module):
                     for chan in self.group_members.get(group_num, []):
                         await self._update_channel(chan, {"state": dim_value})
                 else:  # broadcast
-                    for chan in self._channels.values():
-                        await chan.update({"state": dim_value})
+                    for channel_obj in self._channels.values():
+                        await channel_obj.update({"state": dim_value})
 
         elif isinstance(
             message,

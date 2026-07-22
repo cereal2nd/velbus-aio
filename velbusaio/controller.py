@@ -22,12 +22,9 @@ from velbusaio.channels import (
     Button,
     ButtonCounter,
     Dimmer,
-    EdgeLit,
     Relay,
-    Sensor,
     SensorNumber,
     Temperature,
-    ThermostatChannel,
 )
 from velbusaio.exceptions import VelbusConnectionFailed
 from velbusaio.handler import PacketHandler
@@ -108,9 +105,11 @@ class Velbus:
         self._vlp_file = vlp_file
         self._cache_dir: str = cache_dir
         self._is_connected: bool = False
-        self._on_connect_callbacks: list[t.Callable[[], None]] = []
-        self._on_disconnect_callbacks: list[t.Callable[[], None]] = []
-        self._on_module_found_callbacks: list[t.Callable[[Module], None]] = []
+        self._on_connect_callbacks: list[t.Callable[[], Awaitable[None]]] = []
+        self._on_disconnect_callbacks: list[t.Callable[[], Awaitable[None]]] = []
+        self._on_module_found_callbacks: list[
+            t.Callable[[Module], Awaitable[None]]
+        ] = []
         self._background_tasks: set[asyncio.Task] = set()
         self._scheduled_tasks: dict[str, ScheduledTask] = {}
         self._scheduler_log = logging.getLogger("velbus-scheduler")
@@ -305,18 +304,18 @@ class Velbus:
         # serial and serialx-backed schemes (e.g. /dev/..., esphome://...)
         try:
             (
-                _transport,
-                _protocol,
+                _serial_transport,
+                _serial_protocol,
             ) = await serialx.create_serial_connection(
                 asyncio.get_running_loop(),
-                lambda: self._protocol,
+                t.cast("t.Callable[[], asyncio.Protocol]", lambda: self._protocol),
                 url=destination,
                 baudrate=38400,
                 byte_size=serialx.EIGHTBITS,
                 parity=serialx.Parity.NONE,
                 stopbits=serialx.StopBits.ONE,
-                xonxoff=0,
-                rtscts=1,
+                xonxoff=False,
+                rtscts=True,
             )
         except (FileNotFoundError, serialx.SerialException) as err:
             raise VelbusConnectionFailed from err
@@ -420,21 +419,7 @@ class Velbus:
         """Get all LED devices."""
         return self._get_all("led")
 
-    def _get_all(
-        self, class_name: str
-    ) -> list[
-        Blind
-        | Button
-        | ButtonCounter
-        | Sensor
-        | ThermostatChannel
-        | Dimmer
-        | Temperature
-        | SensorNumber
-        | Relay
-        | EdgeLit
-        | SelectedProgram
-    ]:
+    def _get_all(self, class_name: str) -> list[t.Any]:
         """Get all channels."""
         return [
             chan

@@ -31,11 +31,11 @@ class DaliDeviceSettingsRequest(DeclarativeMessage):
     def __init__(self, address: int | None = None):
         """Initialize Dali Device Settings Request message."""
         super().__init__(address)
-        self.channel: int = None
-        self.data_source: DataSource = None
-        self.settings: DaliDeviceSetting = None
+        self.channel: int | None = None
+        self.data_source: DataSource | None = None
+        self.settings: DaliDeviceSetting | int | None = None
 
-    def populate(self, priority, address: int, rtr: int, data: bytes) -> None:
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
         """Populate message attributes."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
@@ -50,7 +50,10 @@ class DaliDeviceSettingsRequest(DeclarativeMessage):
 
     def data_to_binary(self) -> bytes:
         """Generate binary data for the message."""
+        assert self.channel is not None
         data = bytearray([COMMAND_CODE, self.channel, DataSource.FromMemory.value])
-        if self.settings is not None:
+        if isinstance(self.settings, DaliDeviceSetting):
             data.append(self.settings.value)
+        elif self.settings is not None:
+            data.append(self.settings)
         return bytes(data)

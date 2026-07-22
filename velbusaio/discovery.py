@@ -6,6 +6,9 @@ import asyncio
 import json
 import logging
 import socket
+from typing import cast
+
+_LOGGER = logging.getLogger(__name__)
 
 Address = tuple[str, int]
 
@@ -17,9 +20,9 @@ class VelbusDiscoveryProtocol(asyncio.DatagramProtocol):
         """Initialize the protocol."""
         self.target = target
 
-    def connection_made(self, transport: asyncio.transports.DatagramTransport) -> None:
+    def connection_made(self, transport: asyncio.BaseTransport) -> None:
         """Called when the connection is made."""
-        self.transport = transport
+        self.transport = cast("asyncio.DatagramTransport", transport)
         sock = transport.get_extra_info("socket")
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -52,4 +55,4 @@ class VelbusDiscoveryProtocol(asyncio.DatagramProtocol):
                 "port": json_data["velbus_port"],
                 "auth": json_data["velbus_auth"],
             }
-            logging.log.info("data received:", res)
+            _LOGGER.info("data received: %s", res)

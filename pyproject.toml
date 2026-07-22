@@ -42,7 +42,7 @@ zip-safe  = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["tests", "tests.*", "examples"]
+exclude = ["tests", "tests.*", "examples", "scripts"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

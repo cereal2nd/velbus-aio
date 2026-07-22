@@ -12,14 +12,14 @@ from typing import Any
 from velbusaio.const import CACHEDIR
 
 
-def keys_exists(element: dict[str, Any], *keys) -> dict:
+def keys_exists(element: dict[str, Any], *keys: Any) -> Any:
     """Check if *keys (nested) exists in `element` (dict)."""
     if not isinstance(element, dict):
         raise TypeError("keys_exists() expects dict as first argument.")
     if len(keys) == 0:
         raise AttributeError("keys_exists() expects at least two arguments, one given.")
 
-    _element = element
+    _element: Any = element
     for key in keys:
         _element = _element.get(key)
         if _element is None:
@@ -32,7 +32,7 @@ def h2(inp: int) -> str:
     return format(inp, "02x").upper()
 
 
-def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) -> dict:
+def handle_match(match_dict: dict[str, dict[str, dict[str, Any]]], data: int) -> dict:
     """Handle memory match from the module data."""
     match_result = {}
     binary_data = f"{int(data):08b}"
@@ -44,7 +44,7 @@ def handle_match(match_dict: dict[str, dict[str, dict[str, str]]], data: int) ->
                 res2["Data"] = int(data)
                 tmp.update(res2)
         match_result[num] = tmp
-    result = {}
+    result: dict[int, dict[str, Any]] = {}
     for res in match_result.values():
         if "Channel" in res:
             result[int(res["Channel"])] = {}
@@ -100,5 +100,7 @@ def get_property_key_map() -> dict[str, str]:
 
 def get_cache_dir() -> str:
     """Put together the default configuration directory based on the OS."""
-    data_dir = os.getenv("APPDATA") if os.name == "nt" else str(Path("~").expanduser())
+    data_dir = (
+        os.getenv("APPDATA", "") if os.name == "nt" else str(Path("~").expanduser())
+    )
     return str(Path(data_dir) / CACHEDIR)

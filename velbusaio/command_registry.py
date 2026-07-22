@@ -149,7 +149,7 @@ class CommandRegistry:
         self._register_override(command_value, command_class, module_type)
 
     def _register_override(
-        self, command_value: int, command_class: type, module_type: int
+        self, command_value: int, command_class: type, module_type: int | None
     ) -> None:
         """Register and override."""
         if module_type not in self._overrides:

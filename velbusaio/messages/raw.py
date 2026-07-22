@@ -24,9 +24,9 @@ class MeteoRawMessage(DeclarativeMessage):
     def __init__(self, address=None):
         """Initialize Meteo Raw Message Object."""
         Message.__init__(self)
-        self.rain = 0
-        self.light = 0
-        self.wind = 0
+        self.rain: float = 0
+        self.light: float = 0
+        self.wind: float = 0
 
     def populate(self, priority, address, rtr, data):
         """Populate the Meteo Raw Message Object.
@@ -59,8 +59,8 @@ class SensorRawMessage(DeclarativeMessage):
         Message.__init__(self)
         self.sensor = 0
         self.mode = 0
-        self.value = 0
-        self.unit = None
+        self.value: float = 0
+        self.unit: str | None = None
 
     def populate(self, priority, address, rtr, data):
         """Populate the Sensor Raw Message Object."""

@@ -185,6 +185,17 @@ class PacketHandler:
                         f"Scan module {address} ({address:#02x}, {module.get_type_name()}) completed in {module_scan_time:.2f}, module loaded={await module.is_loaded()}"
                     )
                     await module.wait_for_status_messages()
+                    # A module can be discovered but never reach the fully
+                    # loaded state within the scan window (e.g. a DALI module
+                    # that stays unresponsive to its info/name requests). Fully
+                    # loaded modules already wrote their cache while loading;
+                    # for the rest we still persist a cache file here so every
+                    # found module is represented on disk.
+                    if not await module.is_loaded():
+                        self._log.warning(
+                            f"Module {address} ({address:#02x}) did not finish loading; writing cache anyway"
+                        )
+                        await module.write_cache()
                 except TimeoutError:
                     self._log.error(
                         f"Module {address} ({address:#02x}) did not respond to info requests after successful type request"

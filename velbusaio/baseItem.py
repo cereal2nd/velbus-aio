@@ -112,7 +112,7 @@ class BaseItem(ABC):
         """Get the category of this property."""
 
     @abstractmethod
-    def get_sensor_type(self) -> str:
+    def get_sensor_type(self) -> str | None:
         """Get the sensor type of this property."""
 
     @abstractmethod

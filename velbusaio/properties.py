@@ -110,7 +110,7 @@ class SelectedProgram(Property):
     ):
         """Initialize Selected Program property with per-instance current value."""
         super().__init__(module, name, writer)
-        self._selected_program_str = None
+        self._selected_program_str: str | None = None
 
     def get_categories(self) -> list[str]:
         """Return the categories for this property."""
@@ -124,7 +124,7 @@ class SelectedProgram(Property):
         """Return the available program options for this property."""
         return list(PROGRAM_SELECTION.values())
 
-    def get_selected_program(self) -> str:
+    def get_selected_program(self) -> str | None:
         """Return the currently selected program."""
         return self._selected_program_str
 

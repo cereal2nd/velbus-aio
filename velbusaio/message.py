@@ -15,7 +15,7 @@ class ParserError(Exception):
 class Message:
     """Base Velbus message."""
 
-    def __init__(self, address: int = 0) -> None:
+    def __init__(self, address: int | None = 0) -> None:
         """Initialize message with default values."""
         self.priority = PRIORITY_LOW
         self.address: int = 0
@@ -29,7 +29,7 @@ class Message:
         self.address = address
         self.rtr = rtr
 
-    def populate(self, priority: int, address: int, rtr: bool, data: int) -> None:
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
         """Populate message from raw data."""
         raise NotImplementedError
 

@@ -25,7 +25,7 @@ class DaliDeviceSettingMsg(Message):
         self.set_defaults(address)
         self.channel: int = 0
 
-    def populate(self, priority, address: int, rtr: int, data: bytes) -> None:
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
         """Populate message attributes."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
@@ -34,9 +34,11 @@ class DaliDeviceSettingMsg(Message):
         self.needs_data(data, 2)
         self.channel = data[0]
         message_subtype = data[1]
-        self.data: bytes | DaliDeviceSettingSubMessage = data[2:]
+        # This received message repurposes the outgoing `data` buffer to hold the
+        # parsed payload, which is either the raw bytes or a decoded sub-message.
+        self.data: bytes | DaliDeviceSettingSubMessage = data[2:]  # type: ignore[assignment]
         try:
-            decode_class = DaliDeviceSetting(message_subtype).decode_class
+            decode_class = DaliDeviceSetting(message_subtype).decode_class  # type: ignore[call-arg]
             if decode_class is not None:
                 self.data = decode_class.from_data(self.data)
         except (ValueError, KeyError):
@@ -159,8 +161,10 @@ class MemberOfGroupMsg(DaliDeviceSettingSubMessage):
 class DaliDeviceSetting(enum.Enum):
     """Dali Device Setting enum."""
 
+    decode_class: type[DaliDeviceSettingSubMessage] | None
+
     def __new__(
-        cls, value: int, decode_class: type[DaliDeviceSettingSubMessage]
+        cls, value: int, decode_class: type[DaliDeviceSettingSubMessage] | None
     ) -> Self:
         """New method."""
         obj = object.__new__(cls)

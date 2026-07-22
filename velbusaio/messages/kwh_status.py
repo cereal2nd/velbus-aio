@@ -27,9 +27,9 @@ class KwhStatusMessage(DeclarativeMessage):
         self.channel = 0
         self.pulses = 0
         self.counter = 0
-        self.kwh = 0
+        self.kwh: float = 0
         self.delay = 0
-        self.watt = 0
+        self.watt: float = 0
 
     def populate(self, priority, address, rtr, data):
         """Parses the Kwh Status message.

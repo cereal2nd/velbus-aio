@@ -150,6 +150,6 @@ def _trim_buffer_garbage(rawmessage: bytearray) -> bytearray:
             "Trimming whole buffer as it does not contain the start byte: %s",
             binascii.hexlify(rawmessage),
         )
-        return []
+        return bytearray()
 
     return rawmessage

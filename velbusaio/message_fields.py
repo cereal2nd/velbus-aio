@@ -83,12 +83,13 @@ class Field:
 class ByteField(Field):
     """Single byte field."""
 
-    def __init__(self, byte_index: int, default: int = 0, **kwargs: Any) -> None:
+    def __init__(self, byte_index: int, default: int | None = 0, **kwargs: Any) -> None:
         """Initialize byte field."""
         super().__init__(byte_index=byte_index, default=default, **kwargs)
 
     def parse(self, data: bytes) -> int:
         """Parse byte from data."""
+        assert self.byte_index is not None
         return data[self.byte_index]
 
     def serialize(self, value: int) -> bytes:
@@ -123,6 +124,7 @@ class BitField(Field):
 
     def parse(self, data: bytes) -> Any:
         """Parse masked bits from data."""
+        assert self.byte_index is not None
         value = data[self.byte_index] & self.mask
         if self.shift:
             value >>= self.shift
@@ -216,6 +218,7 @@ class ChannelsField(Field):
 
     def parse(self, data: bytes) -> list[int]:
         """Parse channels from bitmask byte."""
+        assert self.byte_index is not None
         byte_value = data[self.byte_index]
         return [offset + 1 for offset in range(8) if byte_value & (1 << offset)]
 
@@ -237,6 +240,7 @@ class ChannelField(Field):
 
     def parse(self, data: bytes) -> int:
         """Parse single channel from bitmask byte."""
+        assert self.byte_index is not None
         byte_value = data[self.byte_index]
         channels = [offset + 1 for offset in range(8) if byte_value & (1 << offset)]
         if len(channels) != 1:
@@ -261,6 +265,7 @@ class ChannelIndexField(Field):
 
     def parse(self, data: bytes) -> list[int]:
         """Parse channel index byte to list of one channel (or empty)."""
+        assert self.byte_index is not None
         value = data[self.byte_index]
         return [value] if value else []
 
@@ -273,7 +278,12 @@ class Int16Field(Field):
     """16-bit integer field (big-endian)."""
 
     def __init__(
-        self, byte_index: int, default: int = 0, *, signed: bool = False, **kwargs: Any
+        self,
+        byte_index: int,
+        default: int | None = 0,
+        *,
+        signed: bool = False,
+        **kwargs: Any,
     ) -> None:
         """Initialize 16-bit field."""
         super().__init__(byte_index=byte_index, default=default, **kwargs)
@@ -281,6 +291,7 @@ class Int16Field(Field):
 
     def parse(self, data: bytes) -> int:
         """Parse 16-bit value from two bytes."""
+        assert self.byte_index is not None
         value = (data[self.byte_index] << 8) | data[self.byte_index + 1]
         if self.signed and value & 0x8000:
             value -= 0x10000
@@ -302,6 +313,7 @@ class Int24Field(Field):
 
     def parse(self, data: bytes) -> int:
         """Parse 24-bit value from three bytes."""
+        assert self.byte_index is not None
         return (
             (data[self.byte_index] << 16)
             | (data[self.byte_index + 1] << 8)
@@ -322,6 +334,7 @@ class BlindChannelField(Field):
 
     def parse(self, data: bytes) -> int:
         """Parse channel from VMB1BL/VMB2BL encoding."""
+        assert self.byte_index is not None
         tmp = (data[self.byte_index] >> 1) & 0x03
         return 1 if tmp == 1 else 2
 
@@ -348,6 +361,7 @@ class BlindStatusField(Field):
 
     def parse(self, data: bytes) -> int:
         """Parse 2-bit status for this channel from status byte."""
+        assert self.byte_index is not None
         tmp = (data[self.channel_byte_index] >> 1) & 0x03
         channel = 1 if tmp == 1 else 2
         return (data[self.byte_index] >> ((channel - 1) * 2)) & 0x03
@@ -366,6 +380,7 @@ class TemperatureField(Field):
 
     def parse(self, data: bytes) -> float:
         """Parse temperature from two bytes."""
+        assert self.byte_index is not None
         raw = (data[self.byte_index] << 8) | data[self.byte_index + 1]
         if raw >> 15:
             return -127 + (raw / 32 * 0.0625)
@@ -396,6 +411,7 @@ class StringField(Field):
 
     def parse(self, data: bytes) -> str:
         """Parse string from bytes."""
+        assert self.byte_index is not None
         if self.length is not None:
             end_index = self.byte_index + self.length
             string_bytes = data[self.byte_index : end_index]
@@ -428,7 +444,9 @@ def _collect_fields(cls: type) -> dict[str, Field]:
     return fields
 
 
-def _make_set_defaults(cls: type) -> Callable[[Any, int | None], None]:
+def _make_set_defaults(
+    cls: type[DeclarativeMessage],
+) -> Callable[[Any, int | None], None]:
     """Build set_defaults honoring declarative message config."""
 
     def set_defaults(self: DeclarativeMessage, address: int | None) -> None:
@@ -528,7 +546,9 @@ def _serializable_fields(fields: dict[str, Field]) -> list[tuple[str, Field]]:
     return [(name, field) for name, field in fields.items() if field.serializable]
 
 
-def _make_data_to_binary_no_fields(cls: type) -> Callable[[Any], bytes]:
+def _make_data_to_binary_no_fields(
+    cls: type[DeclarativeMessage],
+) -> Callable[[Any], bytes]:
     """Build data_to_binary() for messages with no serializable fields."""
 
     def data_to_binary(self: DeclarativeMessage) -> bytes:
@@ -537,7 +557,9 @@ def _make_data_to_binary_no_fields(cls: type) -> Callable[[Any], bytes]:
     return data_to_binary
 
 
-def _make_data_to_binary(cls: type, fields: dict[str, Field]) -> Callable[[Any], bytes]:
+def _make_data_to_binary(
+    cls: type[DeclarativeMessage], fields: dict[str, Field]
+) -> Callable[[Any], bytes]:
     """Build data_to_binary() from serializable fields."""
 
     serializable = _serializable_fields(fields)
@@ -610,7 +632,7 @@ class DeclarativeMessage(Message):
             cls.__init__ = _make_init(cls, fields)  # type: ignore[method-assign]
 
         if "set_defaults" not in cls.__dict__:
-            cls.set_defaults = _make_set_defaults(cls)  # type: ignore[method-assign]
+            cls.set_defaults = _make_set_defaults(cls)  # type: ignore[method-assign, assignment]
 
         if "populate" not in cls.__dict__:
             if fields:
@@ -624,12 +646,12 @@ class DeclarativeMessage(Message):
             and hasattr(cls, "_command_code")
         ):
             if _serializable_fields(fields):
-                cls.data_to_binary = _make_data_to_binary(cls, fields)  # type: ignore[method-assign]
+                cls.data_to_binary = _make_data_to_binary(cls, fields)  # type: ignore[method-assign, assignment]
             else:
-                cls.data_to_binary = _make_data_to_binary_no_fields(cls)  # type: ignore[method-assign]
+                cls.data_to_binary = _make_data_to_binary_no_fields(cls)  # type: ignore[method-assign, assignment]
 
         if cls._generates_to_json:
             if "to_json_basic" not in cls.__dict__:
-                cls.to_json_basic = _make_to_json_basic(cls, fields)  # type: ignore[method-assign]
+                cls.to_json_basic = _make_to_json_basic(cls, fields)  # type: ignore[method-assign, assignment]
             if "to_json" not in cls.__dict__:
-                cls.to_json = _make_to_json(cls, fields)  # type: ignore[method-assign]
+                cls.to_json = _make_to_json(cls, fields)  # type: ignore[method-assign, assignment]

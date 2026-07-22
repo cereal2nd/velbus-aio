@@ -181,7 +181,7 @@
     "BD": "CounterStatusRequestMessage",
     "D7": "RealtimeClockStatusRequest",
     "D8": "SetRealtimeClock",
-    "ED": "ModuleStatusMessage2",
+    "ED": "ModuleStatusMessage",
     "EF": "ChannelNameRequestMessage",
     "F0": "ChannelNamePart1Message2",
     "F1": "ChannelNamePart2Message2",

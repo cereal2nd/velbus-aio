@@ -12,6 +12,7 @@ import typing as t
 import backoff
 
 from velbusaio.const import MAXIMUM_MESSAGE_SIZE, MINIMUM_MESSAGE_SIZE, SLEEP_TIME
+from velbusaio.message import ParserError
 from velbusaio.raw_message import RawMessage, create as create_message_info
 
 
@@ -25,7 +26,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
     def __init__(
         self,
         message_received_callback: t.Callable[[RawMessage], t.Awaitable[None]],
-        connection_state_callback: t.Callable[[bool], None] | None = None,
+        connection_state_callback: t.Callable[[bool], t.Awaitable[None]] | None = None,
     ) -> None:
         """Initialize VelbusProtocol with callbacks."""
         super().__init__()
@@ -42,12 +43,12 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         self._buffer_view = memoryview(self._buffer)
 
         self._serial_buf = b""
-        self.transport = None
+        self.transport: asyncio.Transport | None = None
 
         # everything for writing to Velbus
-        self._send_queue = asyncio.Queue()
+        self._send_queue: asyncio.Queue = asyncio.Queue()
         self._write_transport_lock = asyncio.Lock()
-        self._writer_task = None
+        self._writer_task: asyncio.Task | None = None
         self._restart_writer = False
         self.restart_writing()
 
@@ -64,7 +65,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
 
     def connection_made(self, transport: transports.BaseTransport) -> None:
         """Called when the Velbus connection is established."""
-        self.transport = transport
+        self.transport = t.cast("asyncio.Transport", transport)
         self._log.info("Connection established to Velbus")
         self._last_activity_time = time.time()
 
@@ -167,14 +168,22 @@ class VelbusProtocol(asyncio.BufferedProtocol):
 
     async def _process_message(self, msg: RawMessage) -> None:
         # self._log.debug(f"RX: {msg}")
-        await self._message_received_callback(msg)
+        # This coroutine is scheduled as a detached task (asyncio.ensure_future),
+        # so any exception it raises would otherwise surface as an unretrieved
+        # "Task exception was never retrieved" error and kill the task silently.
+        # A single malformed/short packet from a module must never take down the
+        # processing pipeline, so swallow parse errors here and log a warning.
+        try:
+            await self._message_received_callback(msg)
+        except ParserError as exc:
+            self._log.warning(f"Dropping unparsable message ({exc}): {msg}")
 
     # Everything write-related
 
     async def write_auth_key(self, authkey: str) -> None:
         """Send authentication key to Velbus interface."""
         self._log.debug("TX: authentication key")
-        if not self.transport.is_closing():
+        if self.transport is not None and not self.transport.is_closing():
             self.transport.write(authkey.encode("utf-8"))
 
     async def send_message(self, msg: RawMessage) -> None:

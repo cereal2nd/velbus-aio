@@ -21,7 +21,7 @@ class ChannelNameRequestMessage(DeclarativeMessage):
     def __init__(self, address=None):
         """Initialize Channel Name Request message."""
         super().__init__(address)
-        self.channels = []
+        self.channels: list[int] | int = []
 
     def populate(self, priority, address, rtr, data):
         """:return: None"""
@@ -54,10 +54,11 @@ class ChannelNameRequestMessage2(ChannelNameRequestMessage):
     def data_to_binary(self):
         """:return: bytes"""
         tmp = 0x00
-        if 1 in self.channels:
-            tmp += 0x03
-        if 2 in self.channels:
-            tmp += 0x0C
+        if isinstance(self.channels, list):
+            if 1 in self.channels:
+                tmp += 0x03
+            if 2 in self.channels:
+                tmp += 0x0C
         return bytes([COMMAND_CODE, tmp])
 
 
@@ -75,4 +76,5 @@ class ChannelNameRequestMessage3(ChannelNameRequestMessage):
 
     def data_to_binary(self):
         """:return: bytes"""
+        assert isinstance(self.channels, int)
         return bytes([COMMAND_CODE, self.channels])

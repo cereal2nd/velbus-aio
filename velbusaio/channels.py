@@ -223,11 +223,11 @@ class Channel(BaseItem):
         """Return the unit of the counter."""
         raise NotImplementedError
 
-    def get_max(self) -> int:
+    def get_max(self) -> int | None:
         """Return the maximum value."""
         raise NotImplementedError
 
-    def get_min(self) -> int:
+    def get_min(self) -> int | None:
         """Return the minimum value."""
         raise NotImplementedError
 
@@ -252,9 +252,9 @@ class Channel(BaseItem):
 class Blind(Channel):
     """A blind channel."""
 
-    _state = None
+    _state: int | None = None
     # State reports the direction of *movement*: moving up, moving down or stopped
-    _position = None
+    _position: int | None = None
     # Position reporting is not supported by VMBxBL modules (only in BLE/BLS)
 
     def get_categories(self) -> list[str]:
@@ -265,7 +265,7 @@ class Blind(Channel):
         """Return the blind position."""
         return self._position
 
-    def get_state(self) -> str:
+    def get_state(self) -> int | None:
         """Return the blind state."""
         return self._state
 
@@ -406,7 +406,7 @@ class ButtonCounter(Button):
     => is_counter   this is the numeric energy value
     """
 
-    _Unit = None
+    _Unit: str | None = None
     _pulses = None
     _counter = None
     _delay = None
@@ -493,7 +493,7 @@ class ButtonCounter(Button):
 
     def get_counter_unit(self) -> str:
         """Return the unit of the counter."""
-        return self._Unit
+        return self._Unit or ""
 
     def is_water(self) -> bool:
         """Return if this channel is a water channel."""
@@ -582,9 +582,9 @@ class Temperature(Channel):
     _max = None
     _min = None
     _target = 0
-    _cmode = None
-    _cool_mode = None
-    _cstatus = None
+    _cmode: str | None = None
+    _cool_mode: str | None = None
+    _cstatus: str | None = None
     _thermostat = False
     _sleep_timer = 0
 
@@ -630,15 +630,15 @@ class Temperature(Channel):
         """Return the target temperature."""
         return round(self._target, 2)
 
-    def get_climate_preset(self) -> str:
+    def get_climate_preset(self) -> str | None:
         """Return the climate preset."""
         return self._cmode
 
-    def get_climate_mode(self) -> str:
+    def get_climate_mode(self) -> str | None:
         """Return the climate mode."""
         return self._cstatus
 
-    def get_cool_mode(self) -> str:
+    def get_cool_mode(self) -> str | None:
         """Return the cool mode."""
         return self._cool_mode
 
@@ -790,7 +790,7 @@ class SensorNumber(Channel):
 class Relay(Channel):
     """A Relay channel."""
 
-    _on = None
+    _on: bool | None = None
     _enabled = True
     _inhibit = False
     _forced_on = False
@@ -803,7 +803,7 @@ class Relay(Channel):
             return ["switch"]
         return []
 
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return if this relay is on."""
         return self._on
 
