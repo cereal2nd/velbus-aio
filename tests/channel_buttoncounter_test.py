@@ -173,13 +173,53 @@ class TestButtonCounter:
         assert button.get_counter_state() == 250.5
 
     def test_get_counter_state_calculated(self, mock_module, mock_writer):
-        """Test getting calculated counter state."""
+        """Test the counter state is derived from the pulse interval."""
         button = ButtonCounter(
             mock_module, 1, "Counter", False, True, mock_writer, 0x01
         )
+        button._Unit = ENERGY_KILO_WATT_HOUR
         button._counter = 1000
         button._pulses = 10
-        assert button.get_counter_state() == 100.0
+        button._delay = 1000
+        expected = (1000 * 1000 * 3600) / (1000 * 10)
+        assert button.get_counter_state() == round(expected, 2)
+
+    def test_get_counter_state_differs_from_energy(self, mock_module, mock_writer):
+        """A module without CounterValueMessage must not report power == energy.
+
+        Modules such as the VMB7IN only send a CounterStatusMessage, so _power
+        and _energy stay None. Both values used to fall back to counter/pulses,
+        which made the power and energy sensors in Home Assistant identical.
+        """
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._Unit = ENERGY_KILO_WATT_HOUR
+        button._counter = 1000
+        button._pulses = 10
+        button._delay = 1000
+        assert button._power is None
+        assert button._energy is None
+        assert button.get_counter_state() != button.energy
+
+    def test_get_counter_state_without_delay(self, mock_module, mock_writer):
+        """Test the counter state is 0 while the pulse interval is unknown."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._Unit = ENERGY_KILO_WATT_HOUR
+        button._counter = 1000
+        button._pulses = 10
+        assert button.get_counter_state() == 0
+
+    def test_get_state_without_pulses(self, mock_module, mock_writer):
+        """Test the rate is 0 instead of raising when the pulses are unknown."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._Unit = ENERGY_KILO_WATT_HOUR
+        button._delay = 1000
+        assert button.get_state() == 0
 
     def test_get_counter_unit(self, mock_module, mock_writer):
         """Test getting counter unit."""
