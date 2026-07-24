@@ -450,24 +450,34 @@ class ButtonCounter(Button):
             return round(self._counter / self._pulses, 2)
         return None
 
+    def _rate_from_pulse_interval(self) -> float:
+        """Return the instantaneous rate derived from the interval between pulses.
+
+        Only VMB8IN-20 maps a CounterValueMessage, so on every other counter
+        module _power stays None and the rate has to be derived from _delay.
+        """
+        # if we don't know the delay or the pulses
+        # or we don't know the unit
+        # or the delay is the max value
+        #   we always return 0
+        if (
+            not self._delay
+            or not self._pulses
+            or not self._Unit
+            or self._delay == 0xFFFF
+        ):
+            return round(0, 2)
+        if self._Unit in {VOLUME_LITERS_HOUR, VOLUME_CUBIC_METER_HOUR}:
+            return round((1000 * 3600) / (self._delay * self._pulses), 2)
+        if self._Unit == ENERGY_KILO_WATT_HOUR:
+            return round((1000 * 1000 * 3600) / (self._delay * self._pulses), 2)
+        return round(0, 2)
+
     def get_state(self) -> int:
         """Return the current state of the counter."""
         if self._energy is not None:
             return self._energy
-        # if we don't know the delay
-        # or we don't know the unit
-        # or the delay is the max value
-        #   we always return 0
-        val = 0
-        if not self._delay or not self._Unit or self._delay == 0xFFFF:
-            return round(0, 2)
-        if self._Unit in {VOLUME_LITERS_HOUR, VOLUME_CUBIC_METER_HOUR}:
-            val = (1000 * 3600) / (self._delay * self._pulses)
-        elif self._Unit == ENERGY_KILO_WATT_HOUR:
-            val = (1000 * 1000 * 3600) / (self._delay * self._pulses)
-        else:
-            val = 0
-        return round(val, 2)
+        return self._rate_from_pulse_interval()
 
     def get_unit(self) -> str | None:
         """Return the unit of the counter."""
@@ -484,12 +494,15 @@ class ButtonCounter(Button):
         self._Unit = unit
 
     def get_counter_state(self) -> int:
-        """Return the current state of the counter."""
+        """Return the instantaneous power (or flow) of the counter.
+
+        Falls back to the pulse interval when the module does not report
+        _power; returning the accumulated counter here would duplicate the
+        energy property.
+        """
         if self._power:
             return self._power
-        if not self._counter or not self._pulses:
-            return 0
-        return round((self._counter / self._pulses), 2)
+        return self._rate_from_pulse_interval()
 
     def get_counter_unit(self) -> str:
         """Return the unit of the counter."""
