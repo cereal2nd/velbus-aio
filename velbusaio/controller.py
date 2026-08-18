@@ -98,7 +98,7 @@ class Velbus:
         self._destination = dsn
         self._send_queue: asyncio.Queue = asyncio.Queue()
         self._connected_event: asyncio.Event = asyncio.Event()
-        self._protocol: VelbusProtocol = self.__protocol_factory()
+        self._protocol: VelbusProtocol | None = None
         self._send_task: asyncio.Task | None = None
         self._handler = PacketHandler(self, one_address)
         self._modules: dict[int, Module] = {}
