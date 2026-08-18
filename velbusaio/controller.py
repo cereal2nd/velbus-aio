@@ -27,6 +27,7 @@ from velbusaio.channels import (
     Temperature,
 )
 from velbusaio.config import ConfigParameter
+from velbusaio.const import SLEEP_TIME
 from velbusaio.exceptions import VelbusConnectionFailed
 from velbusaio.handler import PacketHandler
 from velbusaio.helpers import get_cache_dir
@@ -90,19 +91,17 @@ class Velbus:
     ) -> None:
         """Init the Velbus controller."""
         self._log = logging.getLogger("velbus")
-
-        self._protocol = VelbusProtocol(
-            message_received_callback=self._on_message_received,
-            connection_state_callback=self._on_connection_state,
-        )
         self._closing = False
         self._auto_reconnect = True
 
         self._destination = dsn
+        self._send_queue: asyncio.Queue = asyncio.Queue()
+        self._connected_event: asyncio.Event = asyncio.Event()
+        self._protocol: VelbusProtocol | None = None
+        self._send_task: asyncio.Task | None = None
         self._handler = PacketHandler(self, one_address)
         self._modules: dict[int, Module] = {}
         self._submodules: list[int] = []
-        self._send_queue: asyncio.Queue = asyncio.Queue()
         self._vlp_file = vlp_file
         self._cache_dir: str = cache_dir
         self._is_connected: bool = False
@@ -114,6 +113,73 @@ class Velbus:
         self._background_tasks: set[asyncio.Task] = set()
         self._scheduled_tasks: dict[str, ScheduledTask] = {}
         self._scheduler_log = logging.getLogger("velbus-scheduler")
+
+    @staticmethod
+    def _calculate_queue_sleep_time(msg_info, send_time):
+        """Calculate the sleep time needed after sending a message to Velbus."""
+        sleep_time = SLEEP_TIME
+
+        if msg_info.rtr:
+            sleep_time = SLEEP_TIME  # this is a scan command. We could be quicker?
+
+        if msg_info.command == 0xEF:
+            # 'channel name request' command provokes in worst case 99 answer packets from VMBGPOD
+            sleep_time = SLEEP_TIME * 33  # TODO make this adaptable on module_type
+
+        if send_time > sleep_time:
+            return 0  # no need to wait, we are already late
+        return sleep_time - send_time
+
+    async def _send_loop(self) -> None:
+        """Outbound queue loop that dispatches messages when connected."""
+        self._log.debug("Starting Velbus send loop")
+        while not self._closing:
+            try:
+                await self._connected_event.wait()
+                if self._closing:
+                    break
+
+                msg_info: RawMessage = await self._send_queue.get()
+                try:
+                    message_sent = False
+                    while not message_sent and not self._closing:
+                        await self._connected_event.wait()
+                        if self._closing:
+                            break
+
+                        if not (
+                            self._is_connected
+                            and self._protocol
+                            and self._protocol.is_connected
+                        ):
+                            continue
+
+                        await self._protocol.wait_can_write()
+
+                        # Re-verify connection and closing state after wait_can_write
+                        if self._closing or not (
+                            self._is_connected
+                            and self._protocol
+                            and self._protocol.is_connected
+                        ):
+                            continue
+
+                        start_time = time.monotonic()
+                        message_sent = self._protocol.write_message(msg_info)
+                        if message_sent:
+                            send_time = time.monotonic() - start_time
+                            sleep_time = self._calculate_queue_sleep_time(
+                                msg_info, send_time
+                            )
+                            if sleep_time > 0 and not self._closing:
+                                await asyncio.sleep(sleep_time)
+                finally:
+                    self._send_queue.task_done()
+            except asyncio.CancelledError:
+                break
+            except Exception:  # noqa: BLE001
+                self._log.exception("Error in Velbus send loop")
+        self._log.debug("Ending Velbus send loop")
 
     def add_connect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
         """Register a coroutine to be called on connect."""
@@ -173,9 +239,11 @@ class Velbus:
         """Respond to Protocol connection state changes."""
         self._is_connected = is_connected
         if is_connected:
+            self._connected_event.set()
             for callback in self._on_connect_callbacks:
                 await callback()
         else:
+            self._connected_event.clear()
             for callback in self._on_disconnect_callbacks:
                 await callback()
             if self._auto_reconnect and not self._closing:
@@ -255,14 +323,46 @@ class Velbus:
         """Stop the controller."""
         self._closing = True
         self._auto_reconnect = False
+        self._connected_event.set()
+        if self._send_task and not self._send_task.done():
+            self._send_task.cancel()
         # Stop all scheduled tasks
         for task in self._scheduled_tasks.values():
             task.stop()
-        self._protocol.close()
+        for task in list(self._background_tasks):
+            if not task.done():
+                task.cancel()
+        if self._background_tasks:
+            await asyncio.gather(*list(self._background_tasks), return_exceptions=True)
+        self._background_tasks.clear()
+        if self._protocol:
+            self._protocol.close()
+
+    def _on_disconnect(self, exc: Exception | None) -> None:
+        """Handle protocol disconnect callback synchronously from protocol."""
+        task = asyncio.ensure_future(self._on_connection_state(False))
+        self._background_tasks.add(task)
+        task.add_done_callback(self._background_tasks.discard)
+
+    def __protocol_factory(self) -> VelbusProtocol:
+        """Create a new protocol instance for a new connection."""
+
+        dest_parts = urlparse(self._destination)
+        return VelbusProtocol(
+            message_received_callback=self._on_message_received,
+            on_disconnect_callback=self._on_disconnect,
+            auth_key=dest_parts.username or None,
+        )
 
     async def connect(self) -> None:
         """Connect to the bus and load all the data."""
+        self._closing = False
+        self._auto_reconnect = True
+        if self._send_task is None or self._send_task.done():
+            self._send_task = asyncio.create_task(self._send_loop())
         await self._handler.read_protocol_data()
+        if self._closing:
+            return
         # connect to the bus
         destination = self._destination
         has_scheme = bool(re.search(r"^[A-Za-z0-9+.\-]+://", destination))
@@ -291,25 +391,30 @@ class Velbus:
             try:
                 (
                     _transport,
-                    _protocol,
+                    self._protocol,
                 ) = await asyncio.get_running_loop().create_connection(
-                    lambda: self._protocol,
+                    self.__protocol_factory,
                     host=parts.hostname,
                     port=parts.port,
                     ssl=ctx,
                 )
             except (ConnectionRefusedError, OSError) as err:
                 raise VelbusConnectionFailed from err
+            if self._closing:
+                if self._protocol:
+                    self._protocol.close()
+                return
+            await self._on_connection_state(True)
             return
 
         # serial and serialx-backed schemes (e.g. /dev/..., esphome://...)
         try:
             (
                 _serial_transport,
-                _serial_protocol,
+                self._protocol,
             ) = await serialx.create_serial_connection(
                 asyncio.get_running_loop(),
-                t.cast("t.Callable[[], asyncio.Protocol]", lambda: self._protocol),
+                self.__protocol_factory,
                 url=destination,
                 baudrate=38400,
                 byte_size=serialx.EIGHTBITS,
@@ -320,13 +425,14 @@ class Velbus:
             )
         except (FileNotFoundError, serialx.SerialException) as err:
             raise VelbusConnectionFailed from err
+        if self._closing:
+            if self._protocol:
+                self._protocol.close()
+            return
+        await self._on_connection_state(True)
 
     async def start(self) -> None:
         """Start the controller."""
-        # if auth is required send the auth key
-        parts = urlparse(self._destination)
-        if parts.username:
-            await self._protocol.write_auth_key(parts.username)
 
         if self._vlp_file:
             # use the vlp file to load the modules
@@ -373,7 +479,7 @@ class Velbus:
 
     async def send(self, msg: Message) -> None:
         """Send a packet."""
-        await self._protocol.send_message(
+        self._send_queue.put_nowait(
             RawMessage(
                 priority=msg.priority,
                 address=msg.address,
@@ -500,7 +606,7 @@ class Velbus:
 
     async def wait_on_all_messages_sent_async(self) -> None:
         """Wait for all messages to be sent."""
-        await self._protocol.wait_on_all_messages_sent_async()
+        await self._send_queue.join()
 
     def add_scheduled_task(
         self,

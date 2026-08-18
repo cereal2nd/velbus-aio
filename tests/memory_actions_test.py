@@ -260,7 +260,7 @@ class TestActionTable:
         from pathlib import Path
 
         spec = json.loads(
-            Path("velbusaio/module_spec/48.json").read_text(encoding="utf-8")
+            (Path(__file__).parents[1] / "velbusaio/module_spec/48.json").read_text(encoding="utf-8")
         )["Memory"]["ActionTable"]
         tables = build_action_tables(MemoryBackend(0x48, AsyncMock()), spec)
         assert tables[1].slot_count == 36

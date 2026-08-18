@@ -26,7 +26,6 @@ classifiers = [
 requires-python = ">=3.13"
 dependencies = [
     "serialx",
-    "backoff>=1.10.0",
     "anyio",
     "beautifulsoup4",
     "lxml",
