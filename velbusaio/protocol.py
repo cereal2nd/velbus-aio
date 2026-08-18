@@ -9,97 +9,87 @@ import logging
 import time
 import typing as t
 
-import backoff
-
-from velbusaio.const import MAXIMUM_MESSAGE_SIZE, MINIMUM_MESSAGE_SIZE, SLEEP_TIME
+from velbusaio.const import MAXIMUM_MESSAGE_SIZE, MINIMUM_MESSAGE_SIZE
 from velbusaio.message import ParserError
 from velbusaio.raw_message import RawMessage, create as create_message_info
 
 
 class VelbusProtocol(asyncio.BufferedProtocol):
-    """Handles the Velbus protocol.
-
-    This class is expected to be wrapped inside a VelbusConnection class object which will maintain the socket
-    and handle auto-reconnects
-    """
+    """Handles the Velbus protocol framing and transport I/O."""
 
     def __init__(
         self,
         message_received_callback: t.Callable[[RawMessage], t.Awaitable[None]],
-        connection_state_callback: t.Callable[[bool], t.Awaitable[None]] | None = None,
+        on_disconnect_callback: t.Callable[[Exception | None], None] | None = None,
+        auth_key: str | None = None,
     ) -> None:
         """Initialize VelbusProtocol with callbacks."""
         super().__init__()
         self._log = logging.getLogger("velbus-protocol")
         self._message_received_callback = message_received_callback
-        self._connection_state_callback = connection_state_callback
+        self._on_disconnect_callback = on_disconnect_callback
+        self._auth_key: str | None = auth_key
 
-        # everything for reading from Velbus
+        # Everything for reading from Velbus
+
         # _buffer is a fixed scratch buffer the transport writes into on the
         # BufferedProtocol (get_buffer/buffer_updated) read path. buffer_updated()
         # copies the received bytes into _serial_buf, so both read paths converge
         # on the same framing logic in data_received().
         self._buffer = bytearray(MAXIMUM_MESSAGE_SIZE)
         self._buffer_view = memoryview(self._buffer)
-
         self._serial_buf = b""
         self.transport: asyncio.Transport | None = None
+        self._last_activity_time: float = time.time()
 
-        # everything for writing to Velbus
-        self._send_queue: asyncio.Queue = asyncio.Queue()
-        self._write_transport_lock = asyncio.Lock()
-        self._writer_task: asyncio.Task | None = None
-        self._restart_writer = False
-        self.restart_writing()
-
+        # Flow control
+        self._can_write: asyncio.Event = asyncio.Event()
         self._closing = False
-        self._background_tasks = set()
 
-    def _notify_connection_state_callbacks(self, is_connected: bool) -> None:
-        """Notify all registered callbacks of connection state change."""
-        if self._connection_state_callback is None:
-            return
-        task = asyncio.ensure_future(self._connection_state_callback(is_connected))
-        self._background_tasks.add(task)
-        task.add_done_callback(self._background_tasks.discard)
+    @property
+    def is_connected(self) -> bool:
+        """Return whether transport is active and connected."""
+        return self.transport is not None and not self.transport.is_closing()
+
+    def pause_writing(self) -> None:
+        """Called when transport output buffer exceeds high watermark."""
+        self._can_write.clear()
+        self._log.debug("Transport write paused (high watermark reached)")
+
+    def resume_writing(self) -> None:
+        """Called when transport output buffer drains below low watermark."""
+        self._can_write.set()
+        self._log.debug("Transport write resumed (low watermark reached)")
+
+    async def wait_can_write(self) -> None:
+        """Wait until transport is ready to accept writes."""
+        await self._can_write.wait()
 
     def connection_made(self, transport: transports.BaseTransport) -> None:
         """Called when the Velbus connection is established."""
         self.transport = t.cast("asyncio.Transport", transport)
+        self._can_write.set()
         self._log.info("Connection established to Velbus")
+
+        if self._auth_key:
+            self._log.debug("TX: authentication key")
+            self.transport.write(self._auth_key.encode("utf-8"))
+
         self._last_activity_time = time.time()
-
-        self._restart_writer = True
-        self.restart_writing()
-
-        # Notify callbacks that connection is established
-        self._notify_connection_state_callbacks(True)
-
-    def pause_writing(self) -> None:
-        """Pause writing."""
-        self._restart_writer = False
-        if self._writer_task:
-            self._send_queue.put_nowait(None)
-
-    def restart_writing(self) -> None:
-        """Resume writing."""
-        if self._restart_writer and not self._write_transport_lock.locked():
-            self._writer_task = asyncio.ensure_future(
-                self._get_message_from_send_queue()
-            )
-            self._writer_task.add_done_callback(lambda _future: self.restart_writing())
 
     def close(self) -> None:
         """Close the Velbus connection."""
         self._closing = True
-        self._restart_writer = False
+
+        # By setting _can_write here, we prevent deadlocks in the controller.
+        self._can_write.set()
         if self.transport:
             self.transport.close()
 
     def connection_lost(self, exc: Exception | None) -> None:
         """Called when the Velbus connection is lost."""
         self.transport = None
-        self.pause_writing()
+        self._can_write.set()
 
         if self._closing:
             return  # Connection loss was expected, nothing to do here...
@@ -108,9 +98,10 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         else:
             self._log.error(f"Velbus connection lost: {exc!r}")
 
-        self._notify_connection_state_callbacks(False)
+        if self._on_disconnect_callback is not None:
+            self._on_disconnect_callback(exc)
 
-    # Everything read-related
+    # Read Path
 
     def get_buffer(self, sizehint: int) -> memoryview:
         """Provide a writable buffer for the BufferedProtocol read path.
@@ -178,85 +169,13 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         except ParserError as exc:
             self._log.warning(f"Dropping unparsable message ({exc}): {msg}")
 
-    # Everything write-related
+    # Write Path
 
-    async def write_auth_key(self, authkey: str) -> None:
-        """Send authentication key to Velbus interface."""
-        self._log.debug("TX: authentication key")
-        if self.transport is not None and not self.transport.is_closing():
-            self.transport.write(authkey.encode("utf-8"))
-
-    async def send_message(self, msg: RawMessage) -> None:
-        """Queue a message to be sent to Velbus."""
-        self._send_queue.put_nowait(msg)
-
-    async def _get_message_from_send_queue(self) -> None:
-        """Get messages from the send queue and write them to Velbus."""
-        self._log.debug("Starting Velbus write message from send queue")
-        self._log.debug("Acquiring write lock")
-        await self._write_transport_lock.acquire()
-        while self._restart_writer:
-            # wait for an item from the queue
-            msg_info: RawMessage | None = await self._send_queue.get()
-            if msg_info is None:
-                self._restart_writer = False
-                if self._write_transport_lock.locked():
-                    self._write_transport_lock.release()
-                return
-            message_sent = False
-            try:
-                start_time = time.perf_counter()
-                while not message_sent:
-                    message_sent = await self._write_message(msg_info)
-                send_time = time.perf_counter() - start_time
-
-                self._send_queue.task_done()  # indicate that the item of the queue has been processed
-
-                queue_sleep_time = self._calculate_queue_sleep_time(msg_info, send_time)
-                await asyncio.sleep(queue_sleep_time)
-
-            except (asyncio.CancelledError, GeneratorExit) as exc:
-                if not self._closing:
-                    self._log.error(f"Stopping Velbus writer due to {exc!r}")
-                self._restart_writer = False
-            except (OSError, RuntimeError) as exc:
-                self._log.error(f"Restarting Velbus writer due to {exc!r}")
-                self._restart_writer = True
-        if self._write_transport_lock.locked():
-            self._write_transport_lock.release()
-        self._log.debug("Ending Velbus write message from send queue")
-
-    @staticmethod
-    def _calculate_queue_sleep_time(msg_info, send_time):
-        """Calculate the sleep time needed after sending a message to Velbus."""
-        sleep_time = SLEEP_TIME
-
-        if msg_info.rtr:
-            sleep_time = SLEEP_TIME  # this is a scan command. We could be quicker?
-
-        if msg_info.command == 0xEF:
-            # 'channel name request' command provokes in worst case 99 answer packets from VMBGPOD
-            sleep_time = SLEEP_TIME * 33  # TODO make this adaptable on module_type
-
-        if send_time > sleep_time:
-            return 0  # no need to wait, we are already late
-        return sleep_time - send_time
-
-    @backoff.on_predicate(
-        backoff.expo,
-        lambda is_sent: not is_sent,
-        max_tries=10,
-    )
-    async def _write_message(self, msg: RawMessage) -> bool:
-        """Write a message to Velbus."""
+    def write_message(self, msg: RawMessage) -> bool:
+        """Write a raw message to the Velbus transport."""
         self._log.debug(f"TX: {msg}")
         if self.transport and not self.transport.is_closing():
             self.transport.write(msg.to_bytes())
             self._last_activity_time = time.time()
             return True
         return False
-
-    async def wait_on_all_messages_sent_async(self) -> None:
-        """Wait until all messages in the send queue are sent."""
-        self._log.debug("Waiting on all messages sent")
-        await self._send_queue.join()

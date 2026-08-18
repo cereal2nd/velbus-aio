@@ -87,7 +87,7 @@ async def test_module_status_selected_program(module_type):
             await m._properties["selected_program"].set_selected_program(
                 PROGRAM_SELECTION[program]
             )
-            msg_info = await velbus._protocol._send_queue.get()
+            msg_info = await velbus._send_queue.get()
             assert msg_info.data[1] == program
 
     # test GP4PIR lightvalue

@@ -1,74 +1,18 @@
 """Test cases for VelbusProtocol writing functionality"""
 
 import asyncio
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import pytest
 
+from velbusaio.controller import Velbus
 from velbusaio.protocol import VelbusProtocol
 
 
 class TestVelbusProtocolWriting:
-    """Test cases for writing and pause/restart functionality."""
+    """Test cases for writing functionality."""
 
-    @pytest.mark.asyncio
-    async def test_pause_writing(self):
-        """Test pausing writing."""
-        callback = AsyncMock()
-        protocol = VelbusProtocol(callback)
-
-        protocol._restart_writer = True
-        protocol._writer_task = Mock()
-
-        protocol.pause_writing()
-
-        assert protocol._restart_writer is False
-
-    @pytest.mark.asyncio
-    async def test_restart_writing(self):
-        """Test restarting writing."""
-        callback = AsyncMock()
-        protocol = VelbusProtocol(callback)
-
-        protocol._restart_writer = True
-        protocol.restart_writing()
-
-        assert protocol._writer_task is not None
-        assert not protocol._writer_task.done()
-
-        protocol.pause_writing()
-        await asyncio.wait_for(protocol._writer_task, timeout=1.0)
-
-    def test_restart_writing_when_locked(self):
-        """Test restarting writing when lock is held."""
-        callback = AsyncMock()
-        protocol = VelbusProtocol(callback)
-
-        protocol._restart_writer = True
-        protocol._write_transport_lock._locked = True
-
-        with patch("asyncio.ensure_future") as mock_ensure_future:
-            protocol.restart_writing()
-
-            # Should not restart when locked
-            mock_ensure_future.assert_not_called()
-
-    @pytest.mark.asyncio
-    async def test_send_message(self):
-        """Test sending a message."""
-        callback = AsyncMock()
-        protocol = VelbusProtocol(callback)
-
-        mock_message = Mock()
-        mock_message.to_bytes.return_value = b"\x0f\x01"
-
-        await protocol.send_message(mock_message)
-
-        # Message should be in queue
-        assert protocol._send_queue.qsize() == 1
-
-    @pytest.mark.asyncio
-    async def test_write_message_success(self):
+    def test_write_message_success(self):
         """Test writing a message successfully."""
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)
@@ -80,13 +24,12 @@ class TestVelbusProtocolWriting:
         mock_message = Mock()
         mock_message.to_bytes.return_value = b"\x0f\x01\x02"
 
-        result = await protocol._write_message(mock_message)
+        result = protocol.write_message(mock_message)
 
         assert result is True
         mock_transport.write.assert_called_once_with(b"\x0f\x01\x02")
 
-    @pytest.mark.asyncio
-    async def test_write_message_transport_closing(self):
+    def test_write_message_transport_closing(self):
         """Test writing a message when transport is closing."""
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)
@@ -97,26 +40,46 @@ class TestVelbusProtocolWriting:
 
         mock_message = Mock()
 
-        # Call the undecorated implementation to avoid the backoff retry
-        # decorator, which would otherwise cause the test to wait.
-        result = await protocol._write_message.__wrapped__(protocol, mock_message)
+        result = protocol.write_message(mock_message)
 
         assert result is False
         mock_transport.write.assert_not_called()
 
+    def test_connection_made_sends_auth_key(self):
+        """Test automatic authentication key transmission when connection is established."""
+        callback = AsyncMock()
+        protocol = VelbusProtocol(callback, auth_key="test_key_123")
+
+        mock_transport = Mock()
+        protocol.connection_made(mock_transport)
+
+        mock_transport.write.assert_called_once_with(b"test_key_123")
+
+    def test_connection_made_without_auth_key(self):
+        """Test no authentication key transmitted on connection_made when auth_key is None."""
+        callback = AsyncMock()
+        protocol = VelbusProtocol(callback, auth_key=None)
+
+        mock_transport = Mock()
+        protocol.connection_made(mock_transport)
+
+        mock_transport.write.assert_not_called()
+
     @pytest.mark.asyncio
-    async def test_write_auth_key(self):
-        """Test writing authentication key."""
+    async def test_flow_control_pause_resume(self):
+        """Test pause_writing and resume_writing flow control events."""
         callback = AsyncMock()
         protocol = VelbusProtocol(callback)
 
         mock_transport = Mock()
-        mock_transport.is_closing.return_value = False
-        protocol.transport = mock_transport
+        protocol.connection_made(mock_transport)
+        assert protocol._can_write.is_set()
 
-        await protocol.write_auth_key("test_key_123")
+        protocol.pause_writing()
+        assert not protocol._can_write.is_set()
 
-        mock_transport.write.assert_called_once_with(b"test_key_123")
+        protocol.resume_writing()
+        assert protocol._can_write.is_set()
 
     def test_calculate_queue_sleep_time_normal(self):
         """Test calculating sleep time for normal message."""
@@ -124,7 +87,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = False
         mock_message.command = 0x01
 
-        sleep_time = VelbusProtocol._calculate_queue_sleep_time(mock_message, 0.001)
+        sleep_time = Velbus._calculate_queue_sleep_time(mock_message, 0.001)
 
         assert sleep_time > 0
 
@@ -136,7 +99,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = True
         mock_message.command = 0x01
 
-        sleep_time = VelbusProtocol._calculate_queue_sleep_time(mock_message, 0.001)
+        sleep_time = Velbus._calculate_queue_sleep_time(mock_message, 0.001)
 
         assert sleep_time >= SLEEP_TIME - 0.001
 
@@ -148,9 +111,8 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = False
         mock_message.command = 0xEF
 
-        sleep_time = VelbusProtocol._calculate_queue_sleep_time(mock_message, 0.001)
+        sleep_time = Velbus._calculate_queue_sleep_time(mock_message, 0.001)
 
-        # Should be longer for channel name request
         assert sleep_time >= SLEEP_TIME * 33 - 0.001
 
     def test_calculate_queue_sleep_time_already_late(self):
@@ -161,7 +123,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = False
         mock_message.command = 0x01
 
-        sleep_time = VelbusProtocol._calculate_queue_sleep_time(
+        sleep_time = Velbus._calculate_queue_sleep_time(
             mock_message, SLEEP_TIME + 1
         )
 
@@ -169,13 +131,10 @@ class TestVelbusProtocolWriting:
 
     @pytest.mark.asyncio
     async def test_wait_on_all_messages_sent_async(self):
-        """Test waiting for all messages to be sent."""
-        callback = AsyncMock()
-        protocol = VelbusProtocol(callback)
+        """Test waiting for all messages to be sent in controller."""
+        velbus = Velbus("")
 
-        # Add a message and immediately mark as done
-        await protocol._send_queue.put(Mock())
-        protocol._send_queue.task_done()
+        await velbus._send_queue.put(Mock())
+        velbus._send_queue.task_done()
 
-        # Should complete without hanging
-        await asyncio.wait_for(protocol.wait_on_all_messages_sent_async(), timeout=1.0)
+        await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
