@@ -138,3 +138,32 @@ class TestVelbusProtocolWriting:
         velbus._send_queue.task_done()
 
         await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
+
+    @pytest.mark.asyncio
+    async def test_send_loop_retry_on_disconnect(self):
+        """Test that send loop retries sending a message if connection drops before sending."""
+        velbus = Velbus("")
+        mock_protocol = Mock()
+        mock_protocol.is_connected = False
+        mock_protocol.wait_can_write = AsyncMock()
+
+        send_task = asyncio.create_task(velbus._send_loop())
+
+        mock_msg = Mock()
+        mock_msg.rtr = False
+        mock_msg.command = 0x01
+        await velbus._send_queue.put(mock_msg)
+
+        await asyncio.sleep(0.05)
+        assert velbus._send_queue.qsize() == 1
+
+        velbus._protocol = mock_protocol
+        mock_protocol.write_message.return_value = True
+        velbus._is_connected = True
+        mock_protocol.is_connected = True
+        velbus._connected_event.set()
+
+        await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
+
+        mock_protocol.write_message.assert_called_once_with(mock_msg)
+        await velbus.stop()

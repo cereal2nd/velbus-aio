@@ -158,34 +158,38 @@ class Velbus:
 
                 msg_info: RawMessage = await self._send_queue.get()
                 try:
-                    while not self._closing and not (
-                        self._is_connected
-                        and self._protocol
-                        and self._protocol.is_connected
-                    ):
+                    message_sent = False
+                    while not message_sent and not self._closing:
                         await self._connected_event.wait()
+                        if self._closing:
+                            break
 
-                    if self._closing:
-                        break
+                        if not (
+                            self._is_connected
+                            and self._protocol
+                            and self._protocol.is_connected
+                        ):
+                            continue
 
-                    if self._protocol:
                         await self._protocol.wait_can_write()
 
-                    # Re-verify connection and closing state after wait_can_write
-                    if self._closing or not (
-                        self._is_connected
-                        and self._protocol
-                        and self._protocol.is_connected
-                    ):
-                        continue
+                        # Re-verify connection and closing state after wait_can_write
+                        if self._closing or not (
+                            self._is_connected
+                            and self._protocol
+                            and self._protocol.is_connected
+                        ):
+                            continue
 
-                    start_time = time.monotonic()
-                    self._protocol.write_message(msg_info)
-                    send_time = time.monotonic() - start_time
-
-                    sleep_time = self._calculate_queue_sleep_time(msg_info, send_time)
-                    if sleep_time > 0 and not self._closing:
-                        await asyncio.sleep(sleep_time)
+                        start_time = time.monotonic()
+                        message_sent = self._protocol.write_message(msg_info)
+                        if message_sent:
+                            send_time = time.monotonic() - start_time
+                            sleep_time = self._calculate_queue_sleep_time(
+                                msg_info, send_time
+                            )
+                            if sleep_time > 0 and not self._closing:
+                                await asyncio.sleep(sleep_time)
                 finally:
                     self._send_queue.task_done()
             except asyncio.CancelledError:
