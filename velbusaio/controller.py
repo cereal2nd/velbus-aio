@@ -378,9 +378,13 @@ class Velbus:
 
     async def connect(self) -> None:
         """Connect to the bus and load all the data."""
+        self._closing = False
+        self._auto_reconnect = True
         if self._send_task is None or self._send_task.done():
             self._send_task = asyncio.create_task(self._send_loop())
         await self._handler.read_protocol_data()
+        if self._closing:
+            return
         # connect to the bus
         destination = self._destination
         has_scheme = bool(re.search(r"^[A-Za-z0-9+.\-]+://", destination))
@@ -418,6 +422,10 @@ class Velbus:
                 )
             except (ConnectionRefusedError, OSError) as err:
                 raise VelbusConnectionFailed from err
+            if self._closing:
+                if self._protocol:
+                    self._protocol.close()
+                return
             await self._on_connection_state(True)
             return
 
@@ -439,6 +447,10 @@ class Velbus:
             )
         except (FileNotFoundError, serialx.SerialException) as err:
             raise VelbusConnectionFailed from err
+        if self._closing:
+            if self._protocol:
+                self._protocol.close()
+            return
         await self._on_connection_state(True)
 
     async def start(self) -> None:

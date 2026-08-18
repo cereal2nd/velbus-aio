@@ -167,3 +167,45 @@ class TestVelbusProtocolWriting:
 
         mock_protocol.write_message.assert_called_once_with(mock_msg)
         await velbus.stop()
+
+    @pytest.mark.asyncio
+    async def test_connect_aborted_on_stop(self):
+        """Test that connect() aborts cleanly if stop() is called while connecting."""
+        from unittest.mock import patch
+
+        velbus = Velbus("tcp://127.0.0.1:3788")
+        mock_protocol = Mock()
+
+        async def mock_create_connection(*args, **kwargs):
+            await velbus.stop()
+            return (Mock(), mock_protocol)
+
+        with patch("asyncio.get_running_loop") as mock_loop:
+            mock_loop.return_value.create_connection = AsyncMock(
+                side_effect=mock_create_connection
+            )
+            await velbus.connect()
+
+        assert not velbus.connected
+        mock_protocol.close.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_connect_after_stop(self):
+        """Test that connect() works when called after stop()."""
+        from unittest.mock import patch
+
+        velbus = Velbus("tcp://127.0.0.1:3788")
+        mock_protocol = Mock()
+
+        await velbus.stop()
+        assert velbus._closing
+
+        with patch("asyncio.get_running_loop") as mock_loop:
+            mock_loop.return_value.create_connection = AsyncMock(
+                return_value=(Mock(), mock_protocol)
+            )
+            await velbus.connect()
+
+        assert velbus.connected
+        assert not velbus._closing
+        await velbus.stop()
