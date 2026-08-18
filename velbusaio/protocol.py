@@ -68,12 +68,14 @@ class VelbusProtocol(asyncio.BufferedProtocol):
     def connection_made(self, transport: transports.BaseTransport) -> None:
         """Called when the Velbus connection is established."""
         self.transport = t.cast("asyncio.Transport", transport)
-        self._can_write.set()
         self._log.info("Connection established to Velbus")
 
         if self._auth_key:
             self._log.debug("TX: authentication key")
             self.transport.write(self._auth_key.encode("utf-8"))
+
+        # After sending the auth_key, we can write again.
+        self._can_write.set()
 
         self._last_activity_time = time.time()
 
