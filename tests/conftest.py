@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
+
 @pytest.fixture
 def mock_module():
     """Create a mock module for testing."""

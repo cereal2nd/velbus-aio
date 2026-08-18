@@ -194,7 +194,7 @@ class Velbus:
                     self._send_queue.task_done()
             except asyncio.CancelledError:
                 break
-            except Exception:
+            except Exception:  # noqa: BLE001
                 self._log.exception("Error in Velbus send loop")
         self._log.debug("Ending Velbus send loop")
 
@@ -379,7 +379,7 @@ class Velbus:
         return VelbusProtocol(
             message_received_callback=self._on_message_received,
             on_disconnect_callback=self._on_disconnect,
-            auth_key=dest_parts.username if dest_parts.username else None,
+            auth_key=dest_parts.username or None,
         )
 
     async def connect(self) -> None:

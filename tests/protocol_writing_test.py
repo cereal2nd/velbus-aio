@@ -147,7 +147,7 @@ class TestVelbusProtocolWriting:
         mock_protocol.is_connected = False
         mock_protocol.wait_can_write = AsyncMock()
 
-        send_task = asyncio.create_task(velbus._send_loop())
+        asyncio.create_task(velbus._send_loop())
 
         mock_msg = Mock()
         mock_msg.rtr = False
