@@ -358,6 +358,12 @@ class Velbus:
         # Stop all scheduled tasks
         for task in self._scheduled_tasks.values():
             task.stop()
+        for task in list(self._background_tasks):
+            if not task.done():
+                task.cancel()
+        if self._background_tasks:
+            await asyncio.gather(*list(self._background_tasks), return_exceptions=True)
+        self._background_tasks.clear()
         if self._protocol:
             self._protocol.close()
 

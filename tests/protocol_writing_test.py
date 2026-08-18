@@ -209,3 +209,20 @@ class TestVelbusProtocolWriting:
         assert velbus.connected
         assert not velbus._closing
         await velbus.stop()
+
+    @pytest.mark.asyncio
+    async def test_stop_cancels_background_tasks(self):
+        """Test that stop() cancels all running tasks in _background_tasks."""
+        velbus = Velbus("")
+
+        async def dummy_background_task():
+            await asyncio.sleep(10)
+
+        task = asyncio.create_task(dummy_background_task())
+        velbus._background_tasks.add(task)
+        task.add_done_callback(velbus._background_tasks.discard)
+
+        await velbus.stop()
+
+        assert task.cancelled() or task.done()
+        assert len(velbus._background_tasks) == 0
