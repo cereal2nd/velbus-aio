@@ -264,6 +264,31 @@ class TestButtonCounter:
         button._Unit = VOLUME_LITERS_HOUR
         assert not button.is_electricity()
 
+    def test_get_counter_total_gas(self, mock_module, mock_writer):
+        """Test accumulated counter total for a gas (m³) counter."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._Unit = VOLUME_CUBIC_METER_HOUR
+        button._counter = 5000
+        button._pulses = 100
+        assert button.get_counter_total() == 50.0
+
+    def test_get_counter_total_from_energy_field(self, mock_module, mock_writer):
+        """Test accumulated total uses the energy field (Wh -> kWh) when set."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._energy = 150500
+        assert button.get_counter_total() == 150.5
+
+    def test_get_counter_total_without_data(self, mock_module, mock_writer):
+        """Test accumulated total is None when no counter data received."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        assert button.get_counter_total() is None
+
     def test_energy_from_energy_field(self, mock_module, mock_writer):
         """Test energy property returns kWh from _energy field (Wh)."""
         button = ButtonCounter(

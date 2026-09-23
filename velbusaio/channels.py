@@ -615,6 +615,14 @@ class ButtonCounter(Button):
             return round(self._counter / self._pulses, 2)
         return None
 
+    def get_counter_total(self) -> float | None:
+        """Return the accumulated counter total in its native unit (kWh, m³ or L)."""
+        if self._energy is not None:
+            return round(self._energy / 1000, 3)
+        if self._counter is not None and self._pulses:
+            return round(self._counter / self._pulses, 2)
+        return None
+
     def _rate_from_pulse_interval(self) -> float:
         """Return the instantaneous rate derived from the interval between pulses.
 
