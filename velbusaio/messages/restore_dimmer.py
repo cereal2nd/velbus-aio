@@ -53,3 +53,6 @@ class RestoreDimmerMessage2(RestoreDimmerMessage):
     """
 
     dimmer_channels = ChannelIndexField(0)
+    # VMB2DC-20 / VMB4LEDPWM-20 use the SetDimmer frame layout; 0xFF = restore
+    # last active level (see openhab VelbusSetDimPacket.setLastUsedDim).
+    _padding = ByteField(1, default=255)

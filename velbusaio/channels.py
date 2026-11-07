@@ -763,6 +763,9 @@ class Dimmer(Channel):
         """Restore dimmer to last known state."""
         cls = commandRegistry.get_command(0x11, self._module.get_type())
         msg = cls(self._address)
+        if self.slider_scale == 254 and transitiontime == 0:
+            # New dimmers treat the trailing bytes as fade mode / unchanged (0x00, 0xFF).
+            transitiontime = 0x00FF
         msg.dimmer_transitiontime = int(transitiontime)
         msg.dimmer_channels = [self._num]
         await self._writer(msg)

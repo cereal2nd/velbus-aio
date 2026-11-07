@@ -89,3 +89,21 @@ class TestDimmer:
             mock_registry.get_command.assert_called_once_with(0x11, 0x01)
             assert mock_msg.dimmer_transitiontime == 3
             mock_writer.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_restore_dimmer_state_slider_scale_254(self, mock_module, mock_writer):
+        """Test restoring on -20 dimmers uses unchanged fade trailing bytes."""
+        with patch("velbusaio.channels.commandRegistry") as mock_registry:
+            mock_msg_class = Mock()
+            mock_registry.get_command.return_value = mock_msg_class
+            mock_msg = Mock()
+            mock_msg_class.return_value = mock_msg
+            mock_module.get_type.return_value = 0x06
+
+            dimmer = Dimmer(
+                mock_module, 1, "Dimmer", False, True, mock_writer, 0xCE, slider_scale=254
+            )
+            await dimmer.restore_dimmer_state(transitiontime=0)
+
+            assert mock_msg.dimmer_transitiontime == 0x00FF
+            mock_writer.assert_called_once()

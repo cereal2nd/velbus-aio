@@ -300,8 +300,9 @@ class TestRestoreDimmerMessage2:
     def test_data_to_binary(self):
         """Test Data to binary."""
         msg = RestoreDimmerMessage2()
-        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x05, 0x00, 0x00, 0x05]))
-        assert msg.data_to_binary() == bytes([0x11, 5, 0, 0, 5])
+        msg.dimmer_channels = [5]
+        msg.dimmer_transitiontime = 5
+        assert msg.data_to_binary() == bytes([0x11, 5, 255, 0, 5])
 
 
 class TestStartRelayTimerMessage:
