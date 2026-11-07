@@ -31,6 +31,15 @@ dependencies = [
     "lxml",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.14",
+    "pre-commit",
+    "pytest",
+    "pytest-asyncio",
+    "bumpver",
+]
+
 [project.urls]
 "Source Code" = "https://github.com/Cereal2nd/velbus-aio"
 "Bug Reports" = "https://github.com/Cereal2nd/velbus-aio/issues"
@@ -45,6 +54,8 @@ include = ["velbusaio*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+# Shared HA dev venv auto-loads pytest-homeassistant; respx imports httpx before HA can alias it.
+addopts = "-p no:pytest_homeassistant -p no:respx"
 
 [tool.bandit]
 exclude_dirs = ["tests"]

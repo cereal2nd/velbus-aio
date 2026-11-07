@@ -1,17 +1,22 @@
-name: Upload to PyPi on release
+name: Upload to PyPI on release
 on:
   release:
-    types: [created]
+    types: [published]
 jobs:
   deploy:
+    name: upload release to PyPI
     runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: recursive
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Install pypa/build
@@ -28,7 +33,5 @@ jobs:
           --wheel
           --outdir dist/
           .
-      - name: Publish distribution 📦 to PyPI
+      - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
