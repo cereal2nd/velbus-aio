@@ -204,6 +204,15 @@ class TestModuleStatusGP4PirMessage:
         assert msg.selected_program == 2
         assert msg.light_value_send_interval == 0x0A
 
+    def test_enabled_ignores_light_value_nibble(self):
+        """Upper nibble of data[1] is light value, not push-button enable bits."""
+        msg = ModuleStatusGP4PirMessage()
+        msg.populate(
+            PRIORITY_LOW, 0x01, False, bytes([0x00, 0x30, 0x00, 0x00, 0x00, 0x00, 0x00])
+        )
+        assert msg.enabled == []
+        assert msg.light_value == 0x300
+
     def test_data_to_binary_not_implemented(self):
         """Test Data to binary not implemented."""
         msg = ModuleStatusGP4PirMessage()

@@ -87,7 +87,13 @@ class ModuleStatusGP4PirMessage(DeclarativeMessage):
     _generates_data_to_binary = False
 
     closed = ChannelsField(0)  # data[0]
-    enabled = ChannelsField(1)  # data[1], only 4 bits
+    enabled = ComputedField(
+        parser=lambda data: [
+            offset + 1 for offset in range(4) if data[1] & (1 << offset)
+        ],
+        default=[],
+        serializable=False,
+    )  # data[1] bits 0-3; upper nibble carries light_value
     locked = ChannelsField(3)  # data[3]
     light_value = ComputedField(
         parser=lambda data: ((data[1] & 0x30) << 4) + data[2],

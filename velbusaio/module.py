@@ -30,6 +30,7 @@ from velbusaio.channels import (
     ButtonCounter,
     Channel,
     Dimmer,
+    Sensor,
     Temperature as TemperatureChannelType,
 )
 from velbusaio.command_registry import commandRegistry
@@ -911,9 +912,8 @@ class Module:
             await self._update_channel(
                 channel, {"closed": channel_id in message.closed}
             )
-            if channel in self._channels and isinstance(
-                self._channels[channel], Button
-            ):
+            channel_obj = self._channels.get(channel)
+            if isinstance(channel_obj, Button) and not isinstance(channel_obj, Sensor):
                 await self._update_channel(
                     channel, {"enabled": channel_id in message.enabled}
                 )
@@ -1526,6 +1526,23 @@ class Module:
             msg.channels = list(range(1, (self.number_of_channels() + 1)))
         await self._writer(msg)
 
+    async def _request_memory_name_blocks(self, memory_ranges: str) -> None:
+        """Request module or sensor name data with ReadDataBlockFromMemoryMessage."""
+        for block in memory_ranges.split(";"):
+            addr_start_str, addr_end_str = block.split("-")
+            addr_start_int = int("0x" + addr_start_str, 0)
+            addr_end_int = int("0x" + addr_end_str, 0)
+            current_addr = addr_start_int
+            while current_addr <= addr_end_int:
+                block_end = min(current_addr + 3, addr_end_int)
+                addr_start = struct.unpack(">BB", struct.pack(">h", current_addr))
+                block_msg = ReadDataBlockFromMemoryMessage(self._address)
+                block_msg.priority = PRIORITY_LOW
+                block_msg.high_address = addr_start[0]
+                block_msg.low_address = addr_start[1]
+                await self._writer(block_msg)
+                current_addr = block_end + 1
+
     async def __load_memory(self) -> None:
         """Request all needed memory addresses."""
         if "Memory" not in self._data:
@@ -1547,31 +1564,16 @@ class Module:
                     msg.high_address = addr[0]
                     msg.low_address = addr[1]
                     await self._writer(msg)
-            elif memory_key in {"ModuleName", "SensorName"}:
-                # example:
-                # "ModuleName": "00DD-00E9;01DD-01E9;02DD-02E9;03DD-03E9;04DD-04E8",
-                # request using MermoryDataBlock message, requests 4 bytes
-                for block in memory_part.split(";"):
-                    addr_start_str, addr_end_str = block.split("-")
-                    # Convert to integer addresses
-                    addr_start_int = int("0x" + addr_start_str, 0)
-                    addr_end_int = int("0x" + addr_end_str, 0)
-                    # Split into 4-byte blocks
-                    current_addr = addr_start_int
-                    while current_addr <= addr_end_int:
-                        block_end = min(
-                            current_addr + 3, addr_end_int
-                        )  # 4 bytes = current + 3
-                        # Convert back to high/low address bytes
-                        addr_start = struct.unpack(
-                            ">BB", struct.pack(">h", current_addr)
-                        )
-                        block_msg = ReadDataBlockFromMemoryMessage(self._address)
-                        block_msg.priority = PRIORITY_LOW
-                        block_msg.high_address = addr_start[0]
-                        block_msg.low_address = addr_start[1]
-                        await self._writer(block_msg)
-                        current_addr = block_end + 1
+            elif memory_key == "ModuleName":
+                if isinstance(memory_part, str):
+                    await self._request_memory_name_blocks(memory_part)
+            elif memory_key == "SensorName":
+                if isinstance(memory_part, dict):
+                    for addr_range in memory_part.values():
+                        if isinstance(addr_range, str):
+                            await self._request_memory_name_blocks(addr_range)
+                elif isinstance(memory_part, str):
+                    await self._request_memory_name_blocks(memory_part)
 
     async def _load_properties(self) -> None:
         """Method for per module type loading of properties."""

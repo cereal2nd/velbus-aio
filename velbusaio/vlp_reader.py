@@ -248,9 +248,9 @@ class vlpModule:
         )
         try:
             name = byte_data.decode("ascii")
-        except UnicodeDecodeError as e:
-            self._log.error(f"  => UnicodeDecodeError: {e}")
-            return None
+        except UnicodeDecodeError:
+            # VLP dumps may contain Velbus “extended” name bytes (e.g. 0x80).
+            name = byte_data.decode("latin-1")
         return name
 
     async def _load_module_spec(self) -> None:
