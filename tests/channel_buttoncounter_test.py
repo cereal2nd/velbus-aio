@@ -172,6 +172,27 @@ class TestButtonCounter:
         button._power = 250.5
         assert button.get_counter_state() == 250.5
 
+    def test_get_counter_state_zero_power(self, mock_module, mock_writer):
+        """Zero reported power is a valid reading, not unknown."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._power = 0
+        assert button.get_counter_state() == 0
+
+    def test_set_unit_memory_strings(self, mock_module, mock_writer):
+        """Memory Unit values from the VMB7IN map to internal rate units."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._counter = 1
+        button.set_unit("liter")
+        assert button._Unit == VOLUME_LITERS_HOUR
+        assert button.is_water()
+        button.set_unit("m3")
+        assert button._Unit == VOLUME_CUBIC_METER_HOUR
+        assert button.is_gas()
+
     def test_get_counter_state_calculated(self, mock_module, mock_writer):
         """Test the counter state is derived from the pulse interval."""
         button = ButtonCounter(

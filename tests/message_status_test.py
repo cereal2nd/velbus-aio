@@ -442,7 +442,15 @@ class TestCounterStatusMessage:
         assert msg.pulses == 100
         assert msg.counter == 100
         assert msg.delay == 10
+        assert msg.kwh == 1.0
+        assert msg.watt == (1000 * 1000 * 3600) / (10 * 100)
         assert msg.get_channels() == 2
+
+    def test_populate_low_watt(self):
+        """Instantaneous power below 55 W is reported as zero."""
+        msg = CounterStatusMessage()
+        msg.populate(PRIORITY_LOW, 0x01, False, bytes([0x05, 0, 0, 0, 100, 0xFF, 0xFF]))
+        assert msg.watt == 0
 
 
 class TestCounterValueMessage:
@@ -469,6 +477,7 @@ class TestKwhStatusMessage:
         assert msg.pulses == 100
         assert msg.counter == 100
         assert msg.kwh == 1.0
+        assert msg.watt == (1000 * 1000 * 3600) / (10 * 100)
         assert msg.delay == 10
         assert msg.get_channels() == 2
 

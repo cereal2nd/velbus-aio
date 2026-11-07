@@ -664,6 +664,10 @@ class ButtonCounter(Button):
 
     def set_unit(self, unit: str) -> None:
         """Set the unit of the counter."""
+        if unit == "liter":
+            unit = VOLUME_LITERS_HOUR
+        elif unit in {"m3", "m³"}:
+            unit = VOLUME_CUBIC_METER_HOUR
         self._Unit = unit
 
     def get_counter_state(self) -> int:
@@ -673,7 +677,7 @@ class ButtonCounter(Button):
         _power; returning the accumulated counter here would duplicate the
         energy property.
         """
-        if self._power:
+        if self._power is not None:
             return self._power
         return self._rate_from_pulse_interval()
 

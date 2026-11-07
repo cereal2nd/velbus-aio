@@ -13,6 +13,7 @@ from velbusaio.message_fields import (
     Int16Field,
     Int32Field,
 )
+from velbusaio.messages.counter_rate import compute_counter_kwh_watt
 
 COMMAND_CODE = 0xBE
 
@@ -40,10 +41,9 @@ class KwhStatusMessage(DeclarativeMessage):
     watt = Field(default=0, serializable=False)
 
     def _post_populate(self, data: bytes) -> None:
-        self.kwh = float(float(self.counter) / self.pulses)
-        self.watt = float((1000 * 1000 * 3600) / (self.delay * self.pulses))
-        if self.watt < 55:
-            self.watt = 0
+        self.kwh, self.watt = compute_counter_kwh_watt(
+            self.counter, self.pulses, self.delay
+        )
 
     def get_channels(self):
         """:return: list"""

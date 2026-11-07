@@ -13,6 +13,7 @@ from velbusaio.message_fields import (
     Int16Field,
     Int32Field,
 )
+from velbusaio.messages.counter_rate import compute_counter_kwh_watt
 
 COMMAND_CODE = 0xBE
 
@@ -38,6 +39,11 @@ class CounterStatusMessage(DeclarativeMessage):
     delay = Int16Field(5)
     kwh = Field(default=0, serializable=False)
     watt = Field(default=0, serializable=False)
+
+    def _post_populate(self, data: bytes) -> None:
+        self.kwh, self.watt = compute_counter_kwh_watt(
+            self.counter, self.pulses, self.delay
+        )
 
     def get_channels(self):
         """:return: list"""

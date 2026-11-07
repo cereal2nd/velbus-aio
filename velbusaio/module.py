@@ -88,6 +88,7 @@ from velbusaio.messages.fast_blinking_led import FastBlinkingLedMessage
 from velbusaio.messages.forced_off import ForcedOff
 from velbusaio.messages.forced_on import ForcedOn
 from velbusaio.messages.inhibit import Inhibit
+from velbusaio.messages.kwh_status import KwhStatusMessage
 from velbusaio.messages.memory_data import MemoryDataMessage
 from velbusaio.messages.memory_data_block import MemoryDataBlockMessage
 from velbusaio.messages.module_status import (
@@ -601,6 +602,7 @@ class Module:
             ModuleStatusMessage: self._handle_module_status,
             ModuleStatusMessage2: self._handle_module_status2,
             CounterStatusMessage: self._handle_counter_status,
+            KwhStatusMessage: self._handle_counter_status,
             ModuleStatusPirMessage: self._handle_module_status_pir,
             ModuleStatusGP4PirMessage: self._handle_module_status_gp4_pir,
             # LED messages
@@ -871,18 +873,22 @@ class Module:
             {"selected_program_str": message.selected_program_str},
         )
 
-    async def _handle_counter_status(self, message: CounterStatusMessage) -> None:
+    async def _handle_counter_status(
+        self, message: CounterStatusMessage | KwhStatusMessage
+    ) -> None:
         """Handle counter status messages."""
-        if isinstance(self._channels.get(message.channel), ButtonCounter):
-            channel = self._translate_channel_name(message.channel)
-            await self._update_channel(
-                channel,
-                {
-                    "pulses": message.pulses,
-                    "counter": message.counter,
-                    "delay": message.delay,
-                },
-            )
+        channel_num = self._translate_channel_name(message.channel)
+        channel_obj = self._channels.get(channel_num)
+        if not isinstance(channel_obj, ButtonCounter):
+            return
+        updates: dict[str, int | float] = {
+            "pulses": message.pulses,
+            "counter": message.counter,
+            "delay": message.delay,
+        }
+        if not channel_obj.is_gas() and not channel_obj.is_water():
+            updates["power"] = round(message.watt, 2)
+        await self._update_channel(channel_num, updates)
 
     async def _handle_module_status_pir(self, message: ModuleStatusPirMessage) -> None:
         """Handle PIR module status messages."""
