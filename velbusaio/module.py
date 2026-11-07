@@ -124,6 +124,18 @@ from velbusaio.properties import Property
 from velbusaio.temp_settings import TemperatureSettings, build_temperature_settings
 
 
+def _coerce_cached_sub_address(addr: object) -> int:
+    """Parse a sub-address stored in a module cache file."""
+    if isinstance(addr, int):
+        return addr
+    if isinstance(addr, str):
+        try:
+            return int(addr)
+        except ValueError:
+            return int(addr, 16)
+    return int(addr)
+
+
 class Module:
     """Abstract class for Velbus hardware modules."""
 
@@ -1268,10 +1280,23 @@ class Module:
             await self.__load_memory()
 
         # load the sub addresses from cache if it's available
+        sub_addresses_from_cache = False
         if (self._use_cache or from_cache) and "sub_addresses" in cache:
-            for num, addr in cache["sub_addresses"].items():
-                self._sub_address[int(num)] = int(addr)
-        else:
+            cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
+            try:
+                for num, addr in cache["sub_addresses"].items():
+                    parsed = _coerce_cached_sub_address(addr)
+                    if parsed == 0xFF:
+                        continue
+                    self._sub_address[int(num)] = parsed
+                sub_addresses_from_cache = True
+            except ValueError:
+                self._log.warning(
+                    "Cache file for module %s has invalid sub_addresses, removing it",
+                    self._address,
+                )
+                await anyio.Path(cfile).unlink(missing_ok=True)
+        if not sub_addresses_from_cache:
             # Submit ModuleType request to trigger discovery of sub addresses.
             # Do not cache immediately here: sub addresses are populated asynchronously
             # when the response is handled; caching now could store an empty mapping.

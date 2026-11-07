@@ -41,7 +41,7 @@ from velbusaio.module import Module
 from velbusaio.properties import LightValue, SelectedProgram
 from velbusaio.protocol import VelbusProtocol
 from velbusaio.raw_message import RawMessage
-from velbusaio.vlp_reader import VlpFile
+from velbusaio.vlp_reader import VlpFile, parse_vlp_sub_address_map
 
 
 @dataclass
@@ -462,6 +462,8 @@ class Velbus:
     async def start(self) -> None:
         """Start the controller."""
 
+        # Make sure the cache dir exists
+        await anyio.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
         if self._vlp_file:
             # use the vlp file to load the modules
             vlp = VlpFile(self._vlp_file)
@@ -481,7 +483,8 @@ class Velbus:
                 # handle submodules
                 if len(addr) > 1:
                     self.add_submodules(
-                        self._modules[decimal_addr], dict(enumerate(addr[1:]))
+                        self._modules[decimal_addr],
+                        parse_vlp_sub_address_map(mod_data.get_addr()),
                     )
                 # load module data, special for dali
                 if mod_data.get_type() == 0x45 or mod_data.get_type() == 0x5A:
@@ -491,8 +494,6 @@ class Velbus:
                     await module.load_from_vlp(mod_data)
                     await module.wait_for_status_messages()
         else:
-            # make sure the cachedir exists
-            await anyio.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
             # scan the bus
             await self._handler.scan()
         self._memory_coordinator.schedule_prefetch()

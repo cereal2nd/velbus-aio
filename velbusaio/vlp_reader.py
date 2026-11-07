@@ -14,6 +14,14 @@ from velbusaio.command_registry import MODULE_DIRECTORY
 from velbusaio.helpers import h2
 
 
+def parse_vlp_sub_address_map(addresses: str) -> dict[int, int]:
+    """Map VLP comma-separated sub-address hex strings to bus sub-address numbers."""
+    parts = addresses.split(",")
+    if len(parts) <= 1:
+        return {}
+    return {num: int(sub, 16) for num, sub in enumerate(parts[1:], start=1)}
+
+
 class VlpFile:
     """VLP file reader and parser."""
 

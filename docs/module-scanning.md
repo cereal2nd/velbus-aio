@@ -5,11 +5,11 @@ objects with channels, properties and names.
 
 ## Entry points
 
-| Call                 | Location                  | Behavior                                                                                                                                |
-| -------------------- | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `Velbus.start()`     | `velbusaio/controller.py` | Authenticate if needed; if a VLP file was supplied use the offline path, otherwise create the cache dir and run `PacketHandler.scan()`. |
-| `Velbus.scan()`      | `velbusaio/controller.py` | `PacketHandler.scan(reload_cache=True)` — forces per-address cache deletion.                                                            |
-| `PacketHandler.scan` | `velbusaio/handler.py`    | The full bus discovery routine.                                                                                                         |
+| Call                 | Location                  | Behavior                                                                                                                                    |
+| -------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Velbus.start()`     | `velbusaio/controller.py` | Authenticate if needed; ensure the cache dir exists; if a VLP file was supplied use the offline path, otherwise run `PacketHandler.scan()`. |
+| `Velbus.scan()`      | `velbusaio/controller.py` | `PacketHandler.scan(reload_cache=True)` — forces per-address cache deletion.                                                                |
+| `PacketHandler.scan` | `velbusaio/handler.py`    | The full bus discovery routine.                                                                                                             |
 
 ## The three phases
 
