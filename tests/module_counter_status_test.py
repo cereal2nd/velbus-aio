@@ -7,7 +7,7 @@ from velbusaio.const import ENERGY_KILO_WATT_HOUR, NO_RTR, PRIORITY_LOW
 from velbusaio.controller import Velbus
 from velbusaio.helpers import get_cache_dir
 from velbusaio.messages.counter_status import CounterStatusMessage
-from velbusaio.messages.kwh_status import KwhStatusMessage
+from velbusaio.messages.counter_status import KwhStatusMessage
 from velbusaio.module import Module
 
 VMB7IN = 0x22

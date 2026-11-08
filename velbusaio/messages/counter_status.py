@@ -1,4 +1,4 @@
-"""Counter Status message.
+"""Counter / kWh status message (protocol command 0xBE).
 
 :author: Maikel Punie <maikel.punie@gmail.com>
 """
@@ -21,7 +21,7 @@ COMMAND_CODE = 0xBE
 
 
 @register(COMMAND_CODE)
-class CounterStatusBaseMessage(DeclarativeMessage):
+class CounterStatusMessage(DeclarativeMessage):
     """Counter / kWh status (command 0xBE).
 
     -DB1    last 2 bits   = channel
@@ -52,7 +52,6 @@ class CounterStatusBaseMessage(DeclarativeMessage):
         return cast("int | list[int]", self.channel)
 
 
-CounterStatusMessage = CounterStatusBaseMessage
-KwhStatusMessage = CounterStatusBaseMessage
-MESSAGE_CATALOG["CounterStatusMessage"] = CounterStatusBaseMessage
-MESSAGE_CATALOG["KwhStatusMessage"] = CounterStatusBaseMessage
+# Legacy spec name alias (same 0xBE frame as VMB7IN / GP kWh counters).
+KwhStatusMessage = CounterStatusMessage
+MESSAGE_CATALOG["KwhStatusMessage"] = CounterStatusMessage

@@ -42,7 +42,9 @@ _MAX_UP_LEVELS = 6
 # that tells us whether the module transmits (must decode) or receives the frame.
 COMMAND_RE = re.compile(
     r"databytes?\s+(to send|received)[^\n]*\n\s*"
-    r"DATABYTE1\s*=\s*COMMAND_[A-Z0-9_]*\s*\(H'([0-9A-Fa-f]{2})'\)"
+    r"DATABYTE1\s*=\s*(?:COMMAND_[A-Z0-9_ ]*|[^\n(]*)\s*"
+    r"\(H?'?(?:0x)?([0-9A-Fa-f]{2})'?\)",
+    re.IGNORECASE,
 )
 MODULE_TYPE_RE = re.compile(r"COMMAND_MODULE_TYPE\s*\(H'[0-9A-Fa-f]{2}'\)")
 DATABYTE2_HEX_RE = re.compile(r"DATABYTE2\s*=\s*[^\n(]*\(H'([0-9A-Fa-f]{2})'\)")
@@ -50,6 +52,35 @@ DATABYTE2_HEX_RE = re.compile(r"DATABYTE2\s*=\s*[^\n(]*\(H'([0-9A-Fa-f]{2})'\)")
 # Command bytes handled outside CommandToClass (module-type frame is decoded by
 # the scanner itself), so their absence from a spec is never a bug.
 IGNORED_PDF_BYTES = {"FF"}
+
+# Programming / sensor-config frames the library sends or acknowledges; not decode bugs.
+IGNORED_TRANSMIT_BYTES = {
+    "AB",
+    "AE",
+    "B4",
+    "B6",
+    "BB",
+    "BC",
+    "BF",
+    "C0",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "C5",
+    "C7",
+    "C8",
+    "E1",
+    "E2",
+    "E3",
+    "BA",
+}
+
+# Module ids missing or wrong in the protocol repo README but documented in PDFs.
+PDF_ALIASES: dict[str, str] = {
+    "0D": "protocol_vmb4ryld_20_vmb4ryno_20_vmb1rys_20.pdf",
+    "5D": "protocol_vmbel4pir_20.pdf",
+}
 
 
 def locate(start: Path, *parts: str) -> Path | None:
@@ -150,6 +181,8 @@ def main(argv: list[str] | None = None) -> int:
 
         readme_name = readme_rows.get(hex_id, (None, None))[0]
         pdf_name = readme_rows.get(hex_id, (None, None))[1]
+        if not pdf_name and hex_id in PDF_ALIASES:
+            pdf_name = PDF_ALIASES[hex_id]
 
         # Name cross-check against README (review: README has known typos).
         if readme_name and norm_name(readme_name) != norm_name(spec_type):
@@ -166,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
             review.append(f"[{hex_id}] {mname}: extracted text missing ({txt_path.name})")
             continue
         text = txt_path.read_text(encoding="utf-8")
-        shared = pdf_users.get(pdf_name, 0) > 1
+        shared = pdf_users.get(pdf_name, 0) > 1 or hex_id in PDF_ALIASES
 
         # Module-type byte(s) declared in the protocol frame (authoritative for a
         # single-module PDF; ambiguous when the manual covers several modules).
@@ -191,7 +224,7 @@ def main(argv: list[str] | None = None) -> int:
             byte.upper()
             for direction, byte in COMMAND_RE.findall(text)
             if direction == "to send"
-        } - IGNORED_PDF_BYTES
+        } - IGNORED_PDF_BYTES - IGNORED_TRANSMIT_BYTES
         merged = global_ctc | set(spec.get("CommandToClass", {}))
         missing = sorted(transmit - merged)
         if missing:

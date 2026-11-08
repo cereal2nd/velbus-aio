@@ -67,7 +67,7 @@
     "F6": "SetLedMessage",
     "F7": "SlowBlinkingLedMessage",
     "F8": "FastBlinkingLedMessage",
-    "FB": "RelayStatusMessage",
+    "FB": "RelayStatusMessage3",
     "FF": "ModuleType2Message"
   },
   "Memory": {

@@ -14,13 +14,18 @@ from velbusaio.messages.blind_status import (
     BlindStatusNgMessage,
 )
 from velbusaio.messages.bus_error_counter_status import BusErrorCounterStatusMessage
-from velbusaio.messages.counter_status import CounterStatusMessage
+from velbusaio.messages.counter_status import CounterStatusMessage, KwhStatusMessage
 from velbusaio.messages.counter_value import CounterValueMessage
 from velbusaio.messages.dali_dim_value_status import DimValueStatus
 from velbusaio.messages.dimmer_channel_status import DimmerChannelStatusMessage
 from velbusaio.messages.dimmer_status import DimmerStatusMessage
 from velbusaio.messages.ir_receiver_status import IRReceiverStatusMessage
-from velbusaio.messages.kwh_status import KwhStatusMessage
+from velbusaio.messages.lcd_line_text import (
+    BacklightStatusMessage,
+    LcdLineTextPart1Message,
+    LcdLineTextPart2Message,
+    LcdLineTextPart3Message,
+)
 from velbusaio.messages.module_status import (
     ModuleStatusGP4PirMessage,
     ModuleStatusMessage,
@@ -480,6 +485,37 @@ class TestKwhStatusMessage:
         assert msg.watt == (1000 * 1000 * 3600) / (10 * 100)
         assert msg.delay == 10
         assert msg.get_channels() == 2
+
+
+class TestLcdLineTextMessages:
+    """VMB4PD LCD line text (protocol CD/CE/CF) and backlight D6."""
+
+    def test_lcd_part1(self):
+        """Populate LCD line part 1 per protocol_vmb4pd."""
+        msg = LcdLineTextPart1Message()
+        msg.populate(
+            PRIORITY_LOW,
+            0x01,
+            False,
+            bytes([0x01, ord("A"), ord("B"), 0xFF, 0xFF, 0xFF, 0xFF]),
+        )
+        assert msg.line == 1
+        assert msg.text == "AB"
+
+    def test_lcd_part3(self):
+        """Populate LCD line part 3 (3 characters)."""
+        msg = LcdLineTextPart3Message()
+        msg.populate(
+            PRIORITY_LOW, 0x01, False, bytes([0x04, ord("X"), ord("Y"), ord("Z"), 0])
+        )
+        assert msg.line == 4
+        assert msg.text == "XYZ"
+
+    def test_backlight_status(self):
+        """Populate backlight/contrast status byte."""
+        msg = BacklightStatusMessage()
+        msg.populate(PRIORITY_LOW, 0x01, False, bytes([0xC0]))
+        assert msg.status == 0xC0
 
 
 class TestPsuLoadMessage:

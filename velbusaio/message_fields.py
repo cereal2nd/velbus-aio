@@ -508,7 +508,7 @@ class StringField(Field):
             string_bytes = data[self.byte_index : end_index]
         else:
             string_bytes = data[self.byte_index :]
-        return "".join(chr(x) for x in string_bytes if x != 0)
+        return "".join(chr(x) for x in string_bytes if x not in (0, 0xFF))
 
     def serialize(self, value: str) -> bytes:
         """Serialize string to bytes."""

@@ -88,7 +88,6 @@ from velbusaio.messages.fast_blinking_led import FastBlinkingLedMessage
 from velbusaio.messages.forced_off import ForcedOff
 from velbusaio.messages.forced_on import ForcedOn
 from velbusaio.messages.inhibit import Inhibit
-from velbusaio.messages.kwh_status import KwhStatusMessage
 from velbusaio.messages.memory_data import MemoryDataMessage
 from velbusaio.messages.memory_data_block import MemoryDataBlockMessage
 from velbusaio.messages.module_status import (
@@ -606,7 +605,6 @@ class Module:
             ModuleStatusMessage: self._handle_module_status,
             ModuleStatusMessage2: self._handle_module_status2,
             CounterStatusMessage: self._handle_counter_status,
-            KwhStatusMessage: self._handle_counter_status,
             ModuleStatusPirMessage: self._handle_module_status_pir,
             ModuleStatusGP4PirMessage: self._handle_module_status_gp4_pir,
             # LED messages
@@ -878,9 +876,7 @@ class Module:
             {"selected_program_str": message.selected_program_str},
         )
 
-    async def _handle_counter_status(
-        self, message: CounterStatusMessage | KwhStatusMessage
-    ) -> None:
+    async def _handle_counter_status(self, message: CounterStatusMessage) -> None:
         """Handle counter status messages."""
         channel_num = self._translate_channel_name(message.channel)
         channel_obj = self._channels.get(channel_num)

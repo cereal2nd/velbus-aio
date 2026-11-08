@@ -49,7 +49,7 @@
     "B0": "ModuleSubTypeMessage",
     "B3": "SelectProgramMessage",
     "B7": "SetDate",
-    "BE": "KwhStatusMessage",
+    "BE": "CounterStatusMessage",
     "D7": "RealtimeClockStatusRequest",
     "D8": "SetRealtimeClock",
     "ED": "ModuleStatusMessage",

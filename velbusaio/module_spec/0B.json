@@ -43,6 +43,10 @@
   },
   "CommandToClass": {
     "00": "PushButtonStatusMessage",
+    "CD": "LcdLineTextPart1Message",
+    "CE": "LcdLineTextPart2Message",
+    "CF": "LcdLineTextPart3Message",
+    "D6": "BacklightStatusMessage",
     "D7": "RealtimeClockStatusRequest",
     "D8": "SetRealtimeClock",
     "ED": "ModuleStatusMessage",

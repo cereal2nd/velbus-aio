@@ -39,7 +39,7 @@ from velbusaio.messages.channel_name_request import (
     ChannelNameRequestMessage2,
 )
 from velbusaio.messages.clear_led import ClearLedMessage
-from velbusaio.messages.counter_status import CounterStatusMessage
+from velbusaio.messages.counter_status import CounterStatusMessage, KwhStatusMessage
 from velbusaio.messages.counter_status_request import CounterStatusRequestMessage
 from velbusaio.messages.counter_value import CounterValueMessage
 from velbusaio.messages.cover_down import CoverDownMessage, CoverDownMessage2
@@ -55,7 +55,6 @@ from velbusaio.messages.forced_on import ForcedOn
 from velbusaio.messages.inhibit import Inhibit
 from velbusaio.messages.interface_status_request import InterfaceStatusRequestMessage
 from velbusaio.messages.ir_receiver_status import IRReceiverStatusMessage
-from velbusaio.messages.kwh_status import KwhStatusMessage
 from velbusaio.messages.light_value_request import LightValueRequest
 from velbusaio.messages.memo_text import MemoTextMessage
 from velbusaio.messages.memory_data import MemoryDataMessage

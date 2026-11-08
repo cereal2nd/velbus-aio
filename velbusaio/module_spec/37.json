@@ -180,7 +180,7 @@
     "B3": "SelectProgramMessage",
     "B7": "SetDate",
     "B9": "TempSensorSettingsPart4",
-    "BE": "KwhStatusMessage",
+    "BE": "CounterStatusMessage",
     "C6": "TempSensorSettingsPart3",
     "D4": "SetEdgeColorMessage",
     "D7": "RealtimeClockStatusRequest",
