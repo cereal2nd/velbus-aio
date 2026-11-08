@@ -21,8 +21,26 @@ COMMAND_CODE = 0xEC
 DSTATUS = {0: "off", 1: "up", 2: "down"}
 
 
+class BlindMovementMixin:
+    """Movement helpers for blind status messages with integer ``status``."""
+
+    status: int
+
+    def is_moving_up(self) -> bool:
+        """Is moving up."""
+        return self.status == 0x01
+
+    def is_moving_down(self) -> bool:
+        """Is moving down."""
+        return self.status == 0x02
+
+    def is_stopped(self) -> bool:
+        """Is stopped."""
+        return self.status == 0x00
+
+
 @register(COMMAND_CODE)
-class BlindStatusNgMessage(DeclarativeMessage):
+class BlindStatusNgMessage(BlindMovementMixin, DeclarativeMessage):
     """Blind Status NG message."""
 
     _command_code = COMMAND_CODE
@@ -42,18 +60,6 @@ class BlindStatusNgMessage(DeclarativeMessage):
         json_dict["position"] = self.position
         json_dict["status"] = DSTATUS[self.status]
         return json.dumps(json_dict)
-
-    def is_moving_up(self) -> bool:
-        """Is moving up."""
-        return bool(self.status == 0x01)
-
-    def is_moving_down(self) -> bool:
-        """Is moving down."""
-        return bool(self.status == 0x02)
-
-    def is_stopped(self) -> bool:
-        """Is stopped."""
-        return bool(self.status == 0x00)
 
 
 @register(COMMAND_CODE)
@@ -92,7 +98,7 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
 
 
 @register(COMMAND_CODE)
-class BlindStatusMessage(DeclarativeMessage):
+class BlindStatusMessage(BlindMovementMixin, DeclarativeMessage):
     """Blind Status message."""
 
     _command_code = COMMAND_CODE
@@ -110,15 +116,3 @@ class BlindStatusMessage(DeclarativeMessage):
         json_dict["timeout"] = self.timeout
         json_dict["status"] = DSTATUS[self.status]
         return json.dumps(json_dict)
-
-    def is_moving_up(self) -> bool:
-        """Is moving up."""
-        return bool(self.status == 0x01)
-
-    def is_moving_down(self) -> bool:
-        """Is moving down."""
-        return bool(self.status == 0x02)
-
-    def is_stopped(self) -> bool:
-        """Is stopped."""
-        return bool(self.status == 0x00)
