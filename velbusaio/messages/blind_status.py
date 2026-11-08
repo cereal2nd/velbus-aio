@@ -5,15 +5,15 @@
 
 from __future__ import annotations
 
-import json
+from typing import Any
 
 from velbusaio.command_registry import register
-from velbusaio.message import Message
 from velbusaio.message_fields import (
     BlindChannelField,
     BlindStatusField,
     ByteField,
     ChannelField,
+    ComputedField,
     DeclarativeMessage,
 )
 
@@ -58,35 +58,28 @@ class BlindStatusNgMessage(BlindMovementMixin, DeclarativeMessage):
 class BlindStatusNg20Message(BlindStatusNgMessage):
     """Blind Status NG20 message."""
 
-    def __init__(self, address: int | None = None) -> None:
-        """Initialize BlindStatusNg20Message class."""
-        Message.__init__(self)
-        self.channel = (1, 2)
-        self.timeout = 0
-        self.status = 0
-        self.position = None
-        self.set_defaults(address)
+    channel = ComputedField(
+        parser=lambda data: (1, 2),
+        default=(1, 2),
+        serializable=False,
+    )
+    timeout = ComputedField(parser=lambda data: 0, default=0, serializable=False)
+    status = ComputedField(
+        parser=lambda data: (data[0] & 0x03, (data[0] >> 4) & 0x03),
+        default=(0, 0),
+        serializable=False,
+    )
+    position = ComputedField(
+        parser=lambda data: (data[1], data[2]),
+        default=(0, 0),
+        serializable=False,
+    )
 
-    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
-        """Populate message fields."""
-        self.needs_low_priority(priority)
-        self.needs_no_rtr(rtr)
-        self.needs_data(data, 7)
-        self.set_attributes(priority, address, rtr)
-        self.channel = (1, 2)
-        channel1_status = data[0] & 0x03
-        channel2_status = (data[0] >> 4) & 0x03
-        self.status = (channel1_status, channel2_status)
-        self.position = (data[1], data[2])
-
-    def to_json(self) -> str:
-        """To json."""
-        json_dict = self.to_json_basic()
-        json_dict["channel"] = self.channel
-        json_dict["timeout"] = self.timeout
-        json_dict["position"] = self.position
-        json_dict["status"] = (DSTATUS[self.status[0]], DSTATUS[self.status[1]])
-        return json.dumps(json_dict)
+    def to_json_basic(self) -> dict[str, Any]:
+        """JSON dict with per-channel status labels."""
+        payload = super().to_json_basic()
+        payload["status"] = [DSTATUS[channel_status] for channel_status in self.status]
+        return payload
 
 
 @register(COMMAND_CODE)
