@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ComputedField, DeclarativeMessage, Int32Field
 
@@ -40,6 +38,8 @@ class CounterValueMessage(DeclarativeMessage):
     )
     energy = Int32Field(3)
 
-    def get_channels(self) -> int | list[int]:
-        """:return: channel number or list of channel numbers"""
-        return cast("int | list[int]", self.channel)
+    def get_channels(self) -> int:
+        """:return: counter channel number (1–8)"""
+        channel = self.channel
+        assert isinstance(channel, int)
+        return channel

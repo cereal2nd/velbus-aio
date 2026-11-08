@@ -5,14 +5,13 @@
 
 from __future__ import annotations
 
-from velbusaio.binary import parse_dimmer_transition, serialize_dimmer_transition
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
     ByteField,
     ChannelIndexField,
     ChannelsField,
     DeclarativeMessage,
-    Field,
+    Int16Field,
 )
 
 COMMAND_CODE = 0x07
@@ -31,11 +30,7 @@ class SetDimmerMessage(DeclarativeMessage):
 
     dimmer_channels = ChannelsField(0)
     dimmer_state = ByteField(1)
-    dimmer_transitiontime = Field(
-        default=0,
-        parser=parse_dimmer_transition,
-        serializer=serialize_dimmer_transition,
-    )
+    dimmer_transitiontime = Int16Field(2)
 
 
 @register(COMMAND_CODE)

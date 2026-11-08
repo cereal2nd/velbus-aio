@@ -1,4 +1,9 @@
-"""Big-endian binary helpers for Velbus payloads."""
+"""Big-endian binary helpers for Velbus payloads.
+
+``parse_be_uint16`` and ``serialize_be_uint16`` are the canonical unsigned
+big-endian uint16 codec; :class:`~velbusaio.message_fields.Int16Field` delegates
+to them for wire parse/serialize.
+"""
 
 from __future__ import annotations
 
@@ -19,13 +24,3 @@ def parse_be_uint16(data: bytes, offset: int) -> int:
 def serialize_be_uint16(value: int) -> bytes:
     """Write an unsigned 16-bit big-endian integer."""
     return value.to_bytes(2, byteorder="big", signed=False)
-
-
-def parse_dimmer_transition(data: bytes) -> int:
-    """Transition time at bytes 2–3 of set/restore dimmer payloads."""
-    return parse_be_uint16(data, 2)
-
-
-def serialize_dimmer_transition(value: int) -> bytes:
-    """Serialize dimmer transition time for set/restore dimmer payloads."""
-    return serialize_be_uint16(value)

@@ -5,8 +5,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 from velbusaio.command_registry import MESSAGE_CATALOG, register
 from velbusaio.message_fields import (
     ComputedField,
@@ -47,9 +45,11 @@ class CounterStatusMessage(DeclarativeMessage):
             self.counter, self.pulses, self.delay
         )
 
-    def get_channels(self) -> int | list[int]:
-        """:return: channel number or list of channel numbers"""
-        return cast("int | list[int]", self.channel)
+    def get_channels(self) -> int:
+        """:return: counter channel number (1–4)"""
+        channel = self.channel
+        assert isinstance(channel, int)
+        return channel
 
 
 # Legacy spec name alias (same 0xBE frame as VMB7IN / GP kWh counters).

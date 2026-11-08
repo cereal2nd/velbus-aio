@@ -8,6 +8,12 @@ from __future__ import annotations
 from typing import cast
 
 from velbusaio.command_registry import register
+from velbusaio.json_labels import (
+    THERMOSTAT_MODE_JSON_MAP,
+    THERMOSTAT_STATUS_JSON_MAP,
+    ThermostatModeLabel,
+    ThermostatRunStatusLabel,
+)
 from velbusaio.message_fields import (
     BitField,
     ComputedField,
@@ -17,8 +23,8 @@ from velbusaio.message_fields import (
 )
 
 COMMAND_CODE = 0xEA
-DSTATUS = {0: "run", 2: "manual", 4: "sleep", 6: "disable"}
-DMODE = {0: "safe", 16: "night", 32: "day", 64: "comfort"}
+DSTATUS = THERMOSTAT_STATUS_JSON_MAP
+DMODE = THERMOSTAT_MODE_JSON_MAP
 
 
 @register(COMMAND_CODE)
@@ -35,14 +41,14 @@ class TempSensorStatusMessage(DeclarativeMessage):
     status_mode = BitField(0, 0x06, default=0, serializable=False, json_map=DSTATUS)
     status_str = ComputedField(
         parser=lambda data: DSTATUS[data[0] & 0x06],
-        default="run",
+        default=ThermostatRunStatusLabel.RUN,
         serializable=False,
     )
     auto_send = BitField(0, 0x08, default=0, serializable=False)
     mode = BitField(0, 0x70, default=0, serializable=False, json_map=DMODE)
     mode_str = ComputedField(
         parser=lambda data: DMODE[data[0] & 0x70],
-        default="safe",
+        default=ThermostatModeLabel.SAFE,
         serializable=False,
     )
     cool_mode = BitField(0, 0x80, default=False, as_bool=True, serializable=False)

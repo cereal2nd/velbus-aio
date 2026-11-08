@@ -30,6 +30,12 @@ if TYPE_CHECKING:
     from velbusaio.controller import Velbus
     from velbusaio.module import Module
 
+_MODULE_SUBTYPE_OFFSET_BY_COMMAND: dict[int, int] = {
+    0xB0: 0,
+    0xA7: 4,
+    0xA6: 8,
+}
+
 
 class PacketHandler:
     """The PacketHandler class."""
@@ -248,17 +254,15 @@ class PacketHandler:
             await self.__handle_module_type_response_async(rawmsg)
 
         # handle module subtype response message
-        elif command_value in (0xB0, 0xA7, 0xA6) and not self._scan_complete:
+        elif (
+            command_value in _MODULE_SUBTYPE_OFFSET_BY_COMMAND
+            and not self._scan_complete
+        ):
             if data is None:
                 return
             msg: ModuleSubTypeMessage = ModuleSubTypeMessage()
             msg.populate(priority, address, rtr, data)
-            if command_value == 0xB0:
-                msg.sub_address_offset = 0
-            elif command_value == 0xA7:
-                msg.sub_address_offset = 4
-            elif command_value == 0xA6:
-                msg.sub_address_offset = 8
+            msg.sub_address_offset = _MODULE_SUBTYPE_OFFSET_BY_COMMAND[command_value]
             async with self._scanLock:
                 self._scan_delay_msec += SCAN_MODULEINFO_TIMEOUT_INTERVAL
                 self._handle_module_subtype(msg)

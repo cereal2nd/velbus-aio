@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 from velbusaio.command_registry import register
+from velbusaio.json_labels import BLIND_STATUS_JSON_MAP
 from velbusaio.message_fields import (
     BlindChannelField,
     BlindStatusField,
@@ -18,7 +19,7 @@ from velbusaio.message_fields import (
 )
 
 COMMAND_CODE = 0xEC
-DSTATUS = {0: "off", 1: "up", 2: "down"}
+DSTATUS = BLIND_STATUS_JSON_MAP
 
 
 class BlindMovementMixin:
