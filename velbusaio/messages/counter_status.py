@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import cast
 
-from velbusaio.command_registry import register
+from velbusaio.command_registry import MESSAGE_CATALOG, register
 from velbusaio.message_fields import (
     ComputedField,
     DeclarativeMessage,
@@ -21,8 +21,8 @@ COMMAND_CODE = 0xBE
 
 
 @register(COMMAND_CODE)
-class CounterStatusMessage(DeclarativeMessage):
-    """Counter Status message.
+class CounterStatusBaseMessage(DeclarativeMessage):
+    """Counter / kWh status (command 0xBE).
 
     -DB1    last 2 bits   = channel
     -DB1    first 6 bits  = pulses
@@ -50,3 +50,9 @@ class CounterStatusMessage(DeclarativeMessage):
     def get_channels(self) -> int | list[int]:
         """:return: channel number or list of channel numbers"""
         return cast("int | list[int]", self.channel)
+
+
+CounterStatusMessage = CounterStatusBaseMessage
+KwhStatusMessage = CounterStatusBaseMessage
+MESSAGE_CATALOG["CounterStatusMessage"] = CounterStatusBaseMessage
+MESSAGE_CATALOG["KwhStatusMessage"] = CounterStatusBaseMessage
