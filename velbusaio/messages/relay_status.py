@@ -28,8 +28,39 @@ LED_FAST_BLINKING = 1 << 5
 LED_VERY_FAST_BLINKING = 1 << 4
 
 
+class RelayChannelStatusMixin:
+    """Inhibit and relay-state helpers for single-channel status messages."""
+
+    disable_inhibit_forced: int
+    status: int
+
+    def is_normal(self) -> bool:
+        """:return: bool"""
+        return self.disable_inhibit_forced == CHANNEL_NORMAL
+
+    def is_inhibited(self) -> bool:
+        """:return: bool"""
+        return self.disable_inhibit_forced == CHANNEL_INHIBITED
+
+    def is_forced_on(self) -> bool:
+        """:return: bool"""
+        return self.disable_inhibit_forced == CHANNEL_FORCED_ON
+
+    def is_disabled(self) -> bool:
+        """:return: bool"""
+        return self.disable_inhibit_forced == CHANNEL_DISABLED
+
+    def is_on(self) -> bool:
+        """:return: bool"""
+        return self.status == RELAY_ON
+
+    def has_interval_timer_on(self) -> bool:
+        """:return: bool"""
+        return self.status == INTERVAL_TIMER_ON
+
+
 @register(COMMAND_CODE)
-class RelayStatusMessage(DeclarativeMessage):
+class RelayStatusMessage(RelayChannelStatusMixin, DeclarativeMessage):
     """Relay Status Message."""
 
     _command_code = COMMAND_CODE
@@ -40,30 +71,6 @@ class RelayStatusMessage(DeclarativeMessage):
     status = ByteField(2)
     led_status = ByteField(3)
     delay_time = Int24Field(4)
-
-    def is_normal(self) -> bool:
-        """:return: bool"""
-        return bool(self.disable_inhibit_forced == CHANNEL_NORMAL)
-
-    def is_inhibited(self) -> bool:
-        """:return: bool"""
-        return bool(self.disable_inhibit_forced == CHANNEL_INHIBITED)
-
-    def is_forced_on(self) -> bool:
-        """:return: bool"""
-        return bool(self.disable_inhibit_forced == CHANNEL_FORCED_ON)
-
-    def is_disabled(self) -> bool:
-        """:return: bool"""
-        return bool(self.disable_inhibit_forced == CHANNEL_DISABLED)
-
-    def is_on(self) -> bool:
-        """:return: bool"""
-        return bool(self.status == RELAY_ON)
-
-    def has_interval_timer_on(self) -> bool:
-        """:return: bool"""
-        return bool(self.status == INTERVAL_TIMER_ON)
 
 
 @register(COMMAND_CODE)
