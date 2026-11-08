@@ -179,22 +179,6 @@ class TestSwitchRelayOffMessage:
         assert msg.data_to_binary() == bytes([0x01, 0x03])
 
 
-class TestSwitchRelayOffMessage20:
-    """Tests for SwitchRelayOffMessage20."""
-
-    def test_data_to_binary_channel_index(self):
-        """Test Data to binary channel index."""
-        msg = SwitchRelayOffMessage20()
-        msg.relay_channels = [3]
-        assert msg.data_to_binary() == bytes([0x01, 3])
-
-    def test_data_to_binary_empty(self):
-        """Test Data to binary empty."""
-        msg = SwitchRelayOffMessage20()
-        msg.relay_channels = []
-        assert msg.data_to_binary() == bytes([0x01, 0])
-
-
 class TestSwitchRelayOnMessage:
     """Tests for SwitchRelayOnMessage."""
 
@@ -211,20 +195,34 @@ class TestSwitchRelayOnMessage:
         assert msg.data_to_binary() == bytes([0x02, 0x03])
 
 
-class TestSwitchRelayOnMessage20:
-    """Tests for SwitchRelayOnMessage20."""
+@pytest.mark.parametrize(
+    ("cls", "code"),
+    [
+        (SwitchRelayOffMessage20, 0x01),
+        (SwitchRelayOnMessage20, 0x02),
+    ],
+)
+class TestSwitchRelayMessage20:
+    """Shared serialization tests for -20 series relay on/off messages."""
 
-    def test_data_to_binary_channel_index(self):
+    def test_data_to_binary_channel_index(self, cls, code):
         """Test Data to binary channel index."""
-        msg = SwitchRelayOnMessage20()
+        msg = cls()
         msg.relay_channels = [3]
-        assert msg.data_to_binary() == bytes([0x02, 3])
+        assert msg.data_to_binary() == bytes([code, 3])
 
-    def test_data_to_binary_empty(self):
+    def test_data_to_binary_empty(self, cls, code):
         """Test Data to binary empty."""
-        msg = SwitchRelayOnMessage20()
+        msg = cls()
         msg.relay_channels = []
-        assert msg.data_to_binary() == bytes([0x02, 0])
+        assert msg.data_to_binary() == bytes([code, 0])
+
+    def test_populate_channel_index_round_trip(self, cls, code):
+        """Populate bitmask payload then serialize as first channel index."""
+        msg = cls()
+        msg.populate(PRIORITY_HIGH, 0x01, False, bytes([0x04]))
+        assert msg.relay_channels == [3]
+        assert msg.data_to_binary() == bytes([code, 3])
 
 
 class TestSetDimmerMessage:

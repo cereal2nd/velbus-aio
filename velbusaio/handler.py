@@ -22,7 +22,12 @@ from velbusaio.const import (
     SCAN_MODULEINFO_TIMEOUT_INTERVAL,
     SCAN_MODULETYPE_TIMEOUT,
 )
-from velbusaio.messages.module_subtype import ModuleSubTypeMessage
+from velbusaio.messages.module_subtype import (
+    COMMAND_CODE,
+    COMMAND_CODE_2,
+    COMMAND_CODE_3,
+    ModuleSubTypeMessage,
+)
 from velbusaio.messages.module_type import ModuleType2Message, ModuleTypeMessage
 from velbusaio.raw_message import RawMessage
 
@@ -31,9 +36,9 @@ if TYPE_CHECKING:
     from velbusaio.module import Module
 
 _MODULE_SUBTYPE_OFFSET_BY_COMMAND: dict[int, int] = {
-    0xB0: 0,
-    0xA7: 4,
-    0xA6: 8,
+    COMMAND_CODE: 0,
+    COMMAND_CODE_2: 4,
+    COMMAND_CODE_3: 8,
 }
 
 
