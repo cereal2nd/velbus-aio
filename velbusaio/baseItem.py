@@ -76,7 +76,6 @@ class BaseItem(ABC):
         """Return module software version."""
         return self._module.get_sw_version()
 
-    @final
     def get_module_address(self) -> int:
         """Return module address for channel."""
         return self._module.get_address()
@@ -93,7 +92,6 @@ class BaseItem(ABC):
         """Return if the module is connected."""
         return self._module.is_connected
 
-    @final
     def __repr__(self) -> str:
         """Representation of this property."""
         items = []
@@ -102,7 +100,6 @@ class BaseItem(ABC):
                 items.append(f"{k} = {v!r}")
         return "{}[{}]".format(type(self), ", ".join(items))
 
-    @final
     def __str__(self) -> str:
         """String representation of this property."""
         return self.__repr__()
@@ -127,14 +124,13 @@ class BaseItem(ABC):
     def get_channel_number(self) -> int:
         """Return the channel number of this item."""
 
-    @final
-    def to_cache(self) -> dict:
+    def to_cache(self) -> dict[str, Any]:
         """Return a cacheable representation of this property.
 
         By default, all instance attributes except internal references
         like the parent module and callbacks are included.
         """
-        data: dict = {}
+        data: dict[str, Any] = {}
         for key, value in self.__dict__.items():
             if key in ("_module", "_on_status_update", "_writer"):
                 continue
@@ -142,7 +138,7 @@ class BaseItem(ABC):
         return data
 
     @final
-    async def update(self, data: dict) -> None:
+    async def update(self, data: dict[str, Any]) -> None:
         """Set the attributes of this property."""
         changed = False
         for key, new_val in data.items():

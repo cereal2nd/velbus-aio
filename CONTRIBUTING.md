@@ -21,3 +21,5 @@ This document should get you up and running with your development environment.
 5. Run the tests to check if everything still works as expected: `pytest`
 
 6. Run `pre-commit run --all-files` to check and correct formatting
+
+7. Type-check the library (`mypy.ini` enables strict mode): `mypy velbusaio`

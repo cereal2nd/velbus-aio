@@ -20,7 +20,7 @@ class SetDaylightSaving(DeclarativeMessage):
 
     _ds = ByteField(0, default=None)
 
-    def __init__(self, address=0x00, ds=None) -> None:
+    def __init__(self, address: int = 0x00, ds: int | None = None) -> None:
         """Initialize Set Daylight Saving Message Object."""
         super().__init__(address)
         if ds is not None:

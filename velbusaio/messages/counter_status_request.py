@@ -21,12 +21,12 @@ class CounterStatusRequestMessage(DeclarativeMessage):
 
     wait_after_send = 500
 
-    def __init__(self, address=None):
+    def __init__(self, address: int | None = None) -> None:
         """Initialize Counter Status Request message."""
         Message.__init__(self)
-        self.channels = []
+        self.channels: list[int] = []
         self.set_defaults(address)
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes([COMMAND_CODE, self.channels_to_byte(self.channels), 0x00])

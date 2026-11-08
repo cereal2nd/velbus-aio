@@ -22,7 +22,13 @@ class SetRealtimeClock(DeclarativeMessage):
     _hour = ByteField(1, default=None)
     _min = ByteField(2, default=None)
 
-    def __init__(self, address=0x00, wday=None, hour=None, min=None) -> None:
+    def __init__(
+        self,
+        address: int = 0x00,
+        wday: int | None = None,
+        hour: int | None = None,
+        min: int | None = None,
+    ) -> None:
         """Initialize Set realtime Clock Message Object."""
         super().__init__(address)
         if wday is not None:

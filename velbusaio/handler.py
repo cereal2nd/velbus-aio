@@ -6,16 +6,17 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 import importlib.resources
 import json
 import logging
 import pathlib
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import anyio
 
-from velbusaio.command_registry import commandRegistry
+from velbusaio.command_registry import commandRegistry, instantiate_command
 from velbusaio.const import (
     SCAN_MODULEINFO_TIMEOUT_INITIAL,
     SCAN_MODULEINFO_TIMEOUT_INTERVAL,
@@ -49,18 +50,22 @@ class PacketHandler:
         self._scan_complete = False
         self._scan_delay_msec = 0
         self.__scan_found_addresses: dict[int, ModuleTypeMessage | None] | None = None
-        self._progress_callback = None
+        self._progress_callback: Callable[[str, str], None] | None = None
+        self.broadcast: dict[str, Any] = {}
+        self.ignore: dict[str, Any] = {}
 
-    def set_progress_callback(self, callback):
+    def set_progress_callback(
+        self, callback: Callable[[str, str], None] | None
+    ) -> None:
         """Set a callback for scan progress updates."""
         self._progress_callback = callback
 
-    def _report_progress(self, progress_type: str, value: str):
+    def _report_progress(self, progress_type: str, value: str) -> None:
         """Report progress to the callback."""
-        if self._progress_callback:
+        if self._progress_callback is not None:
             self._progress_callback(progress_type, value)
 
-    async def read_protocol_data(self):
+    async def read_protocol_data(self) -> None:
         """Read the protocol data from the json files."""
         with importlib.resources.path(__name__, "module_spec/broadcast.json") as fspath:
             async with await anyio.open_file(fspath) as protocol_file:
@@ -215,6 +220,8 @@ class PacketHandler:
             )
             return
 
+        if rawmsg.data_only is None:
+            return
         tmsg: ModuleTypeMessage = ModuleTypeMessage()
         tmsg.populate(rawmsg.priority, address, rawmsg.rtr, rawmsg.data_only)
         self._log.debug(
@@ -242,6 +249,8 @@ class PacketHandler:
 
         # handle module subtype response message
         elif command_value in (0xB0, 0xA7, 0xA6) and not self._scan_complete:
+            if data is None:
+                return
             msg: ModuleSubTypeMessage = ModuleSubTypeMessage()
             msg.populate(priority, address, rtr, data)
             if command_value == 0xB0:
@@ -274,11 +283,15 @@ class PacketHandler:
             if module is not None:
                 module_type = module.get_type()
                 if commandRegistry.has_command(int(command_value), module_type):
-                    command = commandRegistry.get_command(command_value, module_type)
-                    if not command:
+                    command_class = commandRegistry.get_command(
+                        command_value, module_type
+                    )
+                    if command_class is None:
                         return
-                    msg = command()
-                    msg.populate(priority, address, rtr, data)
+                    if data is None:
+                        return
+                    module_msg = instantiate_command(command_class)
+                    module_msg.populate(priority, address, rtr, data)
                     # restart the info completion time when info message received
                     if command_value in (
                         0xF0,
@@ -291,7 +304,7 @@ class PacketHandler:
                         self._scan_delay_msec += SCAN_MODULEINFO_TIMEOUT_INTERVAL
                         # self._log.debug(f"Restart timeout {msg}")
                     # send the message to the modules
-                    await module.on_message(msg)
+                    await module.on_message(module_msg)
                 else:
                     self._log.warning(f"NOT FOUND IN command_registry: {rawmsg}")
 

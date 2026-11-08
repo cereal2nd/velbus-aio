@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import dataclasses
 import enum
-from typing import Self
+from typing import Any, Self
 
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ByteField, DeclarativeMessage
@@ -38,9 +38,9 @@ class DaliDeviceSettingMsg(DeclarativeMessage):
             # Unknown subtype or error while decoding; leave as bytes
             pass
 
-    def to_json_basic(self):
+    def to_json_basic(self) -> dict[str, Any]:
         """Generate a basic JSON representation of the message."""
-        me = {
+        me: dict[str, Any] = {
             "name": str(self.__class__.__name__),
             "priority": self.priority,
             "rtr": self.rtr,
@@ -65,7 +65,7 @@ class DaliDeviceSettingSubMessage:
         """To data method."""
         raise NotImplementedError
 
-    def to_json_basic(self):
+    def to_json_basic(self) -> dict[str, Any]:
         """To JSON basic representation."""
         raise NotImplementedError
 
@@ -104,7 +104,7 @@ class DeviceTypeMsg(DaliDeviceSettingSubMessage):
         """To data method."""
         return bytes([self.device_type.value])
 
-    def to_json_basic(self):
+    def to_json_basic(self) -> dict[str, Any]:
         """To JSON basic representation."""
         return {
             "submsg_type": self.__class__.__name__,
@@ -135,7 +135,7 @@ class MemberOfGroupMsg(DaliDeviceSettingSubMessage):
                 i += 1 << group_num
         return i.to_bytes(2, "little")
 
-    def to_json_basic(self):
+    def to_json_basic(self) -> dict[str, Any]:
         """To JSON basic representation."""
         return {
             "member_of_groups": self.member_of_groups,

@@ -21,7 +21,7 @@ def checksum(data: bytes | bytearray) -> int:
 class VelbusException(Exception):
     """Velbus Exception."""
 
-    def __init__(self, value):
+    def __init__(self, value: str) -> None:
         """Initialize Velbus Exception with a value."""
         Exception.__init__(self)
         self.value = value

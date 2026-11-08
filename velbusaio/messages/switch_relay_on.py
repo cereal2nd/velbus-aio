@@ -23,7 +23,7 @@ class SwitchRelayOnMessage(DeclarativeMessage):
 class SwitchRelayOnMessage20(SwitchRelayOnMessage):
     """Switch Relay On Message for -20 series."""
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         if self.relay_channels:
             return bytes([COMMAND_CODE, self.relay_channels[0]])

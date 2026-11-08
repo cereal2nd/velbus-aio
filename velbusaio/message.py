@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import enum
 import json
+from typing import Any
 
 from velbusaio.const import PRIORITY_FIRMWARE, PRIORITY_HIGH, PRIORITY_LOW
 
@@ -52,7 +53,7 @@ class Message:
         """Convert message data to binary format."""
         raise NotImplementedError
 
-    def to_json_basic(self) -> dict:
+    def to_json_basic(self) -> dict[str, Any]:
         """Create JSON structure with generic attributes."""
         me = {}
         me["name"] = str(self.__class__.__name__)

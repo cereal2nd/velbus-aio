@@ -3,9 +3,12 @@
 Handles reading and parsing Velbus VLP files.
 """
 
+from __future__ import annotations
+
 import importlib.resources
 import json
 import logging
+from typing import Any
 
 import anyio
 from bs4 import BeautifulSoup
@@ -25,13 +28,13 @@ def parse_vlp_sub_address_map(addresses: str) -> dict[int, int]:
 class VlpFile:
     """VLP file reader and parser."""
 
-    def __init__(self, file_path) -> None:
+    def __init__(self, file_path: str) -> None:
         """Initialize VLP file reader."""
         self._file_path = file_path
-        self._modules = []
+        self._modules: list[vlpModule] = []
         self._log = logging.getLogger("velbus-vlpFile")
 
-    def get(self) -> list:
+    def get(self) -> list[vlpModule]:
         """Return the parsed modules."""
         return self._modules
 
@@ -47,29 +50,29 @@ class VlpFile:
             assert memory_tag is not None
             mod = vlpModule(
                 caption_tag.get_text(),
-                module["address"],
-                module["build"],
-                module["serial"],
-                module["type"],
+                str(module.get("address", "")),
+                str(module.get("build", "")),
+                str(module.get("serial", "")),
+                str(module.get("type", "")),
                 memory_tag.get_text(),
             )
             self._modules.append(mod)
             await mod.parse()
         self._modules.sort(key=lambda mod: mod.get_decimal_addr())
 
-    # def dump(self) -> None:
-    #    """Dump the parsed modules to the log."""
-    #    for m in self._modules:
-    #        print(f"Module {m.get_decimal_addr()}: {m._name}, type {m._type_id}")
-    #        for key, value in m._channels.items():
-    #            name = value["Name"]
-    #            print(f"  {key} => {name}")
-
 
 class vlpModule:
     """VLP module representation."""
 
-    def __init__(self, name, addresses, build, serial, module_type, memory) -> None:
+    def __init__(
+        self,
+        name: str,
+        addresses: str,
+        build: str,
+        serial: str,
+        module_type: str,
+        memory: str,
+    ) -> None:
         """Initialize VLP module."""
         self._name = name
         self._addresses = addresses
@@ -77,8 +80,8 @@ class vlpModule:
         self._serial = serial
         self._type = module_type
         self._memory = memory
-        self._spec = {}
-        self._channels = {}
+        self._spec: dict[str, Any] = {}
+        self._channels: dict[str, Any] = {}
         self._type_id = next(
             (key for key, value in MODULE_DIRECTORY.items() if value == self._type),
             None,
@@ -112,17 +115,18 @@ class vlpModule:
         """Get module build."""
         return self._build
 
-    def get_channels(self) -> dict:
+    def get_channels(self) -> dict[str, Any]:
         """Get module channels."""
         return self._channels
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation of the module."""
-        return f"vlpModule(name={self._name}, addresses={self._addresses}, build={self._build}, serial={self._serial}, type={self._type})"
+        return (
+            f"vlpModule(name={self._name}, addresses={self._addresses}, "
+            f"build={self._build}, serial={self._serial}, type={self._type})"
+        )
 
-    def get_decimal_addr(
-        self,
-    ) -> int:
+    def get_decimal_addr(self) -> int:
         """Get decimal primary module address."""
         addr = self._addresses.split(",")[0]
         return int(addr, 16)
@@ -277,12 +281,12 @@ class vlpModule:
 
         assert memmap_id is not None
         with importlib.resources.path(
-            __name__, f"module_spec/{h2(memmap_id)}.json"
+            "velbusaio", f"module_spec/{h2(memmap_id)}.json"
         ) as fspath:
             async with await anyio.open_file(fspath) as protocol_file:
                 self._spec = json.loads(await protocol_file.read())
 
-    def _read_from_memory(self, address_range) -> str:
+    def _read_from_memory(self, address_range: str) -> str:
         """Read a range of bytes from the module memory."""
         # Check if there are multiple ranges separated by semicolons
         if ";" in address_range:

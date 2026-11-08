@@ -39,22 +39,22 @@ class DimmerChannelStatusMessage(DeclarativeMessage):
     led_status = ByteField(3)
     delay_time = Int24Field(4)
 
-    def is_normal(self):
+    def is_normal(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_NORMAL
+        return bool(self.disable_inhibit_forced == CHANNEL_NORMAL)
 
-    def is_inhibited(self):
+    def is_inhibited(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_INHIBITED
+        return bool(self.disable_inhibit_forced == CHANNEL_INHIBITED)
 
-    def is_forced_on(self):
+    def is_forced_on(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_FORCED_ON
+        return bool(self.disable_inhibit_forced == CHANNEL_FORCED_ON)
 
-    def is_disabled(self):
+    def is_disabled(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_DISABLED
+        return bool(self.disable_inhibit_forced == CHANNEL_DISABLED)
 
-    def cur_dimmer_state(self):
+    def cur_dimmer_state(self) -> int:
         """:return: int"""
-        return self.dimmer_state
+        return int(self.dimmer_state)

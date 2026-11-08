@@ -31,7 +31,7 @@ def _parse_serial(data: bytes) -> int:
     if data[0] in MODULES_WITHOUT_SERIAL:
         return 0
     (serial,) = struct.unpack(">L", bytes([0, 0, data[1], data[2]]))
-    return serial
+    return int(serial)
 
 
 @register(COMMAND_CODE)

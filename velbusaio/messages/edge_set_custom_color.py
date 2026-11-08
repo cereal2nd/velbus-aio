@@ -25,7 +25,7 @@ class EdgeSetCustomColor(DeclarativeMessage):
     green = ByteField(3)
     blue = ByteField(4)
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes(
             [

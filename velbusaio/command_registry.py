@@ -5,9 +5,15 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 import logging
+from typing import TypeVar, cast
+
+from velbusaio.message import Message
 
 _log = logging.getLogger("velbus-command-registry")
+
+MessageClassT = TypeVar("MessageClassT", bound=type[Message])
 
 
 class CommandRegistryError(Exception):
@@ -115,19 +121,22 @@ MODULE_DIRECTORY = {
 }
 
 # Maps message class names to classes; populated by @register decorators at import.
-MESSAGE_CATALOG: dict[str, type] = {}
+MESSAGE_CATALOG: dict[str, type[Message]] = {}
 
 
 class CommandRegistry:
     """Command registry class."""
 
-    def __init__(self, module_directory: dict) -> None:
+    def __init__(self, module_directory: dict[int, str]) -> None:
         """Init method."""
         self._module_directory = module_directory
-        self._overrides = {}
+        self._overrides: dict[int | None, dict[int, type[Message]]] = {}
 
     def register_command(
-        self, command_value: int, command_class: type, module_name: str | None = None
+        self,
+        command_value: int,
+        command_class: type[Message],
+        module_name: str | None = None,
     ) -> None:
         """Register a command."""
         if command_value < 0 or command_value > 255:
@@ -149,7 +158,10 @@ class CommandRegistry:
         self._register_override(command_value, command_class, module_type)
 
     def _register_override(
-        self, command_value: int, command_class: type, module_type: int | None
+        self,
+        command_value: int,
+        command_class: type[Message],
+        module_type: int | None,
     ) -> None:
         """Register and override."""
         if module_type not in self._overrides:
@@ -185,20 +197,44 @@ class CommandRegistry:
             return False
         return command_value in self._overrides[module_type]
 
-    def get_command(self, command_value: int, module_type: int = 0) -> None | type:
+    def get_command(
+        self, command_value: int, module_type: int = 0
+    ) -> type[Message] | None:
         """Search a command in the registry."""
         if module_type not in self._overrides:
             return None
         return self._overrides[module_type].get(command_value)
 
+    def get_command_or_raise(
+        self, command_value: int, module_type: int = 0
+    ) -> type[Message]:
+        """Return the message class for a command or raise CommandRegistryError."""
+        command_class = self.get_command(command_value, module_type)
+        if command_class is None:
+            raise CommandRegistryError(
+                f"Command {command_value:#04x} not registered "
+                f"for module type {module_type:#04x}"
+            )
+        return command_class
+
+
+def instantiate_command(
+    command_class: type[Message], /, *args: object, **kwargs: object
+) -> Message:
+    """Construct a message using a registry command class (supports extra ctor args)."""
+    construct = cast("Callable[..., Message]", command_class)
+    return construct(*args, **kwargs)
+
 
 commandRegistry = CommandRegistry(MODULE_DIRECTORY)
 
 
-def register(command_value: int | None = None):
+def register(
+    command_value: int | None = None,
+) -> Callable[[MessageClassT], MessageClassT]:
     """Register decorator; catalogs message classes by name."""
 
-    def inner_register(command_class):
+    def inner_register(command_class: MessageClassT) -> MessageClassT:
         MESSAGE_CATALOG[command_class.__name__] = command_class
         return command_class
 

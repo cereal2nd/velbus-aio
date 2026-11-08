@@ -18,11 +18,11 @@ class SwitchToSafeMessage(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _priority = None
 
-    def __init__(self, address=None, sleep=0):
+    def __init__(self, address: int | None = None, sleep: int = 0) -> None:
         """Initialize SwitchToSafeMessage class."""
         super().__init__(address)
         self.sleep = sleep
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes([COMMAND_CODE, self.sleep >> 8, self.sleep & 0xFF])

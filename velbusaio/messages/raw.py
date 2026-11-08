@@ -21,14 +21,14 @@ class MeteoRawMessage(DeclarativeMessage):
     _data_length = 6
     _generates_data_to_binary = False
 
-    def __init__(self, address=None):
+    def __init__(self, address: int | None = None) -> None:
         """Initialize Meteo Raw Message Object."""
         Message.__init__(self)
         self.rain: float = 0
         self.light: float = 0
         self.wind: float = 0
 
-    def populate(self, priority, address, rtr, data):
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
         """Populate the Meteo Raw Message Object.
 
         Data bytes (high + low)
@@ -54,7 +54,7 @@ class SensorRawMessage(DeclarativeMessage):
     _data_length = 5
     _generates_data_to_binary = False
 
-    def __init__(self, address=None):
+    def __init__(self, address: int | None = None) -> None:
         """Initialize Sensor Raw Message Object."""
         Message.__init__(self)
         self.sensor = 0
@@ -62,7 +62,7 @@ class SensorRawMessage(DeclarativeMessage):
         self.value: float = 0
         self.unit: str | None = None
 
-    def populate(self, priority, address, rtr, data):
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
         """Populate the Sensor Raw Message Object."""
         self.needs_no_rtr(rtr)
         self.needs_data(data, 5)

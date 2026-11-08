@@ -18,6 +18,6 @@ class TempSetHeatingMessage(DeclarativeMessage):
     _command_code = COMMAND_CODE
     _priority = None
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes([COMMAND_CODE, 0xAA])

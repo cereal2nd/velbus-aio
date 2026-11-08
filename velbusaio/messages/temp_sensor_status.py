@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+from typing import Any, cast
 
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
@@ -67,13 +68,13 @@ class TempSensorStatusMessage(DeclarativeMessage):
     )
     sleep_timer = Int16Field(5, default=None, serializable=False)
 
-    def getCurTemp(self):
+    def getCurTemp(self) -> float | None:
         """Get current temperature."""
-        return self.current_temp
+        return cast("float | None", self.current_temp)
 
-    def to_json(self):
+    def to_json(self) -> str:
         """:return: str"""
-        json_dict = self.to_json_basic()
+        json_dict: dict[str, Any] = self.to_json_basic()
         json_dict["local_control"] = self.local_control
         json_dict["status_mode"] = DSTATUS[self.status_mode]
         json_dict["auto_send"] = self.auto_send

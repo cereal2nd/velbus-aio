@@ -20,7 +20,7 @@ class SelectProgramMessage(DeclarativeMessage):
 
     select_program = BitField(0, 0x03, default=0, serializable=True)
 
-    def __init__(self, address=None, program=0):
+    def __init__(self, address: int | None = None, program: int = 0) -> None:
         """Initialize Select Program Message Object."""
         super().__init__(address)
         self.select_program = program

@@ -80,7 +80,7 @@ def load_action_catalog(catalog_id: str) -> dict[str, Any]:
         with importlib.resources.path(
             "velbusaio", f"action_catalogs/{catalog_id}.json"
         ) as path:
-            data = json.loads(path.read_text(encoding="utf-8"))
+            data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as err:
         raise VelbusConfigError(f"Unknown action catalog '{catalog_id}'") from err
     _CATALOG_CACHE[catalog_id] = data
@@ -457,6 +457,7 @@ class _SharedSlotStore:
         if self.slots is not None and not force:
             return self.slots
         if not force and self.decode_from_cache():
+            assert self.slots is not None
             return self.slots
         if force:
             length = self.slot_count * self.slot_size

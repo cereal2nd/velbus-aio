@@ -22,7 +22,13 @@ class SetDate(DeclarativeMessage):
     _mon = ByteField(1, default=None)
     _year = Int16Field(2, default=None)
 
-    def __init__(self, address=0x00, day=None, mon=None, year=None) -> None:
+    def __init__(
+        self,
+        address: int = 0x00,
+        day: int | None = None,
+        mon: int | None = None,
+        year: int | None = None,
+    ) -> None:
         """Initialize Set Date Message Object."""
         super().__init__(address)
         if day is not None:

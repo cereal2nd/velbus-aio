@@ -33,7 +33,7 @@ from velbusaio.channels import (
     Sensor,
     Temperature as TemperatureChannelType,
 )
-from velbusaio.command_registry import commandRegistry
+from velbusaio.command_registry import commandRegistry, instantiate_command
 from velbusaio.config import decode_name, encode_name
 from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2, handle_match, keys_exists
@@ -79,7 +79,6 @@ from velbusaio.messages.dali_device_settings import (
 )
 from velbusaio.messages.dali_device_settings_request import (
     COMMAND_CODE as DALI_DEVICE_SETTINGS_REQUEST_COMMAND_CODE,
-    DaliDeviceSettingsRequest,
 )
 from velbusaio.messages.dali_dim_value_status import DimValueStatus
 from velbusaio.messages.dimmer_channel_status import DimmerChannelStatusMessage
@@ -124,6 +123,7 @@ from velbusaio.messages.temp_sensor_status import TempSensorStatusMessage
 from velbusaio.messages.update_led_status import UpdateLedStatusMessage
 from velbusaio.properties import Property
 from velbusaio.temp_settings import TemperatureSettings, build_temperature_settings
+from velbusaio.vlp_reader import vlpModule
 
 
 def _coerce_cached_sub_address(addr: object) -> int:
@@ -135,7 +135,7 @@ def _coerce_cached_sub_address(addr: object) -> int:
             return int(addr)
         except ValueError:
             return int(addr, 16)
-    return int(addr)
+    raise TypeError(f"Unsupported cached sub-address type: {type(addr)!r}")
 
 
 class Module:
@@ -147,7 +147,7 @@ class Module:
         module_address: int,
         module_type: int,
         serial: int | str | None = None,
-        memorymap: int | None = None,
+        memorymap: int | str | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
         cache_dir: str | None = None,
@@ -182,7 +182,7 @@ class Module:
         module_address: int,
         module_type: int,
         serial: int | str | None = None,
-        memorymap: int | None = None,
+        memorymap: int | str | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
         cache_dir: str | None = None,
@@ -191,13 +191,13 @@ class Module:
         """Initialize Module object."""
         self._address = module_address
         self._type = int(module_type)
-        self._data = {}
+        self._data: dict[str, Any] = {}
 
         self._name: str | dict[Any, Any] | None = None
         self._name_buffer: dict[
             int, str
         ] = {}  # temporary buffer while assembling name from memory blocks
-        self._sub_address = {}
+        self._sub_address: dict[int, int] = {}
         # the bus reports the serial as an int, a vlp file as a str => normalize
         self.serial = str(serial) if serial is not None else None
         self.memory_map_version = memorymap
@@ -217,7 +217,7 @@ class Module:
         self._temp_settings: TemperatureSettings | None = None
         self.loaded = False
         self._use_cache = True
-        self._loaded_cache = {}
+        self._loaded_cache: dict[str, Any] = {}
         self._panel_metadata_ready = False
         # serialize cache writes for this module to avoid concurrent
         # coroutines interleaving writes to the same file
@@ -426,7 +426,7 @@ class Module:
         """
         await self._cache()
 
-    def __getstate__(self) -> dict:
+    def __getstate__(self) -> dict[str, Any]:
         """Get state for pickling."""
         d = self.__dict__
         return {
@@ -435,7 +435,7 @@ class Module:
             if k not in {"_writer", "_log", "_controller", "_cache_lock"}
         }
 
-    def __setstate__(self, state: dict) -> None:
+    def __setstate__(self, state: dict[str, Any]) -> None:
         """Set state for unpickling."""
         self.__dict__ = state
 
@@ -447,7 +447,7 @@ class Module:
         """Return string representation of the module."""
         return self.__repr__()
 
-    def to_cache(self) -> dict:
+    def to_cache(self) -> dict[str, Any]:
         """Build cache dict."""
         d: dict[str, Any] = {
             # Fall back to the human-readable module type name when the module
@@ -470,7 +470,7 @@ class Module:
         """Get the module address."""
         return self._address
 
-    def get_addresses(self) -> list:
+    def get_addresses(self) -> list[int]:
         """Get all addresses for this module."""
         res = [self._address]
         res.extend(self._sub_address.values())
@@ -496,7 +496,7 @@ class Module:
         # Check if this sub-index exists in the active sub-addresses
         return sub_idx in self._sub_address
 
-    def add_subaddress(self, num, addr) -> None:
+    def add_subaddress(self, num: int, addr: int) -> None:
         """Add a subaddress to this module."""
         self._sub_address[num] = addr
 
@@ -506,8 +506,9 @@ class Module:
 
     def get_type_name(self) -> str:
         """Get the module type name."""
-        if "Type" in self._data:
-            return self._data["Type"]
+        module_type = self._data.get("Type")
+        if isinstance(module_type, str):
+            return module_type
         return "UNKNOWN"
 
     def get_serial(self) -> str | None:
@@ -563,7 +564,9 @@ class Module:
         """Return if the module is connected."""
         return self._controller.connected
 
-    def _build_message_handlers(self) -> dict:
+    def _build_message_handlers(
+        self,
+    ) -> dict[type[Message], Callable[..., Awaitable[None]]]:
         """Build dispatch table for message handlers."""
         return {
             # Channel name messages
@@ -1067,7 +1070,7 @@ class Module:
         # Notify status
         self._got_status.set()
 
-    async def _update_channel(self, channel: int, updates: dict):
+    async def _update_channel(self, channel: int, updates: dict[str, Any]) -> None:
         try:
             await self._channels[channel].update(updates)
         except KeyError:
@@ -1075,7 +1078,9 @@ class Module:
                 f"channel {channel} does not exist for module @ address {self}"
             )
 
-    async def _update_property(self, property_name: str, updates: dict):
+    async def _update_property(
+        self, property_name: str, updates: dict[str, Any]
+    ) -> None:
         try:
             await self._properties[property_name].update(updates)
         except KeyError:
@@ -1083,7 +1088,7 @@ class Module:
                 f"property {property_name} does not exist for module @ address {self}"
             )
 
-    def get_channels(self) -> dict:
+    def get_channels(self) -> dict[int, Channel]:
         """List all channels for this module."""
         return self._channels
 
@@ -1251,7 +1256,7 @@ class Module:
             self._channels[channel].set_name(decode_name(encode_name(name, length)))
             await self._cache()
 
-    async def load_from_vlp(self, vlp_data) -> None:
+    async def load_from_vlp(self, vlp_data: vlpModule) -> None:
         """Initialize the module from VLP data."""
         self._is_loading = True
         self._use_cache = False
@@ -1338,7 +1343,7 @@ class Module:
         await self._request_module_status()
         await self._trigger_load_finished_callbacks()
 
-    async def _get_cache(self):
+    async def _get_cache(self) -> dict[str, Any]:
         cfile = pathlib.Path(f"{self._cache_dir}/{self._address}.json")
         try:
             async with await anyio.open_file(cfile, "r") as fl:
@@ -1524,12 +1529,16 @@ class Module:
         )
         if msg_type is None:
             return
-        msg = msg_type(self._address)
+        msg = instantiate_command(msg_type, self._address)
         msg.priority = PRIORITY_LOW
         if keys_exists(self._data, "AllChannelStatus"):
-            msg.channels = 0xFF
+            setattr(msg, "channels", 0xFF)
         else:
-            msg.channels = list(range(1, (self.number_of_channels() + 1)))
+            setattr(
+                msg,
+                "channels",
+                list(range(1, (self.number_of_channels() + 1))),
+            )
         await self._writer(msg)
 
     async def _request_memory_name_blocks(self, memory_ranges: str) -> None:
@@ -1667,7 +1676,7 @@ class VmbDali(Module):
         module_address: int,
         module_type: int,
         serial: int | str | None = None,
-        memorymap: int | None = None,
+        memorymap: int | str | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
         cache_dir: str | None = None,
@@ -1706,14 +1715,16 @@ class VmbDali(Module):
             # with actual channels
         await self._request_dali_channels()
 
-    async def _request_dali_channels(self):
+    async def _request_dali_channels(self) -> None:
         msg_type = commandRegistry.get_command(
             DALI_DEVICE_SETTINGS_REQUEST_COMMAND_CODE, self.get_type()
         )
-        msg: DaliDeviceSettingsRequest = msg_type(self._address)
+        if msg_type is None:
+            return
+        msg = instantiate_command(msg_type, self._address)
         msg.priority = PRIORITY_LOW
-        msg.channel = 81  # all
-        msg.settings = None  # all
+        setattr(msg, "channel", 81)  # all
+        setattr(msg, "settings", None)  # all
         await self._writer(msg)
 
     async def on_message(self, message: Message) -> None:
@@ -1814,7 +1825,7 @@ class VmbDali(Module):
         )
         if msg_type is None:
             return
-        msg = msg_type(self._address)
+        msg = instantiate_command(msg_type, self._address)
         msg.priority = PRIORITY_LOW
-        msg.channels = channel_num
+        setattr(msg, "channels", channel_num)
         await self._writer(msg)

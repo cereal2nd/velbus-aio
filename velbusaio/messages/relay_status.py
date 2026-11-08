@@ -41,38 +41,38 @@ class RelayStatusMessage(DeclarativeMessage):
     led_status = ByteField(3)
     delay_time = Int24Field(4)
 
-    def is_normal(self):
+    def is_normal(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_NORMAL
+        return bool(self.disable_inhibit_forced == CHANNEL_NORMAL)
 
-    def is_inhibited(self):
+    def is_inhibited(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_INHIBITED
+        return bool(self.disable_inhibit_forced == CHANNEL_INHIBITED)
 
-    def is_forced_on(self):
+    def is_forced_on(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_FORCED_ON
+        return bool(self.disable_inhibit_forced == CHANNEL_FORCED_ON)
 
-    def is_disabled(self):
+    def is_disabled(self) -> bool:
         """:return: bool"""
-        return self.disable_inhibit_forced == CHANNEL_DISABLED
+        return bool(self.disable_inhibit_forced == CHANNEL_DISABLED)
 
-    def is_on(self):
+    def is_on(self) -> bool:
         """:return: bool"""
-        return self.status == RELAY_ON
+        return bool(self.status == RELAY_ON)
 
-    def has_interval_timer_on(self):
+    def has_interval_timer_on(self) -> bool:
         """:return: bool"""
-        return self.status == INTERVAL_TIMER_ON
+        return bool(self.status == INTERVAL_TIMER_ON)
 
 
 @register(COMMAND_CODE)
 class RelayStatusMessage2(RelayStatusMessage):
     """Relay Status Message."""
 
-    def is_on(self):
+    def is_on(self) -> bool:
         """:return: bool"""
-        return (self.status >> (self.channel - 1)) & 1 != 0
+        return bool((self.status >> (self.channel - 1)) & 1 != 0)
 
 
 @register(COMMAND_CODE)
@@ -91,26 +91,26 @@ class RelayStatusMessage3(DeclarativeMessage):
     interval_timer_bits = ByteField(5)
     alarm_bits = ByteField(6)
 
-    def is_on(self, channel):
+    def is_on(self, channel: int) -> bool:
         """:return: bool"""
-        return (self.status_bits >> (channel - 1)) & 1 != 0
+        return bool((self.status_bits >> (channel - 1)) & 1 != 0)
 
-    def is_inhibited(self, channel):
+    def is_inhibited(self, channel: int) -> bool:
         """:return: bool"""
-        return (self.inhibited_bits >> (channel - 1)) & 1 != 0
+        return bool((self.inhibited_bits >> (channel - 1)) & 1 != 0)
 
-    def is_forced_on(self, channel):
+    def is_forced_on(self, channel: int) -> bool:
         """:return: bool"""
-        return (self.forced_on_bits >> (channel - 1)) & 1 != 0
+        return bool((self.forced_on_bits >> (channel - 1)) & 1 != 0)
 
-    def is_forced_off(self, channel):
+    def is_forced_off(self, channel: int) -> bool:
         """:return: bool"""
-        return (self.forced_off_bits >> (channel - 1)) & 1 != 0
+        return bool((self.forced_off_bits >> (channel - 1)) & 1 != 0)
 
-    def is_program_disabled(self, channel):
+    def is_program_disabled(self, channel: int) -> bool:
         """:return: bool"""
-        return (self.program_disabled_bits >> (channel - 1)) & 1 != 0
+        return bool((self.program_disabled_bits >> (channel - 1)) & 1 != 0)
 
-    def has_interval_timer_on(self, channel):
+    def has_interval_timer_on(self, channel: int) -> bool:
         """:return: bool"""
-        return (self.interval_timer_bits >> (channel - 1)) & 1 != 0
+        return bool((self.interval_timer_bits >> (channel - 1)) & 1 != 0)

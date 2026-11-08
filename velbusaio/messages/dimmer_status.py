@@ -37,7 +37,7 @@ class DimmerStatusMessage(DeclarativeMessage):
     delay_time = Int24Field(3)
     dimmer_config = ByteField(6, serializable=False)
 
-    def __init__(self, address=None):
+    def __init__(self, address: int | None = None) -> None:
         """Initialize Dimmer Status message."""
         super().__init__(address)
         self.channel = 1
@@ -45,43 +45,43 @@ class DimmerStatusMessage(DeclarativeMessage):
     def _post_populate(self, data: bytes) -> None:
         self.channel = 1
 
-    def is_start_stop(self):
+    def is_start_stop(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_START_STOP
+        return bool(self.dimmer_mode == MODE_START_STOP)
 
-    def is_dimmer(self):
+    def is_dimmer(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_DIMMER
+        return bool(self.dimmer_mode == MODE_DIMMER)
 
-    def is_dimmer_memory(self):
+    def is_dimmer_memory(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_MEMORY
+        return bool(self.dimmer_mode == MODE_MEMORY)
 
-    def is_staircase(self):
+    def is_staircase(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_STAIRCASE
+        return bool(self.dimmer_mode == MODE_STAIRCASE)
 
-    def is_multi(self):
+    def is_multi(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_MULTI
+        return bool(self.dimmer_mode == MODE_MULTI)
 
-    def is_slow(self):
+    def is_slow(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_SLOW
+        return bool(self.dimmer_mode == MODE_SLOW)
 
-    def is_slow_on(self):
+    def is_slow_on(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_SLOW_ON
+        return bool(self.dimmer_mode == MODE_SLOW_ON)
 
-    def is_slow_off(self):
+    def is_slow_off(self) -> bool:
         """:return: bool"""
-        return self.dimmer_mode == MODE_SLOW_OFF
+        return bool(self.dimmer_mode == MODE_SLOW_OFF)
 
-    def cur_dimmer_state(self):
+    def cur_dimmer_state(self) -> int:
         """:return: int"""
-        return self.dimmer_state
+        return int(self.dimmer_state)
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes(
             [

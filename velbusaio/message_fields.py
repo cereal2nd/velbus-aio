@@ -8,10 +8,37 @@ from __future__ import annotations
 
 from collections.abc import Callable
 import json
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Protocol, runtime_checkable
 
 from velbusaio.command_registry import CommandRegistryError, commandRegistry
 from velbusaio.message import Message
+
+type PopulateFn = Callable[[DeclarativeMessage, int, int, bool, bytes], None]
+type SetDefaultsFn = Callable[[DeclarativeMessage, int | None], None]
+type InitFn = Callable[[DeclarativeMessage, int | None], None]
+type DataToBinaryFn = Callable[[DeclarativeMessage], bytes]
+type ToJsonBasicFn = Callable[[DeclarativeMessage], dict[str, Any]]
+type ToJsonFn = Callable[[DeclarativeMessage], str]
+
+
+@runtime_checkable
+class DeclarativeMessageHooks(Protocol):
+    """Method surface installed (or inherited) on declarative message subclasses."""
+
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
+        """Parse an inbound frame into declarative fields."""
+
+    def set_defaults(self, address: int | None) -> None:
+        """Apply configured priority, RTR, and address defaults."""
+
+    def data_to_binary(self) -> bytes:
+        """Serialize declared fields to Velbus payload bytes."""
+
+    def to_json_basic(self) -> dict[str, Any]:
+        """Build JSON-ready dict including declarative field values."""
+
+    def to_json(self) -> str:
+        """Serialize the message to a JSON string."""
 
 
 class Field:
@@ -193,10 +220,15 @@ class RawTailField(Field):
 
     def __init__(self, start_index: int, default: bytes = b"") -> None:
         """Initialize raw tail field."""
+        start = start_index
+
+        def parse_tail(data: bytes) -> bytes:
+            return data[start:]
+
         super().__init__(
             byte_index=start_index,
             default=default,
-            parser=lambda data, start=start_index: data[start:],
+            parser=parse_tail,
             serializer=bytes,
             serializable=True,
         )
@@ -443,7 +475,7 @@ class HalfDegreeField(Field):
         """Parse a half-degree temperature byte."""
         assert self.byte_index is not None
         if self.byte_index >= len(data):
-            return self.default
+            return float(self.default)
         raw = data[self.byte_index]
         if self.signed and raw & 0x80:
             raw -= 0x100
@@ -487,6 +519,20 @@ class StringField(Field):
         return padded + bytes(self.length - len(padded))
 
 
+def _install_generated_method(
+    cls: type[DeclarativeMessage],
+    name: str,
+    implementation: PopulateFn
+    | SetDefaultsFn
+    | InitFn
+    | DataToBinaryFn
+    | ToJsonBasicFn
+    | ToJsonFn,
+) -> None:
+    """Attach a factory-built function on the class (avoids mypy method-assign on overrides)."""
+    setattr(cls, name, implementation)
+
+
 def _collect_fields(cls: type) -> dict[str, Field]:
     """Collect Field descriptors from the class MRO."""
     fields: dict[str, Field] = {}
@@ -503,9 +549,7 @@ def _collect_fields(cls: type) -> dict[str, Field]:
     return fields
 
 
-def _make_set_defaults(
-    cls: type[DeclarativeMessage],
-) -> Callable[[Any, int | None], None]:
+def _make_set_defaults(cls: type[DeclarativeMessage]) -> SetDefaultsFn:
     """Build set_defaults honoring declarative message config."""
 
     def set_defaults(self: DeclarativeMessage, address: int | None) -> None:
@@ -526,7 +570,7 @@ def _make_set_defaults(
     return set_defaults
 
 
-def _make_init(cls: type, fields: dict[str, Field]) -> Callable[..., None]:
+def _make_init(cls: type[DeclarativeMessage], fields: dict[str, Field]) -> InitFn:
     """Build __init__ that seeds field defaults."""
 
     def __init__(self: DeclarativeMessage, address: int | None = None) -> None:
@@ -563,7 +607,9 @@ def _validate_populate(
             self.needs_data(data, data_length)
 
 
-def _make_populate(cls: type, fields: dict[str, Field]) -> Callable[..., None]:
+def _make_populate(
+    cls: type[DeclarativeMessage], fields: dict[str, Field]
+) -> PopulateFn:
     """Build populate() from declared fields."""
 
     def populate(
@@ -584,7 +630,7 @@ def _make_populate(cls: type, fields: dict[str, Field]) -> Callable[..., None]:
     return populate
 
 
-def _make_populate_no_fields(cls: type) -> Callable[..., None]:
+def _make_populate_no_fields(cls: type[DeclarativeMessage]) -> PopulateFn:
     """Build populate() for messages with no declared fields."""
 
     def populate(
@@ -605,9 +651,7 @@ def _serializable_fields(fields: dict[str, Field]) -> list[tuple[str, Field]]:
     return [(name, field) for name, field in fields.items() if field.serializable]
 
 
-def _make_data_to_binary_no_fields(
-    cls: type[DeclarativeMessage],
-) -> Callable[[Any], bytes]:
+def _make_data_to_binary_no_fields(cls: type[DeclarativeMessage]) -> DataToBinaryFn:
     """Build data_to_binary() for messages with no serializable fields."""
 
     def data_to_binary(self: DeclarativeMessage) -> bytes:
@@ -618,7 +662,7 @@ def _make_data_to_binary_no_fields(
 
 def _make_data_to_binary(
     cls: type[DeclarativeMessage], fields: dict[str, Field]
-) -> Callable[[Any], bytes]:
+) -> DataToBinaryFn:
     """Build data_to_binary() from serializable fields."""
 
     serializable = _serializable_fields(fields)
@@ -634,8 +678,8 @@ def _make_data_to_binary(
 
 
 def _make_to_json_basic(
-    cls: type, fields: dict[str, Field]
-) -> Callable[[Any], dict[str, Any]]:
+    cls: type[DeclarativeMessage], fields: dict[str, Field]
+) -> ToJsonBasicFn:
     """Build to_json_basic() including declared fields."""
 
     def to_json_basic(self: DeclarativeMessage) -> dict[str, Any]:
@@ -648,7 +692,7 @@ def _make_to_json_basic(
     return to_json_basic
 
 
-def _make_to_json(cls: type, fields: dict[str, Field]) -> Callable[[Any], str]:
+def _make_to_json(cls: type[DeclarativeMessage], fields: dict[str, Field]) -> ToJsonFn:
     """Build to_json() from to_json_basic()."""
 
     def to_json(self: DeclarativeMessage) -> str:
@@ -658,7 +702,10 @@ def _make_to_json(cls: type, fields: dict[str, Field]) -> Callable[[Any], str]:
 
 
 class DeclarativeMessage(Message):
-    """Base class for declaratively defined Velbus messages."""
+    """Base class for declaratively defined Velbus messages.
+
+    :meth:`__init_subclass__` synthesizes hook methods with typed factory builders.
+    """
 
     _command_code: ClassVar[int]
     _module_types: ClassVar[list[str] | None] = None
@@ -688,16 +735,18 @@ class DeclarativeMessage(Message):
                 commandRegistry.register_command(cls._command_code, cls, module_type)
 
         if "__init__" not in cls.__dict__ and fields:
-            cls.__init__ = _make_init(cls, fields)  # type: ignore[method-assign]
+            _install_generated_method(cls, "__init__", _make_init(cls, fields))
 
         if "set_defaults" not in cls.__dict__:
-            cls.set_defaults = _make_set_defaults(cls)  # type: ignore[method-assign, assignment]
+            _install_generated_method(cls, "set_defaults", _make_set_defaults(cls))
 
         if "populate" not in cls.__dict__:
             if fields:
-                cls.populate = _make_populate(cls, fields)  # type: ignore[method-assign]
+                _install_generated_method(cls, "populate", _make_populate(cls, fields))
             else:
-                cls.populate = _make_populate_no_fields(cls)  # type: ignore[method-assign]
+                _install_generated_method(
+                    cls, "populate", _make_populate_no_fields(cls)
+                )
 
         if (
             "data_to_binary" not in cls.__dict__
@@ -705,12 +754,22 @@ class DeclarativeMessage(Message):
             and hasattr(cls, "_command_code")
         ):
             if _serializable_fields(fields):
-                cls.data_to_binary = _make_data_to_binary(cls, fields)  # type: ignore[method-assign, assignment]
+                _install_generated_method(
+                    cls, "data_to_binary", _make_data_to_binary(cls, fields)
+                )
             else:
-                cls.data_to_binary = _make_data_to_binary_no_fields(cls)  # type: ignore[method-assign, assignment]
+                _install_generated_method(
+                    cls,
+                    "data_to_binary",
+                    _make_data_to_binary_no_fields(cls),
+                )
 
         if cls._generates_to_json:
             if "to_json_basic" not in cls.__dict__:
-                cls.to_json_basic = _make_to_json_basic(cls, fields)  # type: ignore[method-assign, assignment]
+                _install_generated_method(
+                    cls, "to_json_basic", _make_to_json_basic(cls, fields)
+                )
             if "to_json" not in cls.__dict__:
-                cls.to_json = _make_to_json(cls, fields)  # type: ignore[method-assign, assignment]
+                _install_generated_method(cls, "to_json", _make_to_json(cls, fields))
+
+        assert issubclass(cls, DeclarativeMessageHooks)

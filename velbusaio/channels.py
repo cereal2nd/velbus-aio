@@ -11,8 +11,13 @@ import math
 import string
 from typing import TYPE_CHECKING, Any
 
+from velbusaio.actions import ActionTable
 from velbusaio.baseItem import BaseItem
-from velbusaio.command_registry import commandRegistry
+from velbusaio.command_registry import (
+    CommandRegistryError,
+    commandRegistry,
+    instantiate_command,
+)
 from velbusaio.config import ConfigParameter
 from velbusaio.const import (
     DEVICE_CLASS_TEMPERATURE,
@@ -34,10 +39,28 @@ from velbusaio.messages.sensor_temp_request import (
     TEMP_AUTOSEND_INTERVAL_MIN,
     TEMP_AUTOSEND_ON_CHANGE,
 )
+from velbusaio.temp_settings import TemperatureSettings
 
 if TYPE_CHECKING:
     from velbusaio.actions import ActionSlot
     from velbusaio.module import Module
+
+
+def _command_message(
+    code: int,
+    module: Module,
+    address: int,
+    /,
+    *args: object,
+    **kwargs: object,
+) -> Message:
+    """Build an outbound message from the module command registry."""
+    command_class = commandRegistry.get_command(code, module.get_type())
+    if command_class is None:
+        raise CommandRegistryError(
+            f"Command {code:#04x} not registered for module type {module.get_type():#04x}"
+        )
+    return instantiate_command(command_class, address, *args, **kwargs)
 
 
 class Channel(BaseItem):
@@ -57,7 +80,7 @@ class Channel(BaseItem):
         subDevice: bool,
         writer: Callable[[Message], Awaitable[None]],
         address: int,
-    ):
+    ) -> None:
         """Initialize the channel."""
         super().__init__(module, name, writer)
         self._num = num
@@ -67,7 +90,7 @@ class Channel(BaseItem):
         else:
             self._is_loaded = False
         self._address = address
-        self._name_parts = {}
+        self._name_parts: dict[int, str] = {}
 
     def get_identifier(self) -> str:
         """Return the identifier of the entity."""
@@ -140,7 +163,7 @@ class Channel(BaseItem):
         self._is_loaded = True
         self._name_parts = {}
 
-    def __getstate__(self):
+    def __getstate__(self) -> dict[str, Any]:
         """Get channel state for pickling."""
         d = self.__dict__
         return {
@@ -149,7 +172,7 @@ class Channel(BaseItem):
             if k not in {"_writer", "_on_status_update", "_name_parts"}
         }
 
-    def to_cache(self) -> dict:
+    def to_cache(self) -> dict[str, Any]:
         """Get channel state for caching."""
         dst = {
             "name": self._name,
@@ -160,7 +183,7 @@ class Channel(BaseItem):
             dst["Unit"] = self._Unit
         return dst
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: dict[str, Any]) -> None:
         """Restore channel from cached state."""
         self.__dict__.update(state)
         self._on_status_update = []
@@ -187,36 +210,12 @@ class Channel(BaseItem):
                 data[key.replace("_", "", 1)] = value
         return data
 
-    async def update(self, data: dict) -> None:
-        """Set the attributes of this channel."""
-        changed = False
-        for key, new_val in data.items():
-            cur_val = getattr(self, f"_{key}", None)
-            if cur_val != new_val:
-                setattr(self, f"_{key}", new_val)
-                changed = True
-        if changed:
-            await self.status_update()
-
-    async def status_update(self) -> None:
-        """Call all registered status update methods."""
-        for m in self._on_status_update:
-            await m()
-
     def get_categories(self) -> list[str]:
         """Get the categories (mainly for home-assistant).
 
         COMPONENT_TYPES = ["switch", "sensor", "binary_sensor", "cover", "climate", "light"]
         """
         return []
-
-    def on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
-        """Register a method to be called on status update."""
-        self._on_status_update.append(meth)
-
-    def remove_on_status_update(self, meth: Callable[[], Awaitable[None]]) -> None:
-        """Remove a method from the status update callbacks."""
-        self._on_status_update.remove(meth)
 
     def get_counter_state(self) -> int:
         """Return the current state of the counter."""
@@ -226,11 +225,11 @@ class Channel(BaseItem):
         """Return the unit of the counter."""
         raise NotImplementedError
 
-    def get_max(self) -> int | None:
+    def get_max(self) -> float | None:
         """Return the maximum value."""
         raise NotImplementedError
 
-    def get_min(self) -> int | None:
+    def get_min(self) -> float | None:
         """Return the minimum value."""
         raise NotImplementedError
 
@@ -251,7 +250,7 @@ class Channel(BaseItem):
         """Return the accumulated energy in kWh, or None if not applicable."""
         return None
 
-    def get_action_table(self):
+    def get_action_table(self) -> ActionTable | None:
         """Return this channel's action table, if available."""
         return self._module.get_action_table(self._num)
 
@@ -372,23 +371,20 @@ class Blind(Channel):
 
     async def open(self) -> None:
         """Open the blind."""
-        cls = commandRegistry.get_command(0x05, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
+        msg = _command_message(0x05, self._module, self._address)
+        setattr(msg, "channel", self._num)
         await self._writer(msg)
 
     async def close(self) -> None:
         """Close the blind."""
-        cls = commandRegistry.get_command(0x06, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
+        msg = _command_message(0x06, self._module, self._address)
+        setattr(msg, "channel", self._num)
         await self._writer(msg)
 
     async def stop(self) -> None:
         """Stop the blind."""
-        cls = commandRegistry.get_command(0x04, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
+        msg = _command_message(0x04, self._module, self._address)
+        setattr(msg, "channel", self._num)
         await self._writer(msg)
 
     async def set_position(self, position: int) -> None:
@@ -398,10 +394,9 @@ class Blind(Channel):
             # at least VMB1BLS ignores command 0x1C with position 0x64
             await self.close()
             return
-        cls = commandRegistry.get_command(0x1C, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
-        msg.position = position
+        msg = _command_message(0x1C, self._module, self._address)
+        setattr(msg, "channel", self._num)
+        setattr(msg, "position", position)
         await self._writer(msg)
 
 
@@ -410,7 +405,7 @@ class Button(Channel):
 
     _enabled = True
     _closed = False
-    _led_state = None
+    _led_state: str | None = None
     _long = False
     _saved_reaction_time: int | None = None
 
@@ -465,14 +460,14 @@ class Button(Channel):
         if current != spec["disabled_value"]:
             self._saved_reaction_time = current
         if enabled:
-            value = (
-                self._saved_reaction_time
-                if self._saved_reaction_time not in (None, spec["disabled_value"])
-                else spec["enabled_value"]
-            )
+            saved = self._saved_reaction_time
+            if saved is not None and saved != spec["disabled_value"]:
+                write_value = saved
+            else:
+                write_value = spec["enabled_value"]
         else:
-            value = spec["disabled_value"]
-        await memory.write_byte(spec["address"], value & 0xFF)
+            write_value = spec["disabled_value"]
+        await memory.write_byte(spec["address"], write_value & 0xFF)
         await self.update({"enabled": enabled})
 
     async def set_name_persistent(self, name: str) -> None:
@@ -540,9 +535,8 @@ class Button(Channel):
 
         _mod_add = self.get_module_address("Button")
         _chn_num = self._num - self._module.calc_channel_offset(_mod_add)
-        cls = commandRegistry.get_command(code, self._module.get_type())
-        msg = cls(_mod_add)
-        msg.leds = [_chn_num]
+        msg = _command_message(code, self._module, _mod_add)
+        setattr(msg, "leds", [_chn_num])
         await self._writer(msg)
         await self.update({"led_state": state})
 
@@ -551,15 +545,14 @@ class Button(Channel):
         _mod_add = self.get_module_address("Button")
         _chn_num = self._num - self._module.calc_channel_offset(_mod_add)
         # send the just pressed
-        cls = commandRegistry.get_command(0x00, self._module.get_type())
-        msg = cls(_mod_add)
-        msg.closed = [_chn_num]
+        msg = _command_message(0x00, self._module, _mod_add)
+        setattr(msg, "closed", [_chn_num])
         await self._writer(msg)
         # wait
         await asyncio.sleep(0.3)
         # send the just released
-        msg = cls(_mod_add)
-        msg.opened = [_chn_num]
+        msg = _command_message(0x00, self._module, _mod_add)
+        setattr(msg, "opened", [_chn_num])
         await self._writer(msg)
 
 
@@ -572,11 +565,11 @@ class ButtonCounter(Button):
     """
 
     _Unit: str | None = None
-    _pulses = None
-    _counter = None
-    _delay = None
-    _power = None
-    _energy = None
+    _pulses: int | None = None
+    _counter: int | None = None
+    _delay: int | None = None
+    _power: int | None = None
+    _energy: float | None = None
 
     def get_categories(self) -> list[str]:
         """Return the categories for this channel."""
@@ -646,7 +639,7 @@ class ButtonCounter(Button):
             return round((1000 * 1000 * 3600) / (self._delay * self._pulses), 2)
         return round(0, 2)
 
-    def get_state(self) -> int:
+    def get_state(self) -> float:
         """Return the current state of the counter."""
         if self._energy is not None:
             return self._energy
@@ -679,7 +672,7 @@ class ButtonCounter(Button):
         """
         if self._power is not None:
             return self._power
-        return self._rate_from_pulse_interval()
+        return int(self._rate_from_pulse_interval())
 
     def get_counter_unit(self) -> str:
         """Return the unit of the counter."""
@@ -734,7 +727,7 @@ class Dimmer(Channel):
         writer: Callable[[Message], Awaitable[None]],
         address: int,
         slider_scale: int = 100,
-    ):
+    ) -> None:
         """Initialize the dimmer channel."""
         super().__init__(module, num, name, nameEditable, subDevice, writer, address)
 
@@ -756,32 +749,30 @@ class Dimmer(Channel):
 
     async def set_dimmer_state(self, slider: int, transitiontime: int = 0) -> None:
         """Set dimmer to slider."""
-        cls = commandRegistry.get_command(0x07, self._module.get_type())
-        msg = cls(self._address)
-        msg.dimmer_state = int(slider * self.slider_scale / 100)
-        msg.dimmer_transitiontime = int(transitiontime)
-        msg.dimmer_channels = [self._num]
+        msg = _command_message(0x07, self._module, self._address)
+        setattr(msg, "dimmer_state", int(slider * self.slider_scale / 100))
+        setattr(msg, "dimmer_transitiontime", int(transitiontime))
+        setattr(msg, "dimmer_channels", [self._num])
         await self._writer(msg)
 
     async def restore_dimmer_state(self, transitiontime: int = 0) -> None:
         """Restore dimmer to last known state."""
-        cls = commandRegistry.get_command(0x11, self._module.get_type())
-        msg = cls(self._address)
+        msg = _command_message(0x11, self._module, self._address)
         if self.slider_scale == 254 and transitiontime == 0:
             # New dimmers treat the trailing bytes as fade mode / unchanged (0x00, 0xFF).
             transitiontime = 0x00FF
-        msg.dimmer_transitiontime = int(transitiontime)
-        msg.dimmer_channels = [self._num]
+        setattr(msg, "dimmer_transitiontime", int(transitiontime))
+        setattr(msg, "dimmer_channels", [self._num])
         await self._writer(msg)
 
 
 class Temperature(Channel):
     """A Temperature sensor channel."""
 
-    _cur = 0
-    _cur_precision = None
-    _max = None
-    _min = None
+    _cur: float = 0
+    _cur_precision: float | None = None
+    _max: float | None = None
+    _min: float | None = None
     _target = 0
     _cmode: str | None = None
     _cool_mode: str | None = None
@@ -807,7 +798,7 @@ class Temperature(Channel):
         """Return the current state of the temperature sensor."""
         return round(float(self._cur), 2)
 
-    def get_sensor_type(self):
+    def get_sensor_type(self) -> str:
         """Return the sensor type."""
         return "temperature"
 
@@ -815,19 +806,19 @@ class Temperature(Channel):
         """Return if this channel is a temperature sensor."""
         return True
 
-    def get_max(self) -> int | None:
+    def get_max(self) -> float | None:
         """Return the maximum temperature recorded."""
         if self._max is None:
             return None
         return round(self._max, 2)
 
-    def get_min(self) -> int | None:
+    def get_min(self) -> float | None:
         """Return the minimum temperature recorded."""
         if self._min is None:
             return None
         return round(self._min, 2)
 
-    def get_climate_target(self) -> int:
+    def get_climate_target(self) -> float:
         """Return the target temperature."""
         return round(self._target, 2)
 
@@ -845,9 +836,8 @@ class Temperature(Channel):
 
     async def set_temp(self, temp: float) -> None:
         """Set the target temperature."""
-        cls = commandRegistry.get_command(0xE4, self._module.get_type())
-        msg = cls(self._address)
-        msg.temp = temp
+        msg = _command_message(0xE4, self._module, self._address)
+        setattr(msg, "temp", temp)
         await self._writer(msg)
 
     async def set_temperature_autosend(
@@ -879,14 +869,11 @@ class Temperature(Channel):
                 f"Unknown temperature autosend mode: {mode!r} "
                 "(expected 'never', 'on_change' or 'interval')"
             )
-        cls = commandRegistry.get_command(0xE5, self._module.get_type())
-        msg = cls(self._address, interval)
+        msg = _command_message(0xE5, self._module, self._address, interval)
         await self._writer(msg)
 
-    def get_temp_settings(self):
+    def get_temp_settings(self) -> TemperatureSettings | None:
         """Return the module temperature settings helper, if available."""
-        if self._module is None:
-            return None
         return self._module.get_temp_settings()
 
     async def refresh_temp_settings(self, *, force: bool = True) -> dict[str, Any]:
@@ -943,8 +930,7 @@ class Temperature(Channel):
             sleep = self._sleep_timer
         else:
             sleep = 0x0
-        cls = commandRegistry.get_command(code, self._module.get_type())
-        msg = cls(self._address, sleep)
+        msg = _command_message(code, self._module, self._address, sleep)
         await self._writer(msg)
 
     async def set_preset(self, preset: str) -> None:
@@ -960,8 +946,7 @@ class Temperature(Channel):
     async def set_mode(self, mode: str) -> None:
         """Set the heat/cool mode."""
         code = 0xDF if mode == "cool" else 0xE0  # 0xE0 = heat
-        cls = commandRegistry.get_command(code, self._module.get_type())
-        msg = cls(self._address)
+        msg = _command_message(code, self._module, self._address)
         await self._writer(msg)
 
     async def maybe_update_temperature(self, new_temp: float, precision: float) -> None:
@@ -1004,9 +989,9 @@ class Temperature(Channel):
 class SensorNumber(Channel):
     """A Numeric Sensor channel."""
 
-    _cur = 0
-    _unit = None
-    _sensor_type = None
+    _cur: float = 0
+    _unit: str | None = None
+    _sensor_type: str | None = None
 
     def get_categories(self) -> list[str]:
         """Return the categories for this channel."""
@@ -1016,7 +1001,7 @@ class SensorNumber(Channel):
         """Return the device class for this channel."""
         return
 
-    def get_unit(self) -> None:
+    def get_unit(self) -> str | None:
         """Return the unit of measurement for this channel."""
         return self._unit
 
@@ -1079,46 +1064,41 @@ class Relay(Channel):
 
     async def turn_on(self) -> None:
         """Send the turn on message."""
-        cls = commandRegistry.get_command(0x02, self._module.get_type())
-        msg = cls(self._address)
-        msg.relay_channels = [self._num]
+        msg = _command_message(0x02, self._module, self._address)
+        setattr(msg, "relay_channels", [self._num])
         await self._writer(msg)
 
     async def turn_off(self) -> None:
         """Send the turn off message."""
-        cls = commandRegistry.get_command(0x01, self._module.get_type())
-        msg = cls(self._address)
-        msg.relay_channels = [self._num]
+        msg = _command_message(0x01, self._module, self._address)
+        setattr(msg, "relay_channels", [self._num])
         await self._writer(msg)
 
     async def set_forced_on(self, state: bool) -> None:
         """Set or cancel forced on."""
         code = 0x14 if state else 0x15
-        cls = commandRegistry.get_command(code, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
+        msg = _command_message(code, self._module, self._address)
+        setattr(msg, "channel", self._num)
         if state:
-            msg.delay_time = 0xFFFFFF  # Permanent
+            setattr(msg, "delay_time", 0xFFFFFF)  # Permanent
         await self._writer(msg)
 
     async def set_forced_off(self, state: bool) -> None:
         """Set or cancel forced off."""
         code = 0x12 if state else 0x13
-        cls = commandRegistry.get_command(code, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
+        msg = _command_message(code, self._module, self._address)
+        setattr(msg, "channel", self._num)
         if state:
-            msg.delay_time = 0xFFFFFF  # Permanent
+            setattr(msg, "delay_time", 0xFFFFFF)  # Permanent
         await self._writer(msg)
 
     async def set_inhibit(self, state: bool) -> None:
         """Set or cancel inhibit."""
         code = 0x16 if state else 0x17
-        cls = commandRegistry.get_command(code, self._module.get_type())
-        msg = cls(self._address)
-        msg.channel = self._num
+        msg = _command_message(code, self._module, self._address)
+        setattr(msg, "channel", self._num)
         if state:
-            msg.delay_time = 0xFFFFFF  # Permanent
+            setattr(msg, "delay_time", 0xFFFFFF)  # Permanent
         await self._writer(msg)
 
     async def set_name_persistent(self, name: str) -> None:
@@ -1231,7 +1211,13 @@ class EdgeLit(Channel):
         """Return the categories for this channel."""
         return ["light"]
 
-    async def reset_color(self, left=True, top=True, right=True, bottom=True):
+    async def reset_color(
+        self,
+        left: bool = True,
+        top: bool = True,
+        right: bool = True,
+        bottom: bool = True,
+    ) -> None:
         """Send the edgelit color message."""
         msg = SetEdgeColorMessage(self._address)
         msg.apply_background_color = True
@@ -1246,12 +1232,12 @@ class EdgeLit(Channel):
     async def set_color(
         self,
         color_idx: int,
-        left=True,
-        top=True,
-        right=True,
-        bottom=True,
-        blinking=False,
-        priority=CustomColorPriority.LOW_PRIORITY,
+        left: bool = True,
+        top: bool = True,
+        right: bool = True,
+        bottom: bool = True,
+        blinking: bool = False,
+        priority: CustomColorPriority = CustomColorPriority.LOW_PRIORITY,
     ) -> None:
         """Send the set color message."""
 
@@ -1273,10 +1259,10 @@ class EdgeLit(Channel):
         green: int,
         blue: int,
         white: int,
-        left=False,
-        top=False,
-        right=False,
-        bottom=False,
+        left: bool = False,
+        top: bool = False,
+        right: bool = False,
+        bottom: bool = False,
     ) -> None:
         """Set RGBW color for specific edges using a dedicated palette index per side."""
         # Mapping sides to palette indices

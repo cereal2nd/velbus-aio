@@ -1,6 +1,6 @@
 -e .
 bumpver
-
+mypy>=1.14
 pre-commit
 pytest
 pytest-asyncio

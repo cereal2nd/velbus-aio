@@ -7,6 +7,7 @@ import json
 from typing import TYPE_CHECKING, Any
 
 from velbusaio.actions import iter_action_options
+from velbusaio.channels import Button, Relay
 
 if TYPE_CHECKING:
     from velbusaio.module import Module
@@ -212,17 +213,18 @@ async def get_module_instance_data(
             "name": channel.get_name(),
             "type": type(channel).__name__,
         }
-        if (
-            hasattr(channel, "supports_channel_enable")
-            and channel.supports_channel_enable()
-        ):
+        if isinstance(channel, Button) and channel.supports_channel_enable():
             entry["enabled"] = await channel.get_channel_enabled(refresh=refresh)
         elif hasattr(channel, "is_enabled"):
             entry["enabled"] = channel.is_enabled()
         table = (
             channel.get_action_table() if hasattr(channel, "get_action_table") else None
         )
-        if table is not None and table.noc_address is not None:
+        if (
+            isinstance(channel, Relay)
+            and table is not None
+            and table.noc_address is not None
+        ):
             normal_closed = await channel.get_normal_closed(refresh=refresh)
             if normal_closed is not None:
                 entry["contact"] = "NC" if normal_closed else "NO"

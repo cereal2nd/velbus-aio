@@ -26,6 +26,10 @@ jobs:
           pip install pytest-asyncio
       - name: Install package
         run: pip install .
+      - name: Typecheck velbusaio (strict)
+        run: |
+          pip install "mypy>=1.14"
+          mypy velbusaio
       - uses: pre-commit/action@v3.0.1
       - name: Run testcases
         run: pytest

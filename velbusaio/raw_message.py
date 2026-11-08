@@ -58,7 +58,7 @@ class RawMessage(NamedTuple):
         return (
             f"RawMessage(priority={self.priority:02x}, address={self.address:02x},"
             f" rtr={self.rtr!r}, command={self.command},"
-            f" data={binascii.hexlify(self.data, ' ')})"
+            f" data={binascii.hexlify(self.data, ' ').decode()})"
         )
 
 
@@ -97,7 +97,8 @@ def _parse(rawmessage: bytearray) -> tuple[RawMessage | None, bytearray]:
     priority = rawmessage[1]
     if priority not in PRIORITIES:
         raise ParseError(
-            f"Invalid priority byte: {priority:02x} in {binascii.hexlify(rawmessage)}"
+            f"Invalid priority byte: {priority:02x} in "
+            f"{binascii.hexlify(rawmessage).decode()}"
         )
 
     address = rawmessage[2]
@@ -112,7 +113,7 @@ def _parse(rawmessage: bytearray) -> tuple[RawMessage | None, bytearray]:
         )  # the full package is not available in the current buffer
 
     if rawmessage[HEADER_LENGTH + data_size + 1] != END_BYTE:
-        raise ParseError(f"Invalid end byte in {binascii.hexlify(rawmessage)}")
+        raise ParseError(f"Invalid end byte in {binascii.hexlify(rawmessage).decode()}")
 
     checksum = rawmessage[HEADER_LENGTH + data_size]
 
@@ -121,7 +122,7 @@ def _parse(rawmessage: bytearray) -> tuple[RawMessage | None, bytearray]:
     if calculated_checksum != checksum:
         raise ParseError(
             f"Invalid checksum: expected {calculated_checksum:02x},"
-            f" but got {checksum:02x} in {binascii.hexlify(rawmessage)}"
+            f" but got {checksum:02x} in {binascii.hexlify(rawmessage).decode()}"
         )
 
     data = bytes(rawmessage[HEADER_LENGTH : HEADER_LENGTH + data_size])

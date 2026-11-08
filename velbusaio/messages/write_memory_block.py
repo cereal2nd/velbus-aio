@@ -22,6 +22,6 @@ class WriteMemoryBlockMessage(DeclarativeMessage):
     low_address = ByteField(1)
     data = RawTailField(2, default=b"")
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes([COMMAND_CODE, self.high_address, self.low_address, *self.data])

@@ -21,7 +21,7 @@ class MemoTextMessage(DeclarativeMessage):
     name = StringField(2)
     memo_text = Field(default="", serializable=False)
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         memo_text = self.memo_text
         while len(memo_text) < 5:

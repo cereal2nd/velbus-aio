@@ -12,6 +12,7 @@ import re
 import ssl
 import time
 import typing as t
+from typing import cast
 from urllib.parse import urlparse
 
 import anyio
@@ -21,6 +22,7 @@ from velbusaio.channels import (
     Blind,
     Button,
     ButtonCounter,
+    Channel,
     Dimmer,
     Relay,
     SensorNumber,
@@ -51,7 +53,7 @@ class ScheduledTask:
     name: str
     callback: Callable[[], Awaitable[None]]
     interval_seconds: float
-    _task: asyncio.Task | None = None
+    _task: asyncio.Task[None] | None = None
     _running: bool = False
 
     async def _run_loop(self) -> None:
@@ -96,10 +98,10 @@ class Velbus:
         self._auto_reconnect = True
 
         self._destination = dsn
-        self._send_queue: asyncio.Queue = asyncio.Queue()
+        self._send_queue: asyncio.Queue[RawMessage] = asyncio.Queue()
         self._connected_event: asyncio.Event = asyncio.Event()
         self._protocol: VelbusProtocol | None = None
-        self._send_task: asyncio.Task | None = None
+        self._send_task: asyncio.Task[None] | None = None
         self._handler = PacketHandler(self, one_address)
         self._modules: dict[int, Module] = {}
         self._submodules: list[int] = []
@@ -111,7 +113,7 @@ class Velbus:
         self._on_module_found_callbacks: list[
             t.Callable[[Module], Awaitable[None]]
         ] = []
-        self._background_tasks: set[asyncio.Task] = set()
+        self._background_tasks: set[asyncio.Task[object]] = set()
         self._scheduled_tasks: dict[str, ScheduledTask] = {}
         self._scheduler_log = logging.getLogger("velbus-scheduler")
         self._memory_coordinator = MemoryAccessCoordinator(self)
@@ -121,7 +123,7 @@ class Velbus:
         """Return the shared memory access coordinator."""
         return self._memory_coordinator
 
-    def add_background_task(self, task: asyncio.Task) -> None:
+    def add_background_task(self, task: asyncio.Task[object]) -> None:
         """Keep a background task referenced until it completes."""
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
@@ -132,7 +134,7 @@ class Velbus:
         return self._memory_coordinator.prefetch_in_progress
 
     @staticmethod
-    def _calculate_queue_sleep_time(msg_info, send_time):
+    def _calculate_queue_sleep_time(msg_info: RawMessage, send_time: float) -> float:
         """Calculate the sleep time needed after sending a message to Velbus."""
         sleep_time = SLEEP_TIME
 
@@ -150,18 +152,18 @@ class Velbus:
     async def _send_loop(self) -> None:
         """Outbound queue loop that dispatches messages when connected."""
         self._log.debug("Starting Velbus send loop")
-        while not self._closing:
+        while not self._is_closing():
             try:
                 await self._connected_event.wait()
-                if self._closing:
+                if self._is_closing():
                     break
 
                 msg_info: RawMessage = await self._send_queue.get()
                 try:
                     message_sent = False
-                    while not message_sent and not self._closing:
+                    while not message_sent and not self._is_closing():
                         await self._connected_event.wait()
-                        if self._closing:
+                        if self._is_closing():
                             break
 
                         if not (
@@ -174,7 +176,7 @@ class Velbus:
                         await self._protocol.wait_can_write()
 
                         # Re-verify connection and closing state after wait_can_write
-                        if self._closing or not (
+                        if self._is_closing() or not (
                             self._is_connected
                             and self._protocol
                             and self._protocol.is_connected
@@ -188,7 +190,7 @@ class Velbus:
                             sleep_time = self._calculate_queue_sleep_time(
                                 msg_info, send_time
                             )
-                            if sleep_time > 0 and not self._closing:
+                            if sleep_time > 0 and not self._is_closing():
                                 await asyncio.sleep(sleep_time)
                 finally:
                     self._send_queue.task_done()
@@ -296,7 +298,7 @@ class Velbus:
         addr: int,
         typ: int,
         serial: int | str | None = None,
-        memorymap: int | None = None,
+        memorymap: int | str | None = None,
         build_year: int | None = None,
         build_week: int | None = None,
     ) -> None:
@@ -328,7 +330,7 @@ class Velbus:
         """Check if an address is a submodule."""
         return addr in self._submodules
 
-    def get_modules(self) -> dict:
+    def get_modules(self) -> dict[int, Module]:
         """Return the module cache."""
         return self._modules
 
@@ -341,11 +343,15 @@ class Velbus:
                 return module
         return None
 
-    def get_channels(self, addr: int) -> None | dict:
+    def get_channels(self, addr: int) -> dict[int, Channel] | None:
         """Get the channels for an address."""
         if addr in self._modules:
             return (self._modules[addr]).get_channels()
         return None
+
+    def _is_closing(self) -> bool:
+        """Return whether the controller is shutting down."""
+        return self._closing
 
     async def stop(self) -> None:
         """Stop the controller."""
@@ -356,11 +362,11 @@ class Velbus:
             self._send_task.cancel()
         self._memory_coordinator.cancel_prefetch()
         # Stop all scheduled tasks
-        for task in self._scheduled_tasks.values():
-            task.stop()
-        for task in list(self._background_tasks):
-            if not task.done():
-                task.cancel()
+        for scheduled in self._scheduled_tasks.values():
+            scheduled.stop()
+        for bg_task in list(self._background_tasks):
+            if not bg_task.done():
+                bg_task.cancel()
         if self._background_tasks:
             await asyncio.gather(*list(self._background_tasks), return_exceptions=True)
         self._background_tasks.clear()
@@ -389,7 +395,7 @@ class Velbus:
         if self._send_task is None or self._send_task.done():
             self._send_task = asyncio.create_task(self._send_loop())
         await self._handler.read_protocol_data()
-        if self._closing:
+        if self._is_closing():
             return
         # connect to the bus
         destination = self._destination
@@ -419,16 +425,17 @@ class Velbus:
             try:
                 (
                     _transport,
-                    self._protocol,
+                    tcp_protocol,
                 ) = await asyncio.get_running_loop().create_connection(
                     self.__protocol_factory,
                     host=parts.hostname,
                     port=parts.port,
                     ssl=ctx,
                 )
+                self._protocol = tcp_protocol
             except (ConnectionRefusedError, OSError) as err:
                 raise VelbusConnectionFailed from err
-            if self._closing:
+            if self._is_closing():
                 if self._protocol:
                     self._protocol.close()
                 return
@@ -437,12 +444,12 @@ class Velbus:
 
         # serial and serialx-backed schemes (e.g. /dev/..., esphome://...)
         try:
-            (
-                _serial_transport,
-                self._protocol,
-            ) = await serialx.create_serial_connection(
+            serial_factory = cast(
+                "t.Callable[[], asyncio.Protocol]", self.__protocol_factory
+            )
+            _serial_transport, serial_protocol = await serialx.create_serial_connection(
                 asyncio.get_running_loop(),
-                self.__protocol_factory,
+                serial_factory,
                 url=destination,
                 baudrate=38400,
                 byte_size=serialx.EIGHTBITS,
@@ -451,9 +458,10 @@ class Velbus:
                 xonxoff=False,
                 rtscts=True,
             )
+            self._protocol = cast("VelbusProtocol", serial_protocol)
         except (FileNotFoundError, serialx.SerialException) as err:
             raise VelbusConnectionFailed from err
-        if self._closing:
+        if self._is_closing():
             if self._protocol:
                 self._protocol.close()
             return
@@ -470,11 +478,19 @@ class Velbus:
             await vlp.read()
             for mod_data in vlp.get():
                 # Convert hex address string to decimal integer
+                module_type = mod_data.get_type()
+                if module_type is None:
+                    self._log.warning(
+                        "Skipping VLP module at %s: unknown type %s",
+                        mod_data.get_addr(),
+                        mod_data.get_build(),
+                    )
+                    continue
                 addr = mod_data.get_addr().split(",")
                 decimal_addr = int(addr[0], 16)
                 await self.add_module(
                     decimal_addr,
-                    mod_data.get_type(),
+                    module_type,
                     serial=mod_data.get_serial(),
                     memorymap=mod_data.get_memory(),
                     build_year=int(mod_data.get_build()[0:2]),
@@ -590,11 +606,15 @@ class Velbus:
                 param for param in channel.get_config_parameters() if param.entity
             )
         seen: set[tuple[int, int | None, str]] = set()
-        for channel in self.get_all_temp_config():
-            for param in channel.get_config_parameters():
+        for temp_channel in self.get_all_temp_config():
+            for param in temp_channel.get_config_parameters():
                 if not param.entity:
                     continue
-                key = (channel.get_module_address(), param.channel, param.key)
+                key = (
+                    temp_channel.get_module_address(),
+                    param.channel,
+                    param.key,
+                )
                 if key in seen:
                     continue
                 seen.add(key)

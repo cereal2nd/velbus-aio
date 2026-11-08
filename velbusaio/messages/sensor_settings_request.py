@@ -21,6 +21,6 @@ class SensorSettingsRequestMessage(DeclarativeMessage):
     _data_length = 0
     _generates_data_to_binary = False
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         return bytes([])

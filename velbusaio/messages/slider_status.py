@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ByteField, ChannelField, DeclarativeMessage
 
@@ -23,6 +25,6 @@ class SliderStatusMessage(DeclarativeMessage):
     slider_state = ByteField(1)
     slider_long_pressed = ByteField(2)
 
-    def cur_slider_state(self):
+    def cur_slider_state(self) -> int:
         """:return: int"""
-        return self.slider_state
+        return cast("int", self.slider_state)

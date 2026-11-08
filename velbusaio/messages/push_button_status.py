@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 
@@ -23,6 +25,6 @@ class PushButtonStatusMessage(DeclarativeMessage):
     opened = ChannelsField(1)
     closed_long = ChannelsField(2)
 
-    def get_channels(self):
+    def get_channels(self) -> list[int]:
         """:return: list"""
-        return self.closed + self.opened
+        return cast("list[int]", self.closed) + cast("list[int]", self.opened)

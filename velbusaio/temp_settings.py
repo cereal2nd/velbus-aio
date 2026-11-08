@@ -251,6 +251,12 @@ class TemperatureSettings:
         await self._write_part(part)
 
     async def _write_part(self, part: int) -> None:
+        msg: (
+            TempSensorSettingsPart1
+            | TempSensorSettingsPart2
+            | TempSensorSettingsPart3
+            | TempSensorSettingsPart4
+        )
         if part == 1:
             msg = TempSensorSettingsPart1(self.module_address)
             for name in _PART1_FIELDS:
@@ -333,7 +339,7 @@ def infer_temp_settings_layout(module_data: dict[str, Any]) -> str:
     """Infer classic vs GP settings layout from the module type."""
     explicit = module_data.get("TempSettingsLayout")
     if explicit in ("classic", "gp"):
-        return explicit
+        return str(explicit)
     module_type = str(module_data.get("Type", "")).upper()
     if module_type in {"VMB1TS", "VMB1TC", "VMB1TCW"}:
         return "classic"

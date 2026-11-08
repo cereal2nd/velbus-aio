@@ -26,7 +26,7 @@ class PsuValuesMessage(DeclarativeMessage):
     volt = ComputedField(parser=lambda data: (data[3] << 8 | data[4]) / 1000, default=0)
     amp = ComputedField(parser=lambda data: (data[5] << 8 | data[6]) / 1000, default=0)
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         watt = int(round(self.watt * 1000))
         volt = int(round(self.volt * 1000))

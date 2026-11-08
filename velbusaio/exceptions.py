@@ -9,7 +9,7 @@ class VelbusException(Exception):
         Exception.__init__(self)
         self.value = value
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return the exception as a string."""
         return repr(self.value)
 

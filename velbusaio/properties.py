@@ -9,8 +9,9 @@ from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING
 
 from velbusaio.baseItem import BaseItem
-from velbusaio.command_registry import commandRegistry
+from velbusaio.command_registry import commandRegistry, instantiate_command
 from velbusaio.message import Message
+from velbusaio.messages.memo_text import MemoTextMessage
 from velbusaio.messages.module_status import PROGRAM_SELECTION
 
 if TYPE_CHECKING:
@@ -88,15 +89,16 @@ class MemoText(Property):
 
     async def set(self, txt: str) -> None:
         """Set the memo text."""
-        cls = commandRegistry.get_command(0xAC, self._module.get_type())
-        msg = cls(self.get_module_address())
+        if not commandRegistry.has_command(0xAC, self._module.get_type()):
+            raise RuntimeError("Memo text is not supported on this module type")
+        msg = MemoTextMessage(self.get_module_address())
         msgcntr = 0
         for char in txt:
             msg.memo_text += char
             if len(msg.memo_text) >= 5:
                 msgcntr += 5
                 await self._writer(msg)
-                msg = cls(self.get_module_address())
+                msg = MemoTextMessage(self.get_module_address())
                 msg.start = msgcntr
         if msg.memo_text:
             await self._writer(msg)
@@ -120,7 +122,7 @@ class SelectedProgram(Property):
         """Return the device class for this property."""
         return
 
-    def get_options(self) -> list:
+    def get_options(self) -> list[str]:
         """Return the available program options for this property."""
         return list(PROGRAM_SELECTION.values())
 
@@ -130,11 +132,12 @@ class SelectedProgram(Property):
 
     async def set_selected_program(self, program_str: str) -> None:
         """Set the currently selected program."""
-        command_code = 0xB3
-        cls = commandRegistry.get_command(command_code, self._module.get_type())
+        command_class = commandRegistry.get_command(0xB3, self._module.get_type())
+        if command_class is None:
+            raise RuntimeError("Program selection is not supported on this module type")
         index = list(PROGRAM_SELECTION.values()).index(program_str)
         program = list(PROGRAM_SELECTION.keys())[index]
-        msg = cls(self.get_module_address(), program)
+        msg = instantiate_command(command_class, self.get_module_address(), program)
         await self._writer(msg)
         await self.update({"selected_program_str": program_str})
 

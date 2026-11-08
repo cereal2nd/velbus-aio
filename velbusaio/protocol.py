@@ -124,7 +124,7 @@ class VelbusProtocol(asyncio.BufferedProtocol):
         self._log.debug(
             "RX: {nbytes} bytes: {data_hex}".format(
                 nbytes=len(data),
-                data_hex=binascii.hexlify(self._serial_buf[: len(data)], " "),
+                data_hex=binascii.hexlify(self._serial_buf[: len(data)], " ").decode(),
             )
         )
         _recheck = True

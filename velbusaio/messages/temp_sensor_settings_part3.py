@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from velbusaio.command_registry import register
 from velbusaio.message import Message
 from velbusaio.message_fields import (
@@ -17,12 +19,27 @@ from velbusaio.message_fields import (
 COMMAND_CODE = 0xC6
 
 
-def _optional_byte(index: int, default: int = 0):
+def _parse_optional_byte(data: bytes, index: int, default: int) -> int:
+    return data[index] if len(data) > index else default
+
+
+def _serialize_optional_byte(value: int) -> bytes:
+    return bytes([value & 0xFF])
+
+
+def _make_optional_byte_parser(index: int, default: int) -> Callable[[bytes], int]:
+    def parser(data: bytes) -> int:
+        return _parse_optional_byte(data, index, default)
+
+    return parser
+
+
+def _optional_byte(index: int, default: int = 0) -> Field:
     return Field(
         byte_index=index,
         default=default,
-        parser=lambda data, i=index, d=default: data[i] if len(data) > i else d,
-        serializer=lambda value: bytes([int(value) & 0xFF]),
+        parser=_make_optional_byte_parser(index, default),
+        serializer=_serialize_optional_byte,
     )
 
 

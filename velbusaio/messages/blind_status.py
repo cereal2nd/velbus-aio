@@ -34,7 +34,7 @@ class BlindStatusNgMessage(DeclarativeMessage):
     status = ByteField(2)
     position = ByteField(4, default=None)
 
-    def to_json(self):
+    def to_json(self) -> str:
         """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
@@ -45,22 +45,22 @@ class BlindStatusNgMessage(DeclarativeMessage):
 
     def is_moving_up(self) -> bool:
         """Is moving up."""
-        return self.status == 0x01
+        return bool(self.status == 0x01)
 
     def is_moving_down(self) -> bool:
         """Is moving down."""
-        return self.status == 0x02
+        return bool(self.status == 0x02)
 
     def is_stopped(self) -> bool:
         """Is stopped."""
-        return self.status == 0x00
+        return bool(self.status == 0x00)
 
 
 @register(COMMAND_CODE)
 class BlindStatusNg20Message(BlindStatusNgMessage):
     """Blind Status NG20 message."""
 
-    def __init__(self, address=None):
+    def __init__(self, address: int | None = None) -> None:
         """Initialize BlindStatusNg20Message class."""
         Message.__init__(self)
         self.channel = (1, 2)
@@ -69,7 +69,7 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         self.position = None
         self.set_defaults(address)
 
-    def populate(self, priority, address, rtr, data):
+    def populate(self, priority: int, address: int, rtr: bool, data: bytes) -> None:
         """Populate message fields."""
         self.needs_low_priority(priority)
         self.needs_no_rtr(rtr)
@@ -81,7 +81,7 @@ class BlindStatusNg20Message(BlindStatusNgMessage):
         self.status = (channel1_status, channel2_status)
         self.position = (data[1], data[2])
 
-    def to_json(self):
+    def to_json(self) -> str:
         """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
@@ -103,7 +103,7 @@ class BlindStatusMessage(DeclarativeMessage):
     timeout = ByteField(1)
     status = BlindStatusField(2)
 
-    def to_json(self):
+    def to_json(self) -> str:
         """To json."""
         json_dict = self.to_json_basic()
         json_dict["channel"] = self.channel
@@ -113,12 +113,12 @@ class BlindStatusMessage(DeclarativeMessage):
 
     def is_moving_up(self) -> bool:
         """Is moving up."""
-        return self.status == 0x01
+        return bool(self.status == 0x01)
 
     def is_moving_down(self) -> bool:
         """Is moving down."""
-        return self.status == 0x02
+        return bool(self.status == 0x02)
 
     def is_stopped(self) -> bool:
         """Is stopped."""
-        return self.status == 0x00
+        return bool(self.status == 0x00)

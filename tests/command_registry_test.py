@@ -282,6 +282,22 @@ class TestCommandRegistryGetCommand:
         registry._register_override(0x15, OverrideCommand, 0x01)
         assert registry.get_command(0x15, 0x02) is None
 
+    def test_get_command_or_raise_returns_class(self, test_module_directory):
+        """get_command_or_raise returns the registered message class."""
+        registry = CommandRegistry(test_module_directory)
+
+        class TestCommand:
+            pass
+
+        registry._register_override(0x20, TestCommand, 0x01)
+        assert registry.get_command_or_raise(0x20, 0x01) is TestCommand
+
+    def test_get_command_or_raise_missing_raises(self, test_module_directory):
+        """get_command_or_raise raises when no command is registered."""
+        registry = CommandRegistry(test_module_directory)
+        with pytest.raises(CommandRegistryError):
+            registry.get_command_or_raise(0x99, 0x01)
+
 
 class TestRegisterDecorator:
     """Test register decorator function."""

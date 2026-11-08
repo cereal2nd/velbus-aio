@@ -43,7 +43,7 @@ class SetEdgeColorMessage(DeclarativeMessage):
         default=CustomColorPriority.LOW_PRIORITY, serializable=False
     )
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         byte_2 = (
             (0x80 if self.custom_color_palette else 0x00)
@@ -78,7 +78,7 @@ class SetCustomColorMessage(DeclarativeMessage):
     green = Field(default=0, serializable=False)
     blue = Field(default=0, serializable=False)
 
-    def data_to_binary(self):
+    def data_to_binary(self) -> bytes:
         """:return: bytes"""
         byte_3 = (0x80 if self.white_mode else 0x00) | (self.saturation & 0x7F)
         return bytes(

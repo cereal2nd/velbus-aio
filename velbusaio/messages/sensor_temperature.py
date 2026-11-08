@@ -5,6 +5,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 from velbusaio.command_registry import register
 from velbusaio.message_fields import DeclarativeMessage, TemperatureField
 
@@ -24,14 +26,14 @@ class SensorTemperatureMessage(DeclarativeMessage):
     min = TemperatureField(2)
     max = TemperatureField(4)
 
-    def getCurTemp(self):
+    def getCurTemp(self) -> float:
         """Get current temperature."""
-        return self.cur
+        return cast("float", self.cur)
 
-    def getMaxTemp(self):
+    def getMaxTemp(self) -> float:
         """Get maximum temperature."""
-        return self.max
+        return cast("float", self.max)
 
-    def getMinTemp(self):
+    def getMinTemp(self) -> float:
         """Get minimum temperature."""
-        return self.min
+        return cast("float", self.min)

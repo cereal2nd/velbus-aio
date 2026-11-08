@@ -54,8 +54,8 @@ class SetDimmerMessage2(SetDimmerMessage):
 
     dimmer_channels = ChannelIndexField(0)
 
-    def channels_to_byte(self, channels) -> int:
+    def channels_to_byte(self, channels: list[int]) -> int:
         """Channels to byte."""
         if len(channels) != 1:
             raise ValueError("We should have exact one channel")
-        return channels[0]
+        return int(channels[0])

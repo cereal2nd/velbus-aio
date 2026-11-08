@@ -32,7 +32,9 @@ def h2(inp: int) -> str:
     return format(inp, "02x").upper()
 
 
-def handle_match(match_dict: dict[str, dict[str, dict[str, Any]]], data: int) -> dict:
+def handle_match(
+    match_dict: dict[str, dict[str, dict[str, Any]]], data: int
+) -> dict[int, dict[str, Any]]:
     """Handle memory match from the module data."""
     match_result = {}
     binary_data = f"{int(data):08b}"
