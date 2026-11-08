@@ -46,20 +46,12 @@ class BlindStatusNgMessage(BlindMovementMixin, DeclarativeMessage):
     _command_code = COMMAND_CODE
     _data_length = 7
     _generates_data_to_binary = False
+    _generates_to_json = True
 
     channel = ChannelField(0)
     timeout = ByteField(1)
-    status = ByteField(2)
+    status = ByteField(2, json_map=DSTATUS)
     position = ByteField(4, default=None)
-
-    def to_json(self) -> str:
-        """To json."""
-        json_dict = self.to_json_basic()
-        json_dict["channel"] = self.channel
-        json_dict["timeout"] = self.timeout
-        json_dict["position"] = self.position
-        json_dict["status"] = DSTATUS[self.status]
-        return json.dumps(json_dict)
 
 
 @register(COMMAND_CODE)
@@ -104,15 +96,8 @@ class BlindStatusMessage(BlindMovementMixin, DeclarativeMessage):
     _command_code = COMMAND_CODE
     _data_length = 7
     _generates_data_to_binary = False
+    _generates_to_json = True
 
     channel = BlindChannelField(0)
     timeout = ByteField(1)
-    status = BlindStatusField(2)
-
-    def to_json(self) -> str:
-        """To json."""
-        json_dict = self.to_json_basic()
-        json_dict["channel"] = self.channel
-        json_dict["timeout"] = self.timeout
-        json_dict["status"] = DSTATUS[self.status]
-        return json.dumps(json_dict)
+    status = BlindStatusField(2, json_map=DSTATUS)

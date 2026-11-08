@@ -5,8 +5,7 @@
 
 from __future__ import annotations
 
-import json
-from typing import Any, cast
+from typing import cast
 
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
@@ -30,16 +29,17 @@ class TempSensorStatusMessage(DeclarativeMessage):
     _priority = None
     _data_length = 7
     _generates_data_to_binary = False
+    _generates_to_json = True
 
     local_control = BitField(0, 0x01, default=0, serializable=False)
-    status_mode = BitField(0, 0x06, default=0, serializable=False)
+    status_mode = BitField(0, 0x06, default=0, serializable=False, json_map=DSTATUS)
     status_str = ComputedField(
         parser=lambda data: DSTATUS[data[0] & 0x06],
         default="run",
         serializable=False,
     )
     auto_send = BitField(0, 0x08, default=0, serializable=False)
-    mode = BitField(0, 0x70, default=0, serializable=False)
+    mode = BitField(0, 0x70, default=0, serializable=False, json_map=DMODE)
     mode_str = ComputedField(
         parser=lambda data: DMODE[data[0] & 0x70],
         default="safe",
@@ -71,24 +71,3 @@ class TempSensorStatusMessage(DeclarativeMessage):
     def getCurTemp(self) -> float | None:
         """Get current temperature."""
         return cast("float | None", self.current_temp)
-
-    def to_json(self) -> str:
-        """:return: str"""
-        json_dict: dict[str, Any] = self.to_json_basic()
-        json_dict["local_control"] = self.local_control
-        json_dict["status_mode"] = DSTATUS[self.status_mode]
-        json_dict["auto_send"] = self.auto_send
-        json_dict["mode"] = DMODE[self.mode]
-        json_dict["cool_mode"] = self.cool_mode
-        json_dict["heater"] = self.heater
-        json_dict["boost"] = self.boost
-        json_dict["pump"] = self.pump
-        json_dict["cooler"] = self.cooler
-        json_dict["alarm1"] = self.alarm1
-        json_dict["alarm2"] = self.alarm2
-        json_dict["alarm3"] = self.alarm3
-        json_dict["alarm4"] = self.alarm4
-        json_dict["current_temp"] = self.current_temp
-        json_dict["target_temp"] = self.target_temp
-        json_dict["sleep_timer"] = self.sleep_timer
-        return json.dumps(json_dict)
