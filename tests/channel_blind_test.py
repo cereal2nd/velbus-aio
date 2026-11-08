@@ -5,6 +5,10 @@ from unittest.mock import Mock, patch
 import pytest
 
 from velbusaio.channels import Blind
+from velbusaio.command_registry import commandRegistry
+
+VMB1BL = 0x03
+VMB2BLE_10 = 0x4A
 
 
 class TestBlind:
@@ -86,14 +90,25 @@ class TestBlind:
         blind = Blind(mock_module, 1, "Blind", False, True, mock_writer, 0x01)
         assert blind.is_open() is None
 
-    @pytest.mark.asyncio
-    async def test_support_position(self, mock_module, mock_writer):
-        """Test checking if position is supported."""
+    def test_support_position_vmb2ble_without_reported_position(
+        self, mock_module, mock_writer
+    ):
+        """NG blind modules expose position support before status arrives."""
+        commandRegistry.register_module_commands(
+            VMB2BLE_10, {"1C": "CoverPosMessage"}
+        )
+        mock_module.get_type.return_value = VMB2BLE_10
+        blind = Blind(mock_module, 1, "Blind", False, True, mock_writer, 0x01)
+        assert blind.support_position()
+
+    def test_support_position_vmb1bl(self, mock_module, mock_writer):
+        """Legacy blind modules without 0x1C do not support position."""
+        commandRegistry.register_module_commands(
+            VMB1BL, {"EC": "BlindStatusMessage"}
+        )
+        mock_module.get_type.return_value = VMB1BL
         blind = Blind(mock_module, 1, "Blind", False, True, mock_writer, 0x01)
         assert not blind.support_position()
-
-        await blind.update({"position": 50})
-        assert blind.support_position()
 
     @pytest.mark.asyncio
     async def test_open(self, mock_module, mock_writer):

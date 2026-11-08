@@ -71,6 +71,7 @@ from velbusaio.messages.clear_led import ClearLedMessage
 from velbusaio.messages.counter_status import CounterStatusMessage
 from velbusaio.messages.counter_status_request import CounterStatusRequestMessage
 from velbusaio.messages.counter_value import CounterValueMessage
+from velbusaio.messages.cover_position import CoverPosMessage
 from velbusaio.messages.dali_device_settings import (
     DaliDeviceSettingMsg,
     DeviceType as DaliDeviceType,
@@ -621,6 +622,7 @@ class Module:
             BlindStatusNgMessage: self._handle_blind_status_ng,
             BlindStatusNg20Message: self._handle_blind_status_ng20,
             BlindStatusMessage: self._handle_blind_status,
+            CoverPosMessage: self._handle_cover_position,
             # Sensor messages
             MeteoRawMessage: self._handle_meteo_raw,
             SensorRawMessage: self._handle_sensor_raw,
@@ -1014,6 +1016,11 @@ class Module:
         """Handle blind status messages."""
         channel = self._translate_channel_name(message.channel)
         await self._update_channel(channel, {"state": message.status})
+
+    async def _handle_cover_position(self, message: CoverPosMessage) -> None:
+        """Handle cover position messages."""
+        channel = self._translate_channel_name(message.channel)
+        await self._update_channel(channel, {"position": message.position})
 
     async def _handle_meteo_raw(self, message: MeteoRawMessage) -> None:
         """Handle meteo raw messages."""

@@ -364,10 +364,8 @@ class Blind(Channel):
         return self._position == 0
 
     def support_position(self) -> bool:
-        """Return if position reporting is supported."""
-        # position will be populated after the first BlindStatusNgMessage (during module load)
-        # For VMBxBL modules, position will remain None and not be overwritten
-        return self._position is not None
+        """Return if the blind supports position get/set (module command 0x1C)."""
+        return commandRegistry.has_command(0x1C, self._module.get_type())
 
     async def open(self) -> None:
         """Open the blind."""
