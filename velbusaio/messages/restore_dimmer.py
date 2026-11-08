@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.binary import parse_dimmer_transition, serialize_dimmer_transition
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
     ByteField,
@@ -15,14 +16,6 @@ from velbusaio.message_fields import (
 )
 
 COMMAND_CODE = 0x11
-
-
-def _parse_transition(data: bytes) -> int:
-    return int.from_bytes(data[2:4], byteorder="big", signed=False)
-
-
-def _serialize_transition(value: int) -> bytes:
-    return value.to_bytes(2, byteorder="big", signed=False)
 
 
 @register(COMMAND_CODE)
@@ -40,8 +33,8 @@ class RestoreDimmerMessage(DeclarativeMessage):
     _padding = ByteField(1, default=0)
     dimmer_transitiontime = Field(
         default=0,
-        parser=_parse_transition,
-        serializer=_serialize_transition,
+        parser=parse_dimmer_transition,
+        serializer=serialize_dimmer_transition,
     )
 
 
