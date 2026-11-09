@@ -109,8 +109,8 @@ class BaseItem(ABC):
         """Get the category of this property."""
 
     @abstractmethod
-    def get_sensor_type(self) -> str | None:
-        """Get the sensor type of this property."""
+    def get_sensor_types(self) -> list[str]:
+        """Return integrator sensor keys (one per entity) for this item."""
 
     @abstractmethod
     def is_sub_device(self) -> bool:

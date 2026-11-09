@@ -50,9 +50,9 @@ class Temperature(Channel):
         """Return the current state of the temperature sensor."""
         return round(float(self._cur), 2)
 
-    def get_sensor_type(self) -> str:
-        """Return the sensor type."""
-        return "temperature"
+    def get_sensor_types(self) -> list[str]:
+        """Return the temperature sensor key."""
+        return ["temperature"]
 
     def is_temperature(self) -> bool:
         """Return if this channel is a temperature sensor."""

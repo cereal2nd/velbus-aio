@@ -28,6 +28,6 @@ class SensorNumber(Channel):
         """Return the current state of the temperature sensor."""
         return round(self._cur, 2)
 
-    def get_sensor_type(self) -> str | None:
-        """Return the sensor type."""
-        return self._sensor_type
+    def get_sensor_types(self) -> list[str]:
+        """Numeric sensors map to the generic measurement entity (VLP: ``_sensor_type``)."""
+        return ["measurement"]

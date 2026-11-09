@@ -193,9 +193,9 @@ class Channel(BaseItem):
         """Simulate a press action on this channel."""
         raise NotImplementedError
 
-    def get_sensor_type(self) -> str | None:
-        """Return the sensor type."""
-        return None
+    def get_sensor_types(self) -> list[str]:
+        """Return integrator sensor keys for this channel."""
+        return []
 
     @property
     def energy(self) -> float | None:

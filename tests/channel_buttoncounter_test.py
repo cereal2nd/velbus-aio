@@ -69,16 +69,16 @@ class TestButtonCounter:
         await button.update({"long": False})
         assert not button.is_long_pressed()
 
-    def test_get_sensor_type_counter(self, mock_module, mock_writer):
-        """Test getting sensor type for counter."""
+    def test_get_sensor_types_counter_modes(self, mock_module, mock_writer):
+        """Counters expose entity keys only when in counter mode."""
         button = ButtonCounter(
             mock_module, 1, "Counter", False, True, mock_writer, 0x01
         )
-        button._counter = True
-        assert button.get_sensor_type() == "counter"
+        button._counter = 100
+        assert button.get_sensor_types() == ["power", "energy"]
 
-        button._counter = False
-        assert button.get_sensor_type() is None
+        button._counter = None
+        assert button.get_sensor_types() == []
 
     def test_get_state_with_energy(self, mock_module, mock_writer):
         """Test getting state with energy value."""
@@ -352,6 +352,40 @@ class TestButtonCounter:
         button._pulses = 10
         button._Unit = VOLUME_LITERS_HOUR
         assert button.energy is None
+
+    def test_get_sensor_types_not_counter_channel(self, mock_module, mock_writer):
+        """Button mode returns no sensor types."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        assert button.get_sensor_types() == []
+
+    def test_get_sensor_types_gas(self, mock_module, mock_writer):
+        """Gas counter exposes flow and gas entity keys."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._counter = 1
+        button._Unit = VOLUME_CUBIC_METER_HOUR
+        assert button.get_sensor_types() == ["flow", "gas"]
+
+    def test_get_sensor_types_water(self, mock_module, mock_writer):
+        """Water counter exposes flow and water entity keys."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._counter = 1
+        button._Unit = VOLUME_LITERS_HOUR
+        assert button.get_sensor_types() == ["flow", "water"]
+
+    def test_get_sensor_types_electricity(self, mock_module, mock_writer):
+        """Electricity counter exposes power and energy entity keys."""
+        button = ButtonCounter(
+            mock_module, 1, "Counter", False, True, mock_writer, 0x01
+        )
+        button._counter = 1
+        button._Unit = ENERGY_KILO_WATT_HOUR
+        assert button.get_sensor_types() == ["power", "energy"]
 
 
 # Sensor Tests

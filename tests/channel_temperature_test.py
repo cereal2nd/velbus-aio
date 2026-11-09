@@ -40,10 +40,10 @@ class TestTemperature:
         await temp.update({"cur": 21.5})
         assert temp.get_state() == 21.5
 
-    def test_get_sensor_type(self, mock_module, mock_writer):
-        """Test getting sensor type."""
+    def test_get_sensor_types(self, mock_module, mock_writer):
+        """Test getting sensor types."""
         temp = Temperature(mock_module, 1, "Temp", False, True, mock_writer, 0x01)
-        assert temp.get_sensor_type() == "temperature"
+        assert temp.get_sensor_types() == ["temperature"]
 
     def test_is_temperature(self, mock_module, mock_writer):
         """Test checking if channel is temperature."""

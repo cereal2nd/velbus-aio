@@ -41,12 +41,14 @@ class Property(BaseItem):
         """
         return ["sensor"]
 
-    def get_sensor_type(self) -> str:
-        """Get the sensor type of this property.
+    def get_sensor_types(self) -> list[str]:
+        """Return integrator sensor keys for this property.
 
         Override in subclass if needed.
         """
-        return type(self).__name__
+        if "sensor" not in self.get_categories():
+            return []
+        return ["measurement"]
 
     def get_property_key(self) -> str:
         """Return a stable, type-unique key for use in unique_id generation."""
@@ -67,17 +69,33 @@ class PSUPower(Property):
         """Return the current state of the PSU power."""
         return round(self._cur, 2)
 
+    def get_sensor_types(self) -> list[str]:
+        """Return the PSU power sensor key."""
+        return ["power"]
+
 
 class PSUVoltage(PSUPower):
     """PSU Voltage property."""
+
+    def get_sensor_types(self) -> list[str]:
+        """Return the PSU voltage sensor key."""
+        return ["voltage"]
 
 
 class PSUCurrent(PSUPower):
     """PSU Current property."""
 
+    def get_sensor_types(self) -> list[str]:
+        """Return the PSU current sensor key."""
+        return ["current"]
+
 
 class PSULoad(PSUPower):
     """PSU Load property."""
+
+    def get_sensor_types(self) -> list[str]:
+        """Return the PSU load sensor key."""
+        return ["load"]
 
 
 class MemoText(Property):

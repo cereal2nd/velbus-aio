@@ -33,11 +33,12 @@ class TestSensorNumber:
         assert sensor.get_state() == 42.75
 
     @pytest.mark.asyncio
-    async def test_get_sensor_type(self, mock_module, mock_writer):
-        """Test getting sensor type."""
+    async def test_get_sensor_types(self, mock_module, mock_writer):
+        """Integrator key is measurement; VLP type is stored separately."""
         sensor = SensorNumber(mock_module, 1, "Sensor", False, True, mock_writer, 0x01)
         await sensor.update({"sensor_type": "humidity"})
-        assert sensor.get_sensor_type() == "humidity"
+        assert sensor._sensor_type == "humidity"
+        assert sensor.get_sensor_types() == ["measurement"]
 
 
 # LightSensor Tests

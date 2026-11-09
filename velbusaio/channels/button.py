@@ -204,11 +204,15 @@ class ButtonCounter(Button):
             or self._energy is not None
         )
 
-    def get_sensor_type(self) -> str | None:
-        """Return the sensor type."""
-        if self._counter:
-            return "counter"
-        return None
+    def get_sensor_types(self) -> list[str]:
+        """Return flow/gas, flow/water, or power/energy keys for counter channels."""
+        if not self.is_counter_channel():
+            return []
+        if self.is_gas():
+            return ["flow", "gas"]
+        if self.is_water():
+            return ["flow", "water"]
+        return ["power", "energy"]
 
     @property
     def energy(self) -> float | None:
