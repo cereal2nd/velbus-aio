@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import datetime
 import itertools
 import logging
+import pathlib
 import re
 import ssl
 import time
@@ -112,6 +113,9 @@ class Velbus:
         self._on_disconnect_callbacks: list[t.Callable[[], Awaitable[None]]] = []
         self._on_module_found_callbacks: list[
             t.Callable[[Module], Awaitable[None]]
+        ] = []
+        self._on_scan_complete_callbacks: list[
+            t.Callable[[set[int]], Awaitable[None]]
         ] = []
         self._background_tasks: set[asyncio.Task[object]] = set()
         self._scheduled_tasks: dict[str, ScheduledTask] = {}
@@ -231,10 +235,47 @@ class Velbus:
         """Remove a previously registered on module found coroutine."""
         self._on_module_found_callbacks.remove(meth)
 
+    def add_scan_complete_callback(
+        self, meth: t.Callable[[set[int]], Awaitable[None]]
+    ) -> None:
+        """Register a coroutine called after a full bus module scan.
+
+        The callback receives ``found_addresses``: module addresses (1–254)
+        that returned a module-type response during that scan. This is not
+        invoked after single-address scans (``one_address`` mode).
+        """
+        self._on_scan_complete_callbacks.append(meth)
+
+    def remove_scan_complete_callback(
+        self, meth: t.Callable[[set[int]], Awaitable[None]]
+    ) -> None:
+        """Remove a previously registered scan-complete coroutine."""
+        self._on_scan_complete_callbacks.remove(meth)
+
     async def _on_modules_loaded(self, module: Module) -> None:
         """Called when all modules are loaded."""
         for callback in self._on_module_found_callbacks:
             await callback(module)
+
+    async def notify_scan_complete(self, found_addresses: set[int]) -> None:
+        """Notify listeners that a full bus scan finished."""
+        for callback in self._on_scan_complete_callbacks:
+            await callback(found_addresses)
+
+    async def remove_stale_module(self, address: int) -> None:
+        """Drop a module that did not respond during a full bus scan."""
+        module = self._modules.pop(address, None)
+        if module is None:
+            return
+        for sub_addr in module.get_addresses():
+            if sub_addr == address:
+                continue
+            if sub_addr in self._submodules:
+                self._submodules.remove(sub_addr)
+        cache_file = pathlib.Path(self._cache_dir) / f"{address}.json"
+        if await anyio.Path(cache_file).is_file():
+            await anyio.Path(cache_file).unlink()
+        self._log.info("Removed stale module at address %s (%#02x)", address, address)
 
     @property
     def connected(self) -> bool:
@@ -509,6 +550,7 @@ class Velbus:
                     module = self._modules[decimal_addr]
                     await module.load_from_vlp(mod_data)
                     await module.wait_for_status_messages()
+            await self.notify_scan_complete(set(self._modules.keys()))
         else:
             # scan the bus
             await self._handler.scan()

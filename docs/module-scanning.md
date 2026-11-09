@@ -11,6 +11,26 @@ objects with channels, properties and names.
 | `Velbus.scan()`      | `velbusaio/controller.py` | `PacketHandler.scan(reload_cache=True)` — forces per-address cache deletion.                                                                |
 | `PacketHandler.scan` | `velbusaio/handler.py`    | The full bus discovery routine.                                                                                                             |
 
+## Scan-complete callback (integrators)
+
+After a **full** address-range scan (`PacketHandler.scan` with `one_address` unset),
+`Velbus` invokes registered `add_scan_complete_callback` coroutines once with
+`found_addresses: set[int]` — every address in the scan range that returned a
+module-type (0xFF) response.
+
+For each address in the scanned range **without** a type response, any cached
+module at that address is removed from `_modules`, its `{cache_dir}/{addr}.json`
+file is deleted, and submodule bookkeeping on the controller is updated.
+
+| Mode                                          | `scan_complete` callbacks              | Prune absent modules |
+| --------------------------------------------- | -------------------------------------- | -------------------- |
+| Full scan (`start()` / `scan()` default)      | Yes                                    | Yes                  |
+| Single-address (`Velbus(..., one_address=N)`) | No                                     | No                   |
+| VLP import (`vlp_file` on `start()`)          | Yes, once with loaded module addresses | No bus scan          |
+
+Register with `add_scan_complete_callback` / `remove_scan_complete_callback`
+on `Velbus` (same pattern as `add_module_found_callback`).
+
 ## The three phases
 
 ```mermaid

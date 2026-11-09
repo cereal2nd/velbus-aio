@@ -217,9 +217,29 @@ class PacketHandler:
                         f"Module {address} ({address:#02x}) did not respond to info requests after successful type request"
                     )
 
+            await self._finalize_full_scan(
+                start_address, max_address, self.__scan_found_addresses
+            )
             self._scan_complete = True
             total_time = time.perf_counter() - start_time
             self._log.info(f"Module scan completed in {total_time:.2f} seconds")
+
+    async def _finalize_full_scan(
+        self,
+        start_address: int,
+        max_address: int,
+        found_map: dict[int, ModuleTypeMessage | None],
+    ) -> None:
+        """Prune absent modules and notify scan-complete listeners."""
+        if self._one_address is not None:
+            return
+        found_addresses = {
+            address for address, msg in found_map.items() if msg is not None
+        }
+        for address in range(start_address, max_address):
+            if found_map.get(address) is None:
+                await self._velbus.remove_stale_module(address)
+        await self._velbus.notify_scan_complete(found_addresses)
 
     async def __handle_module_type_response_async(self, rawmsg: RawMessage) -> None:
         """Handle a received module type response packet."""
