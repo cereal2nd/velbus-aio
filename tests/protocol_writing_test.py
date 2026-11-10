@@ -140,6 +140,37 @@ class TestVelbusProtocolWriting:
         await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
 
     @pytest.mark.asyncio
+    async def test_send_loop_does_not_spin_when_event_stale(self):
+        """Send loop must yield when protocol is down but _connected_event is still set."""
+        velbus = Velbus("")
+        mock_protocol = Mock()
+        mock_protocol.is_connected = False
+        mock_protocol.wait_can_write = AsyncMock()
+        velbus._protocol = mock_protocol
+        velbus._is_connected = True
+        velbus._connected_event.set()
+
+        disconnect_done = asyncio.Event()
+
+        async def on_disconnect() -> None:
+            disconnect_done.set()
+
+        velbus.add_disconnect_callback(on_disconnect)
+
+        velbus._send_task = asyncio.create_task(velbus._send_loop())
+        mock_msg = Mock()
+        mock_msg.rtr = False
+        mock_msg.command = 0x01
+        await velbus._send_queue.put(mock_msg)
+
+        disconnect_task = asyncio.create_task(velbus._on_connection_state(False))
+        await asyncio.wait_for(disconnect_done.wait(), timeout=1.0)
+        await disconnect_task
+
+        assert not velbus._connected_event.is_set()
+        await velbus.stop()
+
+    @pytest.mark.asyncio
     async def test_send_loop_retry_on_disconnect(self):
         """Test that send loop retries sending a message if connection drops before sending."""
         velbus = Velbus("")

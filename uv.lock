@@ -605,7 +605,7 @@ wheels = [
 
 [[package]]
 name = "velbus-aio"
-version = "2026.11.0"
+version = "2026.11.2"
 source = { editable = "." }
 dependencies = [
     { name = "anyio" },

@@ -175,6 +175,10 @@ class Velbus:
                             and self._protocol
                             and self._protocol.is_connected
                         ):
+                            # Event can still be set while disconnect runs in a task;
+                            # clear it so wait() blocks instead of starving the loop.
+                            self._connected_event.clear()
+                            await asyncio.sleep(0)
                             continue
 
                         await self._protocol.wait_can_write()
@@ -185,6 +189,9 @@ class Velbus:
                             and self._protocol
                             and self._protocol.is_connected
                         ):
+                            if not self._is_closing():
+                                self._connected_event.clear()
+                            await asyncio.sleep(0)
                             continue
 
                         start_time = time.monotonic()
@@ -416,6 +423,7 @@ class Velbus:
 
     def _on_disconnect(self, exc: Exception | None) -> None:
         """Handle protocol disconnect callback synchronously from protocol."""
+        self._connected_event.clear()
         task = asyncio.ensure_future(self._on_connection_state(False))
         self.add_background_task(task)
 
