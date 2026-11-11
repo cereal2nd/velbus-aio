@@ -203,6 +203,9 @@ class Velbus:
                             )
                             if sleep_time > 0 and not self._is_closing():
                                 await asyncio.sleep(sleep_time)
+                        elif not self._is_closing():
+                            self._connected_event.clear()
+                            await asyncio.sleep(0)
                 finally:
                     self._send_queue.task_done()
             except asyncio.CancelledError:
@@ -423,6 +426,7 @@ class Velbus:
 
     def _on_disconnect(self, exc: Exception | None) -> None:
         """Handle protocol disconnect callback synchronously from protocol."""
+        self._is_connected = False
         self._connected_event.clear()
         task = asyncio.ensure_future(self._on_connection_state(False))
         self.add_background_task(task)
