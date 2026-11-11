@@ -174,6 +174,14 @@ class LightValue(Property):
         """Return the current light sensor value."""
         return round(self._cur, 2)
 
+    def get_sensor_types(self) -> list[str]:
+        """Return the illuminance sensor key."""
+        return ["illuminance"]
+
+    def get_unit(self) -> str | None:
+        """Return the unit for the light sensor (lux)."""
+        return "lx"
+
 
 class BusErrorTx(Property):
     """Bus Error Transmit property."""
@@ -188,6 +196,10 @@ class BusErrorTx(Property):
     def get_state(self) -> float:
         """Return the current Bus Error Transmit count."""
         return float(self._cur)
+
+    def get_sensor_types(self) -> list[str]:
+        """Return the Velbus bus error counter sensor key."""
+        return ["bus_error"]
 
 
 class BusErrorRx(BusErrorTx):

@@ -140,6 +140,20 @@ class TestVelbusProtocolWriting:
         await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
 
     @pytest.mark.asyncio
+    async def test_on_disconnect_clears_connected_state_sync(self):
+        """connection_lost must drop connected flag before async disconnect work runs."""
+        velbus = Velbus("")
+        velbus._is_connected = True
+        velbus._connected_event.set()
+
+        velbus._on_disconnect(None)
+
+        assert not velbus._is_connected
+        assert not velbus._connected_event.is_set()
+        await asyncio.sleep(0)
+        await velbus.stop()
+
+    @pytest.mark.asyncio
     async def test_send_loop_does_not_spin_when_event_stale(self):
         """Send loop must yield when protocol is down but _connected_event is still set."""
         velbus = Velbus("")

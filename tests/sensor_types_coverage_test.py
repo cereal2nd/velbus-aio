@@ -40,7 +40,7 @@ class TestSensorCategoryItems:
             ),
             (
                 lambda m, w: LightValue(m, "Lux", w),
-                ["measurement"],
+                ["illuminance"],
             ),
             (
                 lambda m, w: PSUVoltage(m, "V", w),
@@ -60,15 +60,15 @@ class TestSensorCategoryItems:
             ),
             (
                 lambda m, w: BusErrorTx(m, "Tx", w),
-                ["measurement"],
+                ["bus_error"],
             ),
             (
                 lambda m, w: BusErrorRx(m, "Rx", w),
-                ["measurement"],
+                ["bus_error"],
             ),
             (
                 lambda m, w: BusErrorOff(m, "Off", w),
-                ["measurement"],
+                ["bus_error"],
             ),
         ],
     )

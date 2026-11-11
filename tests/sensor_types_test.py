@@ -23,9 +23,10 @@ class TestSensorTypes:
         assert channel.get_sensor_types() == ["temperature"]
 
     def test_light_value_types(self, mock_module, mock_writer):
-        """Light sensors use the measurement key."""
+        """Light sensors use the illuminance key."""
         prop = LightValue(mock_module, "Light", mock_writer)
-        assert prop.get_sensor_types() == ["measurement"]
+        assert prop.get_sensor_types() == ["illuminance"]
+        assert prop.get_unit() == "lx"
 
     def test_psu_voltage_types(self, mock_module, mock_writer):
         prop = PSUVoltage(mock_module, "V", mock_writer)
