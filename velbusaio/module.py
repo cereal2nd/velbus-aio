@@ -27,7 +27,6 @@ from velbusaio.config import decode_name, encode_name
 from velbusaio.const import PRIORITY_LOW, SCAN_MODULEINFO_TIMEOUT_INITIAL
 from velbusaio.helpers import h2
 from velbusaio.memory import MemoryBackend
-from velbusaio.memory_prefetch import MemoryAccessCoordinator
 from velbusaio.message import Message
 from velbusaio.messages.channel_name_request import (
     COMMAND_CODE as CHANNEL_NAME_REQUEST_COMMAND_CODE,
@@ -133,7 +132,6 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
         self.loaded = False
         self._use_cache = True
         self._loaded_cache: dict[str, Any] = {}
-        self._panel_metadata_ready = False
         # serialize cache writes for this module to avoid concurrent
         # coroutines interleaving writes to the same file
         self._cache_lock = asyncio.Lock()
@@ -209,14 +207,7 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
 
         # set some params from the velbus controller
         self._writer = writer
-        get_coordinator = getattr(controller, "get_memory_access_coordinator", None)
-        access_coordinator = get_coordinator() if get_coordinator else None
-        self._memory = MemoryBackend(
-            self._address,
-            writer,
-            self._log,
-            access_coordinator=access_coordinator,
-        )
+        self._memory = MemoryBackend(self._address, writer, self._log)
         if self._memory_map_outdated:
             self._memory.block_writes(
                 f"module build {self.get_build()} predates the memory map from "
@@ -368,6 +359,22 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
             return self._name
         return ""
 
+    def set_manager_display_name(self, name: str) -> None:
+        """Set the module name from a Signum Manager actor snapshot."""
+        self._name = name
+
+    async def apply_manager_channel_update(
+        self, channel: int, updates: dict[str, Any]
+    ) -> None:
+        """Apply Signum Manager property deltas to a channel."""
+        await self._update_channel(channel, updates)
+
+    async def apply_manager_property_update(
+        self, property_name: str, updates: dict[str, Any]
+    ) -> None:
+        """Apply Signum Manager property deltas to a module property."""
+        await self._update_property(property_name, updates)
+
     def get_sw_version(self) -> str:
         """Get the module software version."""
         return f"{self.build_year}.{self.build_week}"
@@ -452,7 +459,6 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
 
     def invalidate_config_memory_cache(self) -> None:
         """Drop EEPROM and decoded config-panel caches for this module."""
-        self._panel_metadata_ready = False
         if self._memory is not None:
             self._memory.invalidate()
         cleared_shared: set[int] = set()
@@ -463,44 +469,6 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
                 shared.slots = None
                 cleared_shared.add(id(shared))
 
-    def is_panel_metadata_ready(self) -> bool:
-        """Return True when panel metadata EEPROM is in the shadow cache."""
-        return self._panel_metadata_ready
-
-    def _needs_panel_metadata_cache(self) -> bool:
-        memory_spec = self._data.get("Memory", {})
-        has_noc = any(
-            table.noc_address is not None for table in self._action_tables.values()
-        )
-        return bool(memory_spec.get("ChannelEnable") or has_noc)
-
-    async def ensure_panel_metadata_cache(self) -> None:
-        """Load enable/contact EEPROM for module/get without action tables."""
-        if self._panel_metadata_ready:
-            return
-        if self._memory is None or not self._needs_panel_metadata_cache():
-            self._panel_metadata_ready = True
-            return
-
-        enable_spec = self._data.get("Memory", {}).get("ChannelEnable")
-        if enable_spec:
-            for address in enable_spec.get("channels", {}).values():
-                await self._memory.read_byte(int(str(address), 16), use_cache=True)
-
-        for table in self._action_tables.values():
-            if table.noc_address is not None:
-                await table.load_noc()
-        self._panel_metadata_ready = True
-
-    async def ensure_action_table_cache(self, channel: int) -> None:
-        """Load one channel's action table into the shadow cache."""
-        table = self.get_action_table(channel)
-        if table is None or table.loaded:
-            return
-        if table.decode_from_cache():
-            return
-        await table.load(force=False)
-
     async def get_channel_actions(
         self,
         channel: int,
@@ -509,42 +477,10 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
         include_empty: bool = False,
     ) -> list[ActionSlot]:
         """Return action-table slots for the config panel."""
-        if refresh:
-            table = self.get_action_table(channel)
-            if table is None:
-                return []
-            return await table.get_actions(refresh=True, include_empty=include_empty)
-        await self.ensure_action_table_cache(channel)
         table = self.get_action_table(channel)
         if table is None:
             return []
-        return await table.get_actions(refresh=False, include_empty=include_empty)
-
-    async def prefetch_config_memory(
-        self, coordinator: MemoryAccessCoordinator
-    ) -> None:
-        """Prefetch panel-relevant EEPROM into the in-process cache."""
-        if self._memory is None:
-            self._panel_metadata_ready = True
-            return
-        seen_shared_banks: set[int] = set()
-        for table in self._action_tables.values():
-            await coordinator.wait_prefetch_allowed()
-            if table.layout == "shared" and table.bank in seen_shared_banks:
-                await table.load_noc(prefetch=True)
-                continue
-            if table.layout == "shared":
-                seen_shared_banks.add(table.bank)
-            await table.load(force=False, prefetch=True)
-
-        enable_spec = self._data.get("Memory", {}).get("ChannelEnable")
-        if enable_spec:
-            for address in enable_spec.get("channels", {}).values():
-                await coordinator.wait_prefetch_allowed()
-                await self._memory.read_byte(
-                    int(str(address), 16), use_cache=True, prefetch=True
-                )
-        self._panel_metadata_ready = True
+        return await table.get_actions(refresh=refresh, include_empty=include_empty)
 
     def _channel_name_range(self, channel: int) -> tuple[int, int] | None:
         """Return (start, length) for a channel name memory range."""
@@ -585,6 +521,10 @@ class Module(ModuleMessageHandlersMixin, ModuleScanMixin):
 
     async def set_memo_text(self, txt: str) -> None:
         """Set memo text property."""
+        backend = getattr(self._controller, "manager_backend", None)
+        if backend is not None:
+            await backend.set_memo_text(self._address, txt)
+            return
         memo_prop = self._properties.get("memo_text")
         if not isinstance(memo_prop, properties_module.MemoText):
             return

@@ -19,8 +19,7 @@ class TestVelbusStartCacheDir:
         mock_vlp.read = AsyncMock()
         mock_vlp.get.return_value = []
 
-        with patch("velbusaio.controller.VlpFile", return_value=mock_vlp):
-            velbus._memory_coordinator.schedule_prefetch = MagicMock()
+        with patch("velbusaio.bus.raw.backend.VlpFile", return_value=mock_vlp):
             await velbus.start()
 
         assert cache_dir.is_dir()

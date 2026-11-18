@@ -1,0 +1,51 @@
+{
+  "gateways": [
+    {
+      "id": "GWLOCAL",
+      "type": "velbusgateway",
+      "velbusId": "1",
+      "gatewayKey": "1",
+      "name": "LocalVelbusGateway",
+      "address": "127.0.0.1",
+      "port": 27015,
+      "hasSSL": false,
+      "isLocalGateway": true,
+      "state": "Connected"
+    }
+  ],
+  "modules": [
+    {
+      "id": "MOD1RY",
+      "type": "velbusmodule",
+      "addresses": [5, 255, 255, 255, 255],
+      "mainAddress": 5,
+      "subAddresses": [255, 255, 255, 255],
+      "name": "Relay module",
+      "moduleType": "VMB1RY",
+      "serialNumber": 12345,
+      "buildNumber": 1247,
+      "velbusType": "None",
+      "state": "Created",
+      "detected": true,
+      "thermostatAddressIdx": 0,
+      "attributes": [],
+      "channels": [
+        {
+          "id": "CHREL1",
+          "type": "velbuschannel",
+          "parentId": "MOD1RY",
+          "channelId": 1,
+          "channelType": "relay",
+          "name": "Relay 1",
+          "isVirtual": false,
+          "addressIdx": 0,
+          "state": "Created",
+          "properties": {
+            "On": false
+          }
+        }
+      ],
+      "properties": {}
+    }
+  ]
+}

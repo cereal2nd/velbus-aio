@@ -22,6 +22,22 @@ class VelbusConnectionFailed(VelbusException):
         super().__init__("Connection setup failed")
 
 
+class VelbusAuthenticationFailed(VelbusConnectionFailed):
+    """Exception when the Signum Manager rejects the access token."""
+
+    def __init__(self) -> None:
+        """Initialize the exception."""
+        VelbusException.__init__(self, "Authentication failed")
+
+
+class VelbusNotSupported(VelbusException):
+    """Exception when an operation is not available on the active backend."""
+
+    def __init__(self, feature: str = "Operation") -> None:
+        """Initialize the exception."""
+        super().__init__(f"{feature} is not supported")
+
+
 class VelbusConnectionTerminated(VelbusException):
     """Exception for connection termination."""
 

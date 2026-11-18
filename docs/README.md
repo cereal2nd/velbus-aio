@@ -9,6 +9,8 @@ talks to a Velbus home-automation bus.
 | [classes.md](./classes.md)                     | Description of the main classes and how they relate to each other.                                  |
 | [module-scanning.md](./module-scanning.md)     | How modules are discovered and built during a bus scan.                                             |
 | [message-registry.md](./message-registry.md)   | How command bytes map to message classes, and how messages parse/serialize.                         |
+| [manager.md](./manager.md)                     | Signum Manager backend: REST/WebSocket, snapshot, live updates, and command translation.            |
+| [bus.md](./bus.md)                             | Bus package overview: manager vs raw backends and `VelbusBusBackend` protocol.                      |
 
 ## Big picture
 
@@ -36,3 +38,6 @@ flowchart LR
 
 The diagrams in this folder are written in [Mermaid](https://mermaid.js.org/) so
 they render directly on GitHub and in most Markdown viewers.
+
+For **Signum Manager** (`manager://` DSN) the Velbus bus in the diagram above is
+replaced by Signum’s HTTP API and WebSocket feed; see [signum.md](./signum.md).

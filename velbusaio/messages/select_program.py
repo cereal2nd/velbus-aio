@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.command_effects import SelectProgram as SelectProgramEffect
 from velbusaio.command_registry import register
 from velbusaio.message_fields import BitField, DeclarativeMessage
 
@@ -24,3 +25,7 @@ class SelectProgramMessage(DeclarativeMessage):
         """Initialize Select Program Message Object."""
         super().__init__(address)
         self.select_program = program
+
+    def command_effect(self) -> SelectProgramEffect | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        return SelectProgramEffect(program=int(self.select_program))

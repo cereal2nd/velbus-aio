@@ -451,9 +451,7 @@ class _SharedSlotStore:
         self.slots = self._decode_slots(raw)
         return True
 
-    async def load(
-        self, *, force: bool = False, prefetch: bool = False
-    ) -> list[ActionSlot]:
+    async def load(self, *, force: bool = False) -> list[ActionSlot]:
         if self.slots is not None and not force:
             return self.slots
         if not force and self.decode_from_cache():
@@ -464,9 +462,7 @@ class _SharedSlotStore:
             self.memory.invalidate(self.bank, self.bank + length - 1)
             self.slots = None
         length = self.slot_count * self.slot_size
-        raw = await self.memory.read_bytes(
-            self.bank, length, use_cache=not force, prefetch=prefetch
-        )
+        raw = await self.memory.read_bytes(self.bank, length, use_cache=not force)
         self.slots = self._decode_slots(raw)
         return self.slots
 
@@ -593,9 +589,7 @@ class ActionTable:
             )
         return self.bank + (slot * self.slot_size)
 
-    async def load(
-        self, *, force: bool = False, prefetch: bool = False
-    ) -> list[ActionSlot]:
+    async def load(self, *, force: bool = False) -> list[ActionSlot]:
         """Read all slots from module memory."""
         if force:
             length = self.slot_count * self.slot_size
@@ -604,14 +598,12 @@ class ActionTable:
         elif self.decode_from_cache():
             return self.get_slots(include_empty=True)
         if self._shared is not None:
-            slots = await self._shared.load(force=force, prefetch=prefetch)
+            slots = await self._shared.load(force=force)
         elif self._slots is not None and not force:
             slots = self._slots
         else:
             length = self.slot_count * self.slot_size
-            raw = await self._memory.read_bytes(
-                self.bank, length, use_cache=not force, prefetch=prefetch
-            )
+            raw = await self._memory.read_bytes(self.bank, length, use_cache=not force)
             slots = []
             for slot in range(self.slot_count):
                 offset = slot * self.slot_size
@@ -628,9 +620,7 @@ class ActionTable:
             self._slots = slots
 
         if self.noc_address is not None and (force or self._normal_closed is None):
-            value = await self._memory.read_byte(
-                self.noc_address, use_cache=not force, prefetch=prefetch
-            )
+            value = await self._memory.read_byte(self.noc_address, use_cache=not force)
             self._normal_closed = value == 0x00
 
         return list(slots)
@@ -667,15 +657,13 @@ class ActionTable:
             await self.load(force=False)
         return self.get_slots(include_empty=include_empty)
 
-    async def load_noc(self, *, refresh: bool = False, prefetch: bool = False) -> None:
+    async def load_noc(self, *, refresh: bool = False) -> None:
         """Load only the NO/NC contact byte for this channel."""
         if self.noc_address is None:
             return
         if self._normal_closed is not None and not refresh:
             return
-        value = await self._memory.read_byte(
-            self.noc_address, use_cache=not refresh, prefetch=prefetch
-        )
+        value = await self._memory.read_byte(self.noc_address, use_cache=not refresh)
         self._normal_closed = value == 0x00
 
     async def get_normal_closed(self, *, refresh: bool = False) -> bool | None:

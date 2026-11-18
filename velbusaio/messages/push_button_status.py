@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import cast
 
+from velbusaio.command_effects import PressButton, first_channel
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 
@@ -28,3 +29,13 @@ class PushButtonStatusMessage(DeclarativeMessage):
     def get_channels(self) -> list[int]:
         """:return: list"""
         return cast("list[int]", self.closed) + cast("list[int]", self.opened)
+
+    def command_effect(self) -> PressButton | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        if self.opened:
+            return None
+        channels = self.closed or self.closed_long
+        channel = first_channel(channels)
+        if channel is None:
+            return None
+        return PressButton(channel=channel)

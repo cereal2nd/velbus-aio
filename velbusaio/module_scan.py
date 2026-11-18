@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, cast
 import anyio
 
 from velbusaio import channels as channels_module, properties as properties_module
+from velbusaio.bus.manager.channel_remap import remap_channel_number
 from velbusaio.channels import ButtonCounter, Dimmer
 from velbusaio.command_registry import commandRegistry, instantiate_command
 from velbusaio.const import PRIORITY_LOW
@@ -122,6 +123,26 @@ class ModuleScanMixin(ModuleMixinState):
                 await self._on_module_found(cast("Module", self))
             except (RuntimeError, ValueError, TypeError, AttributeError) as e:
                 self._log.error(f"Error in on_module_found callback: {e}")
+
+    async def load_from_manager(self, signum_channels: list[dict[str, Any]]) -> None:
+        """Initialize the module from a Signum Manager actor snapshot."""
+        self._is_loading = True
+        self._use_cache = False
+        await self._load_default_channels()
+        await self._load_properties()
+        for ch_data in signum_channels:
+            chan_num = remap_channel_number(self.get_type(), int(ch_data["channelId"]))
+            if chan_num not in self._channels:
+                continue
+            name = ch_data.get("name")
+            if isinstance(name, str) and name:
+                self._channels[chan_num].set_name(name)
+            self._channels[chan_num].set_loaded(True)
+        for chan in self._channels.values():
+            chan.set_loaded(True)
+        self.loaded = True
+        self._is_loading = False
+        await self._trigger_load_finished_callbacks()
 
     async def load_from_vlp(self, vlp_data: vlpModule) -> None:
         """Initialize the module from VLP data."""

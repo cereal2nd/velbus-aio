@@ -54,7 +54,8 @@ async def test_thermostat_operating_mode(mode, sleep_timer):
     assert m._channels[chan]._sleep_timer == sleep_timer
 
     await m._channels[chan].set_climate_mode(DSTATUS[mode])
-    msg_info = await velbus._send_queue.get()
+    assert velbus.raw_backend is not None
+    msg_info = await velbus.raw_backend.send_queue.get()
     check_sleep_timer = (msg_info.data[1] << 8) + msg_info.data[2]
     if DSTATUS[mode] == "run":
         sleep = 0x0

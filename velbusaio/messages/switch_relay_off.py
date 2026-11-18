@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from velbusaio.binary import first_channel_payload
+from velbusaio.command_effects import SetRelay, relay_command_effect
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ChannelsField, DeclarativeMessage
 
@@ -18,6 +19,10 @@ class SwitchRelayOffMessage(DeclarativeMessage):
     _data_length = 1
 
     relay_channels = ChannelsField(0)
+
+    def command_effect(self) -> SetRelay | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        return relay_command_effect(self.relay_channels, on=False)
 
 
 @register(COMMAND_CODE)

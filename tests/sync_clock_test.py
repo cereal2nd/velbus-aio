@@ -18,15 +18,16 @@ from velbusaio.messages.set_realtime_clock import SetRealtimeClock
 async def test_sync_clock_uses_passed_aware_datetime() -> None:
     """sync_clock encodes the provided timezone-aware datetime."""
     velbus = Velbus("")
-    velbus.send = AsyncMock()
+    backend_send = AsyncMock()
+    velbus._backend.send = backend_send
 
     # Friday 21 Feb 2025 13:30 in Brussels (CET, standard time, not DST)
     dt = datetime.datetime(2025, 2, 21, 13, 30, tzinfo=ZoneInfo("Europe/Brussels"))
 
     await velbus.sync_clock(dt)
 
-    assert velbus.send.await_count == 3
-    calls = [call.args[0] for call in velbus.send.await_args_list]
+    assert backend_send.await_count == 3
+    calls = [call.args[0] for call in backend_send.await_args_list]
 
     assert isinstance(calls[0], SetRealtimeClock)
     assert calls[0]._wday == 4

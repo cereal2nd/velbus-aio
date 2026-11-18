@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.command_effects import CoverMove
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
     BlindChannelField,
@@ -26,6 +27,10 @@ class CoverDownMessage(DeclarativeMessage):
 
     channel = ChannelField(0, default=0)
     delay_time = Int24Field(1)
+
+    def command_effect(self) -> CoverMove | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        return CoverMove(channel=int(self.channel), motion="close")
 
 
 @register(COMMAND_CODE)

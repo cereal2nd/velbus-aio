@@ -5,8 +5,15 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 
+from velbusaio.bus.raw.backend import RawBusBackend
 from velbusaio.controller import Velbus
 from velbusaio.protocol import VelbusProtocol
+
+
+def _raw(velbus: Velbus) -> RawBusBackend:
+    backend = velbus.raw_backend
+    assert backend is not None
+    return backend
 
 
 class TestVelbusProtocolWriting:
@@ -87,7 +94,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = False
         mock_message.command = 0x01
 
-        sleep_time = Velbus._calculate_queue_sleep_time(mock_message, 0.001)
+        sleep_time = RawBusBackend.calculate_queue_sleep_time(mock_message, 0.001)
 
         assert sleep_time > 0
 
@@ -99,7 +106,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = True
         mock_message.command = 0x01
 
-        sleep_time = Velbus._calculate_queue_sleep_time(mock_message, 0.001)
+        sleep_time = RawBusBackend.calculate_queue_sleep_time(mock_message, 0.001)
 
         assert sleep_time >= SLEEP_TIME - 0.001
 
@@ -111,7 +118,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = False
         mock_message.command = 0xEF
 
-        sleep_time = Velbus._calculate_queue_sleep_time(mock_message, 0.001)
+        sleep_time = RawBusBackend.calculate_queue_sleep_time(mock_message, 0.001)
 
         assert sleep_time >= SLEEP_TIME * 33 - 0.001
 
@@ -123,7 +130,7 @@ class TestVelbusProtocolWriting:
         mock_message.rtr = False
         mock_message.command = 0x01
 
-        sleep_time = Velbus._calculate_queue_sleep_time(
+        sleep_time = RawBusBackend.calculate_queue_sleep_time(
             mock_message, SLEEP_TIME + 1
         )
 
@@ -133,9 +140,10 @@ class TestVelbusProtocolWriting:
     async def test_wait_on_all_messages_sent_async(self):
         """Test waiting for all messages to be sent in controller."""
         velbus = Velbus("")
+        raw = _raw(velbus)
 
-        await velbus._send_queue.put(Mock())
-        velbus._send_queue.task_done()
+        await raw.send_queue.put(Mock())
+        raw.send_queue.task_done()
 
         await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
 
@@ -143,13 +151,14 @@ class TestVelbusProtocolWriting:
     async def test_on_disconnect_clears_connected_state_sync(self):
         """connection_lost must drop connected flag before async disconnect work runs."""
         velbus = Velbus("")
-        velbus._is_connected = True
-        velbus._connected_event.set()
+        raw = _raw(velbus)
+        raw._is_connected = True
+        raw._connected_event.set()
 
-        velbus._on_disconnect(None)
+        raw._on_disconnect(None)
 
-        assert not velbus._is_connected
-        assert not velbus._connected_event.is_set()
+        assert not raw._is_connected
+        assert not raw._connected_event.is_set()
         await asyncio.sleep(0)
         await velbus.stop()
 
@@ -157,12 +166,13 @@ class TestVelbusProtocolWriting:
     async def test_send_loop_does_not_spin_when_event_stale(self):
         """Send loop must yield when protocol is down but _connected_event is still set."""
         velbus = Velbus("")
+        raw = _raw(velbus)
         mock_protocol = Mock()
         mock_protocol.is_connected = False
         mock_protocol.wait_can_write = AsyncMock()
-        velbus._protocol = mock_protocol
-        velbus._is_connected = True
-        velbus._connected_event.set()
+        raw._protocol = mock_protocol
+        raw._is_connected = True
+        raw._connected_event.set()
 
         disconnect_done = asyncio.Event()
 
@@ -171,42 +181,43 @@ class TestVelbusProtocolWriting:
 
         velbus.add_disconnect_callback(on_disconnect)
 
-        velbus._send_task = asyncio.create_task(velbus._send_loop())
+        raw._send_task = asyncio.create_task(raw._send_loop())
         mock_msg = Mock()
         mock_msg.rtr = False
         mock_msg.command = 0x01
-        await velbus._send_queue.put(mock_msg)
+        await raw.send_queue.put(mock_msg)
 
         disconnect_task = asyncio.create_task(velbus._on_connection_state(False))
         await asyncio.wait_for(disconnect_done.wait(), timeout=1.0)
         await disconnect_task
 
-        assert not velbus._connected_event.is_set()
+        assert not raw._connected_event.is_set()
         await velbus.stop()
 
     @pytest.mark.asyncio
     async def test_send_loop_retry_on_disconnect(self):
         """Test that send loop retries sending a message if connection drops before sending."""
         velbus = Velbus("")
+        raw = _raw(velbus)
         mock_protocol = Mock()
         mock_protocol.is_connected = False
         mock_protocol.wait_can_write = AsyncMock()
 
-        asyncio.create_task(velbus._send_loop())
+        asyncio.create_task(raw._send_loop())
 
         mock_msg = Mock()
         mock_msg.rtr = False
         mock_msg.command = 0x01
-        await velbus._send_queue.put(mock_msg)
+        await raw.send_queue.put(mock_msg)
 
         await asyncio.sleep(0.05)
-        assert velbus._send_queue.qsize() == 1
+        assert raw.send_queue.qsize() == 1
 
-        velbus._protocol = mock_protocol
+        raw._protocol = mock_protocol
         mock_protocol.write_message.return_value = True
-        velbus._is_connected = True
+        raw._is_connected = True
         mock_protocol.is_connected = True
-        velbus._connected_event.set()
+        raw._connected_event.set()
 
         await asyncio.wait_for(velbus.wait_on_all_messages_sent_async(), timeout=1.0)
 
@@ -225,7 +236,7 @@ class TestVelbusProtocolWriting:
             await velbus.stop()
             return (Mock(), mock_protocol)
 
-        with patch("asyncio.get_running_loop") as mock_loop:
+        with patch("velbusaio.bus.raw.backend.asyncio.get_running_loop") as mock_loop:
             mock_loop.return_value.create_connection = AsyncMock(
                 side_effect=mock_create_connection
             )
@@ -245,7 +256,7 @@ class TestVelbusProtocolWriting:
         await velbus.stop()
         assert velbus._closing
 
-        with patch("asyncio.get_running_loop") as mock_loop:
+        with patch("velbusaio.bus.raw.backend.asyncio.get_running_loop") as mock_loop:
             mock_loop.return_value.create_connection = AsyncMock(
                 return_value=(Mock(), mock_protocol)
             )

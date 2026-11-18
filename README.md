@@ -38,6 +38,7 @@ The latest version of the library is published as a python package on [pypi](htt
 | (tcp://)ip:port    | 192.168.1.9:1234                 | An ip address + tcp port combination, used in combination with any velbus => tcp gateway, the tcp:// part is optional |
 | tls://ip:port      | tls://192.168.1.9:12345          | A connection to [Signum](https://www.velbus.eu/products/view/?id=458140)                                              |
 | tls://auth@ip:port | tls://iauthKey@192.168.1.9:12345 | A connection to [Signum](https://www.velbus.eu/products/view/?id=458140) with uthentication                           |
+| manager://ip:port  | manager://192.168.1.9:4201       | Signum Manager (REST + WebSocket on port 4201); optional `access_token` kwarg for remote HA                           |
 
 # Development
 

@@ -10,14 +10,11 @@ import asyncio
 from collections.abc import Awaitable, Callable
 import logging
 import struct
-from typing import TYPE_CHECKING, Final
+from typing import Final
 
 from velbusaio.const import PRIORITY_LOW, SLEEP_TIME
 from velbusaio.exceptions import VelbusMemoryTimeout, VelbusMemoryWriteBlocked
 from velbusaio.message import Message
-
-if TYPE_CHECKING:
-    from velbusaio.memory_prefetch import MemoryAccessCoordinator
 from velbusaio.messages.memory_data import MemoryDataMessage
 from velbusaio.messages.memory_data_block import MemoryDataBlockMessage
 from velbusaio.messages.read_data_block_from_memory import (
@@ -55,14 +52,12 @@ class MemoryBackend:
         logger: logging.Logger | None = None,
         *,
         timeout: float = _DEFAULT_TIMEOUT,
-        access_coordinator: MemoryAccessCoordinator | None = None,
     ) -> None:
         """Initialize the memory backend."""
         self._module_address = module_address
         self._writer = writer
         self._log = logger or logging.getLogger("velbus-memory")
         self._timeout = timeout
-        self._access_coordinator = access_coordinator
         self._cache: dict[int, int] = {}
         self._waiters: dict[int, asyncio.Future[bytes]] = {}
         self._lock = asyncio.Lock()
@@ -138,39 +133,10 @@ class MemoryBackend:
         for addr in range(len(memory_hex) // 2):
             self._cache[addr] = int(memory_hex[addr * 2 : addr * 2 + 2], 16)
 
-    async def read_byte(
-        self, address: int, *, use_cache: bool = True, prefetch: bool = False
-    ) -> int:
+    async def read_byte(self, address: int, *, use_cache: bool = True) -> int:
         """Read one memory byte."""
         if use_cache and address in self._cache:
             return self._cache[address]
-        if prefetch:
-            return await self._read_byte_prefetch(address, use_cache=use_cache)
-        return await self._read_byte_interactive(address, use_cache=use_cache)
-
-    async def _read_byte_interactive(self, address: int, *, use_cache: bool) -> int:
-        if self._access_coordinator is not None:
-            self._access_coordinator.begin_interactive()
-        try:
-            async with self._lock:
-                if use_cache and address in self._cache:
-                    return self._cache[address]
-                high, low = split_address(address)
-                msg = ReadDataFromMemoryMessage(self._module_address)
-                msg.priority = PRIORITY_LOW
-                msg.high_address = high
-                msg.low_address = low
-                data = await self._request(address, msg, expect_len=1)
-                return data[0]
-        finally:
-            if self._access_coordinator is not None:
-                self._access_coordinator.end_interactive()
-
-    async def _read_byte_prefetch(self, address: int, *, use_cache: bool) -> int:
-        if use_cache and address in self._cache:
-            return self._cache[address]
-        if self._access_coordinator is not None:
-            await self._access_coordinator.wait_prefetch_allowed()
         async with self._lock:
             if use_cache and address in self._cache:
                 return self._cache[address]
@@ -188,7 +154,6 @@ class MemoryBackend:
         length: int,
         *,
         use_cache: bool = True,
-        prefetch: bool = False,
     ) -> bytes:
         """Read a contiguous memory range, preferring 4-byte blocks."""
         if length <= 0:
@@ -196,60 +161,12 @@ class MemoryBackend:
         cached = self.get_cached_range(start, length) if use_cache else None
         if cached is not None:
             return cached
-        if prefetch:
-            return await self._read_bytes_prefetch(start, length, use_cache=use_cache)
-        return await self._read_bytes_interactive(start, length, use_cache=use_cache)
-
-    async def _read_bytes_interactive(
-        self, start: int, length: int, *, use_cache: bool
-    ) -> bytes:
-        if self._access_coordinator is not None:
-            self._access_coordinator.begin_interactive()
-        try:
-            async with self._lock:
-                if use_cache:
-                    cached = self.get_cached_range(start, length)
-                    if cached is not None:
-                        return cached
-                return await self._read_range_unlocked(
-                    start, length, use_cache=use_cache
-                )
-        finally:
-            if self._access_coordinator is not None:
-                self._access_coordinator.end_interactive()
-
-    async def _read_bytes_prefetch(
-        self, start: int, length: int, *, use_cache: bool
-    ) -> bytes:
-        out = bytearray()
-        current = start
-        end = start + length
-        while current < end:
-            remaining = end - current
-            chunk_len = _BLOCK_SIZE if remaining >= _BLOCK_SIZE else 1
+        async with self._lock:
             if use_cache:
-                cached = self.get_cached_range(current, chunk_len)
+                cached = self.get_cached_range(start, length)
                 if cached is not None:
-                    out.extend(cached)
-                    current += chunk_len
-                    continue
-            if self._access_coordinator is not None:
-                await self._access_coordinator.wait_prefetch_allowed()
-            async with self._lock:
-                if use_cache:
-                    cached = self.get_cached_range(current, chunk_len)
-                    if cached is not None:
-                        out.extend(cached)
-                        current += chunk_len
-                        continue
-                if chunk_len >= _BLOCK_SIZE:
-                    block = await self._read_block_unlocked(current)
-                    out.extend(block[:chunk_len])
-                else:
-                    out.append(await self._read_byte_unlocked(current))
-                current += chunk_len
-            await asyncio.sleep(0)
-        return bytes(out)
+                    return cached
+            return await self._read_range_unlocked(start, length, use_cache=use_cache)
 
     async def _read_range_unlocked(
         self, start: int, length: int, *, use_cache: bool = True
@@ -284,42 +201,30 @@ class MemoryBackend:
     async def write_byte(self, address: int, value: int) -> None:
         """Write one memory byte and wait for the 0xFE acknowledgement."""
         self._assert_writable()
-        if self._access_coordinator is not None:
-            self._access_coordinator.begin_interactive()
-        try:
-            async with self._lock:
-                await self._write_byte_unlocked(address, value & 0xFF)
-                await asyncio.sleep(_WRITE_BYTE_GAP)
-        finally:
-            if self._access_coordinator is not None:
-                self._access_coordinator.end_interactive()
+        async with self._lock:
+            await self._write_byte_unlocked(address, value & 0xFF)
+            await asyncio.sleep(_WRITE_BYTE_GAP)
 
     async def write_bytes(self, start: int, data: bytes) -> None:
         """Write a contiguous memory range using 4-byte blocks when possible."""
         self._assert_writable()
         if not data:
             return
-        if self._access_coordinator is not None:
-            self._access_coordinator.begin_interactive()
-        try:
-            async with self._lock:
-                current = start
-                offset = 0
-                while offset < len(data):
-                    remaining = len(data) - offset
-                    if remaining >= _BLOCK_SIZE:
-                        chunk = data[offset : offset + _BLOCK_SIZE]
-                        await self._write_block_unlocked(current, chunk)
-                        current += _BLOCK_SIZE
-                        offset += _BLOCK_SIZE
-                    else:
-                        await self._write_byte_unlocked(current, data[offset])
-                        await asyncio.sleep(_WRITE_BYTE_GAP)
-                        current += 1
-                        offset += 1
-        finally:
-            if self._access_coordinator is not None:
-                self._access_coordinator.end_interactive()
+        async with self._lock:
+            current = start
+            offset = 0
+            while offset < len(data):
+                remaining = len(data) - offset
+                if remaining >= _BLOCK_SIZE:
+                    chunk = data[offset : offset + _BLOCK_SIZE]
+                    await self._write_block_unlocked(current, chunk)
+                    current += _BLOCK_SIZE
+                    offset += _BLOCK_SIZE
+                else:
+                    await self._write_byte_unlocked(current, data[offset])
+                    await asyncio.sleep(_WRITE_BYTE_GAP)
+                    current += 1
+                    offset += 1
 
     async def _read_byte_unlocked(self, address: int) -> int:
         high, low = split_address(address)

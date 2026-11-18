@@ -204,8 +204,6 @@ async def get_module_instance_data(
     module: Module, *, refresh: bool = False
 ) -> dict[str, Any]:
     """Return live module values for the config panel."""
-    if not refresh:
-        await module.ensure_panel_metadata_cache()
     channels = module.get_channels()
     channel_data: dict[str, Any] = {}
     for channel_num, channel in channels.items():

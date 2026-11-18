@@ -9,16 +9,15 @@ import datetime
 import itertools
 import logging
 import pathlib
-import re
-import ssl
-import time
 import typing as t
-from typing import cast
 from urllib.parse import urlparse
 
+from aiohttp import ClientSession
 import anyio
-import serialx
 
+from velbusaio.bus.base import VelbusBusBackend
+from velbusaio.bus.manager.backend import ManagerBackend
+from velbusaio.bus.raw.backend import RawBusBackend
 from velbusaio.channels import (
     Blind,
     Button,
@@ -30,21 +29,14 @@ from velbusaio.channels import (
     Temperature,
 )
 from velbusaio.config import ConfigParameter
-from velbusaio.const import SLEEP_TIME
 from velbusaio.exceptions import VelbusConnectionFailed
 from velbusaio.handler import PacketHandler
 from velbusaio.helpers import get_cache_dir
-from velbusaio.memory_prefetch import MemoryAccessCoordinator
 from velbusaio.message import Message
 from velbusaio.messages.module_type_request import ModuleTypeRequestMessage
-from velbusaio.messages.set_date import SetDate
-from velbusaio.messages.set_daylight_saving import SetDaylightSaving
-from velbusaio.messages.set_realtime_clock import SetRealtimeClock
 from velbusaio.module import Module
 from velbusaio.properties import LightValue, SelectedProgram
-from velbusaio.protocol import VelbusProtocol
 from velbusaio.raw_message import RawMessage
-from velbusaio.vlp_reader import VlpFile, parse_vlp_sub_address_map
 
 
 @dataclass
@@ -92,6 +84,8 @@ class Velbus:
         cache_dir: str = get_cache_dir(),
         vlp_file: str | None = None,
         one_address: int | None = None,
+        session: ClientSession | None = None,
+        access_token: str | None = None,
     ) -> None:
         """Init the Velbus controller."""
         self._log = logging.getLogger("velbus")
@@ -99,16 +93,11 @@ class Velbus:
         self._auto_reconnect = True
 
         self._destination = dsn
-        self._send_queue: asyncio.Queue[RawMessage] = asyncio.Queue()
-        self._connected_event: asyncio.Event = asyncio.Event()
-        self._protocol: VelbusProtocol | None = None
-        self._send_task: asyncio.Task[None] | None = None
         self._handler = PacketHandler(self, one_address)
         self._modules: dict[int, Module] = {}
         self._submodules: list[int] = []
         self._vlp_file = vlp_file
         self._cache_dir: str = cache_dir
-        self._is_connected: bool = False
         self._on_connect_callbacks: list[t.Callable[[], Awaitable[None]]] = []
         self._on_disconnect_callbacks: list[t.Callable[[], Awaitable[None]]] = []
         self._on_module_found_callbacks: list[
@@ -120,99 +109,50 @@ class Velbus:
         self._background_tasks: set[asyncio.Task[object]] = set()
         self._scheduled_tasks: dict[str, ScheduledTask] = {}
         self._scheduler_log = logging.getLogger("velbus-scheduler")
-        self._memory_coordinator = MemoryAccessCoordinator(self)
         self._had_modules_before_connect = False
 
-    def get_memory_access_coordinator(self) -> MemoryAccessCoordinator:
-        """Return the shared memory access coordinator."""
-        return self._memory_coordinator
+        parts = urlparse(dsn)
+        if parts.scheme == "manager":
+            if parts.hostname is None or parts.port is None:
+                raise VelbusConnectionFailed
+            self._backend: VelbusBusBackend = ManagerBackend(
+                self,
+                parts.hostname,
+                parts.port,
+                session,
+                access_token,
+            )
+        else:
+            self._backend = RawBusBackend(self, dsn)
+
+    @property
+    def manager_backend(self) -> ManagerBackend | None:
+        """Return the Signum Manager backend when active."""
+        if isinstance(self._backend, ManagerBackend):
+            return self._backend
+        return None
+
+    @property
+    def raw_backend(self) -> RawBusBackend | None:
+        """Return the raw protocol backend when active."""
+        if isinstance(self._backend, RawBusBackend):
+            return self._backend
+        return None
+
+    def add_auth_failed_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
+        """Register a coroutine when Signum Manager rejects the access token."""
+        self._backend.add_auth_failed_callback(meth)
+
+    def remove_auth_failed_callback(
+        self, meth: t.Callable[[], Awaitable[None]]
+    ) -> None:
+        """Remove a previously registered auth-failed coroutine."""
+        self._backend.remove_auth_failed_callback(meth)
 
     def add_background_task(self, task: asyncio.Task[object]) -> None:
         """Keep a background task referenced until it completes."""
         self._background_tasks.add(task)
         task.add_done_callback(self._background_tasks.discard)
-
-    @property
-    def memory_prefetch_in_progress(self) -> bool:
-        """Return True while EEPROM prefetch is running in the background."""
-        return self._memory_coordinator.prefetch_in_progress
-
-    @staticmethod
-    def _calculate_queue_sleep_time(msg_info: RawMessage, send_time: float) -> float:
-        """Calculate the sleep time needed after sending a message to Velbus."""
-        sleep_time = SLEEP_TIME
-
-        if msg_info.rtr:
-            sleep_time = SLEEP_TIME  # this is a scan command. We could be quicker?
-
-        if msg_info.command == 0xEF:
-            # 'channel name request' command provokes in worst case 99 answer packets from VMBGPOD
-            sleep_time = SLEEP_TIME * 33  # TODO make this adaptable on module_type
-
-        if send_time > sleep_time:
-            return 0  # no need to wait, we are already late
-        return sleep_time - send_time
-
-    async def _send_loop(self) -> None:
-        """Outbound queue loop that dispatches messages when connected."""
-        self._log.debug("Starting Velbus send loop")
-        while not self._is_closing():
-            try:
-                await self._connected_event.wait()
-                if self._is_closing():
-                    break
-
-                msg_info: RawMessage = await self._send_queue.get()
-                try:
-                    message_sent = False
-                    while not message_sent and not self._is_closing():
-                        await self._connected_event.wait()
-                        if self._is_closing():
-                            break
-
-                        if not (
-                            self._is_connected
-                            and self._protocol
-                            and self._protocol.is_connected
-                        ):
-                            # Event can still be set while disconnect runs in a task;
-                            # clear it so wait() blocks instead of starving the loop.
-                            self._connected_event.clear()
-                            await asyncio.sleep(0)
-                            continue
-
-                        await self._protocol.wait_can_write()
-
-                        # Re-verify connection and closing state after wait_can_write
-                        if self._is_closing() or not (
-                            self._is_connected
-                            and self._protocol
-                            and self._protocol.is_connected
-                        ):
-                            if not self._is_closing():
-                                self._connected_event.clear()
-                            await asyncio.sleep(0)
-                            continue
-
-                        start_time = time.monotonic()
-                        message_sent = self._protocol.write_message(msg_info)
-                        if message_sent:
-                            send_time = time.monotonic() - start_time
-                            sleep_time = self._calculate_queue_sleep_time(
-                                msg_info, send_time
-                            )
-                            if sleep_time > 0 and not self._is_closing():
-                                await asyncio.sleep(sleep_time)
-                        elif not self._is_closing():
-                            self._connected_event.clear()
-                            await asyncio.sleep(0)
-                finally:
-                    self._send_queue.task_done()
-            except asyncio.CancelledError:
-                break
-            except Exception:  # noqa: BLE001
-                self._log.exception("Error in Velbus send loop")
-        self._log.debug("Ending Velbus send loop")
 
     def add_connect_callback(self, meth: t.Callable[[], Awaitable[None]]) -> None:
         """Register a coroutine to be called on connect."""
@@ -233,10 +173,7 @@ class Velbus:
     def add_module_found_callback(
         self, meth: t.Callable[[Module], Awaitable[None]]
     ) -> None:
-        """Register a coroutine to be called on module found.
-
-        This routine will be called when a new module finished its initialization.
-        """
+        """Register a coroutine to be called on module found."""
         self._on_module_found_callbacks.append(meth)
 
     def remove_module_found_callback(
@@ -248,12 +185,7 @@ class Velbus:
     def add_scan_complete_callback(
         self, meth: t.Callable[[set[int]], Awaitable[None]]
     ) -> None:
-        """Register a coroutine called after a full bus module scan.
-
-        The callback receives ``found_addresses``: module addresses (1–254)
-        that returned a module-type response during that scan. This is not
-        invoked after single-address scans (``one_address`` mode).
-        """
+        """Register a coroutine called after a full bus module scan."""
         self._on_scan_complete_callbacks.append(meth)
 
     def remove_scan_complete_callback(
@@ -290,43 +222,59 @@ class Velbus:
     @property
     def connected(self) -> bool:
         """Return connection state."""
-        return self._is_connected
+        return self._backend.is_connected
 
-    async def _reconnect_loop(self) -> None:
-        """Keep retrying connect() until it succeeds or auto_reconnect is disabled."""
-        retry_delay = 10
-        while self._auto_reconnect and not self._closing:
-            try:
-                await self.connect()
-            except VelbusConnectionFailed:
-                self._log.warning("Reconnect failed, retrying in %ds", retry_delay)
-                await asyncio.sleep(retry_delay)
-                retry_delay = min(retry_delay * 2, 300)
-            else:
-                return
+    @property
+    def closing(self) -> bool:
+        """Return whether :meth:`stop` has been requested."""
+        return self._closing
+
+    @property
+    def auto_reconnect_enabled(self) -> bool:
+        """Return whether the transport should reconnect after a drop."""
+        return self._auto_reconnect
+
+    @property
+    def vlp_file(self) -> str | None:
+        """Return the optional VLP file used instead of a live bus scan."""
+        return self._vlp_file
+
+    @property
+    def log(self) -> logging.Logger:
+        """Return the controller logger."""
+        return self._log
+
+    @property
+    def packet_handler(self) -> PacketHandler:
+        """Return the inbound packet handler."""
+        return self._handler
+
+    def is_closing(self) -> bool:
+        """Return whether shutdown is in progress."""
+        return self._closing
+
+    async def notify_connection_state(self, is_connected: bool) -> None:
+        """Notify listeners that the transport link changed."""
+        await self._on_connection_state(is_connected)
+
+    async def deliver_message(self, msg: RawMessage) -> None:
+        """Deliver an inbound raw packet to the handler."""
+        await self._on_message_received(msg)
 
     async def _on_connection_state(self, is_connected: bool) -> None:
-        """Respond to Protocol connection state changes."""
-        self._is_connected = is_connected
+        """Respond to transport connection state changes."""
         if is_connected:
-            self._connected_event.set()
             if self._had_modules_before_connect:
                 self._invalidate_all_memory_caches()
-                self._memory_coordinator.bump_generation()
-                self._memory_coordinator.schedule_prefetch()
             self._had_modules_before_connect = bool(self._modules)
             for callback in self._on_connect_callbacks:
                 await callback()
         else:
-            self._connected_event.clear()
-            self._memory_coordinator.cancel_prefetch()
             self._had_modules_before_connect = bool(self._modules)
             for callback in self._on_disconnect_callbacks:
                 await callback()
             if self._auto_reconnect and not self._closing:
-                self._log.debug("Reconnecting to transport")
-                task = asyncio.ensure_future(self._reconnect_loop())
-                self.add_background_task(task)
+                self._backend.schedule_reconnect()
         for mod in self._modules.values():
             for chan in mod.get_channels().values():
                 await chan.status_update()
@@ -400,179 +348,40 @@ class Velbus:
             return (self._modules[addr]).get_channels()
         return None
 
-    def _is_closing(self) -> bool:
-        """Return whether the controller is shutting down."""
-        return self._closing
-
     async def stop(self) -> None:
         """Stop the controller."""
         self._closing = True
         self._auto_reconnect = False
-        self._connected_event.set()
-        if self._send_task and not self._send_task.done():
-            self._send_task.cancel()
-        self._memory_coordinator.cancel_prefetch()
-        # Stop all scheduled tasks
-        for scheduled in self._scheduled_tasks.values():
-            scheduled.stop()
-        for bg_task in list(self._background_tasks):
-            if not bg_task.done():
-                bg_task.cancel()
-        if self._background_tasks:
-            await asyncio.gather(*list(self._background_tasks), return_exceptions=True)
-        self._background_tasks.clear()
-        if self._protocol:
-            self._protocol.close()
-
-    def _on_disconnect(self, exc: Exception | None) -> None:
-        """Handle protocol disconnect callback synchronously from protocol."""
-        self._is_connected = False
-        self._connected_event.clear()
-        task = asyncio.ensure_future(self._on_connection_state(False))
-        self.add_background_task(task)
-
-    def __protocol_factory(self) -> VelbusProtocol:
-        """Create a new protocol instance for a new connection."""
-
-        dest_parts = urlparse(self._destination)
-        return VelbusProtocol(
-            message_received_callback=self._on_message_received,
-            on_disconnect_callback=self._on_disconnect,
-            auth_key=dest_parts.username or None,
-        )
+        await self._backend.stop()
+        if isinstance(self._backend, RawBusBackend):
+            for scheduled in self._scheduled_tasks.values():
+                scheduled.stop()
+            for bg_task in list(self._background_tasks):
+                if not bg_task.done():
+                    bg_task.cancel()
+            if self._background_tasks:
+                await asyncio.gather(
+                    *list(self._background_tasks), return_exceptions=True
+                )
+            self._background_tasks.clear()
 
     async def connect(self) -> None:
         """Connect to the bus and load all the data."""
         self._closing = False
         self._auto_reconnect = True
-        if self._send_task is None or self._send_task.done():
-            self._send_task = asyncio.create_task(self._send_loop())
         await self._handler.read_protocol_data()
-        if self._is_closing():
+        if self.is_closing():
             return
-        # connect to the bus
-        destination = self._destination
-        has_scheme = bool(re.search(r"^[A-Za-z0-9+.\-]+://", destination))
-        is_bare_host_port = bool(re.search(r"^[^/]+:\d+$", destination))
-
-        tcp_destination: str | None = None
-        if has_scheme:
-            parts = urlparse(destination)
-            if parts.scheme in {"tcp", "tls"}:
-                tcp_destination = destination
-        elif is_bare_host_port:
-            tcp_destination = f"tcp://{destination}"
-
-        if tcp_destination is not None:
-            parts = urlparse(tcp_destination)
-            if parts.scheme == "tls":
-                ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-                ctx.check_hostname = False
-                ctx.verify_mode = ssl.CERT_NONE
-            else:
-                ctx = None
-
-            if parts.hostname is None or parts.port is None:
-                raise VelbusConnectionFailed
-
-            try:
-                (
-                    _transport,
-                    tcp_protocol,
-                ) = await asyncio.get_running_loop().create_connection(
-                    self.__protocol_factory,
-                    host=parts.hostname,
-                    port=parts.port,
-                    ssl=ctx,
-                )
-                self._protocol = tcp_protocol
-            except (ConnectionRefusedError, OSError) as err:
-                raise VelbusConnectionFailed from err
-            if self._is_closing():
-                if self._protocol:
-                    self._protocol.close()
-                return
-            await self._on_connection_state(True)
-            return
-
-        # serial and serialx-backed schemes (e.g. /dev/..., esphome://...)
-        try:
-            serial_factory = cast(
-                "t.Callable[[], asyncio.Protocol]", self.__protocol_factory
-            )
-            _serial_transport, serial_protocol = await serialx.create_serial_connection(
-                asyncio.get_running_loop(),
-                serial_factory,
-                url=destination,
-                baudrate=38400,
-                byte_size=serialx.EIGHTBITS,
-                parity=serialx.Parity.NONE,
-                stopbits=serialx.StopBits.ONE,
-                xonxoff=False,
-                rtscts=True,
-            )
-            self._protocol = cast("VelbusProtocol", serial_protocol)
-        except (FileNotFoundError, serialx.SerialException) as err:
-            raise VelbusConnectionFailed from err
-        if self._is_closing():
-            if self._protocol:
-                self._protocol.close()
-            return
-        await self._on_connection_state(True)
+        await self._backend.connect()
 
     async def start(self) -> None:
         """Start the controller."""
-
-        # Make sure the cache dir exists
         await anyio.Path(self._cache_dir).mkdir(parents=True, exist_ok=True)
-        if self._vlp_file:
-            # use the vlp file to load the modules
-            vlp = VlpFile(self._vlp_file)
-            await vlp.read()
-            for mod_data in vlp.get():
-                # Convert hex address string to decimal integer
-                module_type = mod_data.get_type()
-                if module_type is None:
-                    self._log.warning(
-                        "Skipping VLP module at %s: unknown type %s",
-                        mod_data.get_addr(),
-                        mod_data.get_build(),
-                    )
-                    continue
-                addr = mod_data.get_addr().split(",")
-                decimal_addr = int(addr[0], 16)
-                await self.add_module(
-                    decimal_addr,
-                    module_type,
-                    serial=mod_data.get_serial(),
-                    memorymap=mod_data.get_memory(),
-                    build_year=int(mod_data.get_build()[0:2]),
-                    build_week=int(mod_data.get_build()[2:4]),
-                )
-                # handle submodules
-                if len(addr) > 1:
-                    self.add_submodules(
-                        self._modules[decimal_addr],
-                        parse_vlp_sub_address_map(mod_data.get_addr()),
-                    )
-                # load module data, special for dali
-                if mod_data.get_type() == 0x45 or mod_data.get_type() == 0x5A:
-                    await self._modules[decimal_addr].load()
-                else:
-                    module = self._modules[decimal_addr]
-                    await module.load_from_vlp(mod_data)
-                    await module.wait_for_status_messages()
-            await self.notify_scan_complete(set(self._modules.keys()))
-        else:
-            # scan the bus
-            await self._handler.scan()
-        self._memory_coordinator.schedule_prefetch()
+        await self._backend.start()
 
     async def scan(self) -> None:
         """Service endpoint to restart the scan."""
-        await self._handler.scan(True)
-        self._memory_coordinator.bump_generation()
-        self._memory_coordinator.schedule_prefetch()
+        await self._backend.scan()
 
     async def sendTypeRequestMessage(self, address: int) -> None:
         """Send a module type request message."""
@@ -581,14 +390,7 @@ class Velbus:
 
     async def send(self, msg: Message) -> None:
         """Send a packet."""
-        self._send_queue.put_nowait(
-            RawMessage(
-                priority=msg.priority,
-                address=msg.address,
-                rtr=msg.rtr,
-                data=msg.data_to_binary(),
-            )
-        )
+        await self._backend.send(msg)
 
     def get_all_sensor(
         self,
@@ -688,31 +490,12 @@ class Velbus:
         ]
 
     async def sync_clock(self, dt: datetime.datetime | None = None) -> None:
-        """Will send all the needed messages to sync the clock.
-
-        :param dt: The datetime to sync to. When omitted, the local time of the
-            machine running this process is used. Callers (e.g. Home Assistant)
-            should pass their own localized time to avoid relying on the clock
-            of the host running the connection.
-        """
-        if dt is None:
-            dt = datetime.datetime.now()
-        # Determine daylight saving. For timezone-aware datetimes we can derive
-        # it directly, otherwise fall back to the local time settings.
-        dst = dt.dst()
-        if dst is not None:
-            is_dst = dst != datetime.timedelta(0)
-        else:
-            is_dst = bool(time.localtime().tm_isdst)
-        await self.send(
-            SetRealtimeClock(wday=dt.weekday(), hour=dt.hour, min=dt.minute)
-        )
-        await self.send(SetDate(day=dt.day, mon=dt.month, year=dt.year))
-        await self.send(SetDaylightSaving(ds=not is_dst))
+        """Will send all the needed messages to sync the clock."""
+        await self._backend.sync_clock(dt)
 
     async def wait_on_all_messages_sent_async(self) -> None:
         """Wait for all messages to be sent."""
-        await self._send_queue.join()
+        await self._backend.wait_on_all_messages_sent_async()
 
     def add_scheduled_task(
         self,
@@ -720,13 +503,7 @@ class Velbus:
         callback: Callable[[], Awaitable[None]],
         interval_seconds: float,
     ) -> None:
-        """Add a scheduled task that runs at a specific interval.
-
-        Args:
-            name: Unique name for the task
-            callback: Async function to call at each interval
-            interval_seconds: Time in seconds between each execution
-        """
+        """Add a scheduled task that runs at a specific interval."""
         if name in self._scheduled_tasks:
             self._scheduler_log.warning(f"Task '{name}' already exists, replacing it")
             self.remove_scheduled_task(name)
@@ -743,20 +520,12 @@ class Velbus:
         )
 
     def remove_scheduled_task(self, name: str) -> None:
-        """Remove a scheduled task.
-
-        Args:
-            name: Name of the task to remove
-        """
+        """Remove a scheduled task."""
         if name in self._scheduled_tasks:
             self._scheduled_tasks[name].stop()
             del self._scheduled_tasks[name]
             self._scheduler_log.info(f"Scheduled task '{name}' removed")
 
     def get_scheduled_tasks(self) -> dict[str, ScheduledTask]:
-        """Get all scheduled tasks.
-
-        Returns:
-            Dictionary of task names to ScheduledTask objects
-        """
+        """Get all scheduled tasks."""
         return self._scheduled_tasks.copy()

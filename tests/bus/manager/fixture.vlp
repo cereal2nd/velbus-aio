@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Module build="1247" address="05" type="VMB1RY" serial="3039" locked="0" layer="0" terminator="0">
+    <Caption>Relay module</Caption>
+    <Memory></Memory>
+  </Module>
+</Project>

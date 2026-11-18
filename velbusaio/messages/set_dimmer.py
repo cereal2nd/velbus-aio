@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.command_effects import SetBrightness, first_channel
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
     ByteField,
@@ -31,6 +32,20 @@ class SetDimmerMessage(DeclarativeMessage):
     dimmer_channels = ChannelsField(0)
     dimmer_state = ByteField(1)
     dimmer_transitiontime = Int16Field(2)
+
+    def command_effect(self) -> SetBrightness | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        channel = first_channel(self.dimmer_channels)
+        if channel is None:
+            return None
+        transition = (
+            int(self.dimmer_transitiontime) if self.dimmer_transitiontime else None
+        )
+        return SetBrightness(
+            channel=channel,
+            level=int(self.dimmer_state),
+            transition_time=transition,
+        )
 
 
 @register(COMMAND_CODE)

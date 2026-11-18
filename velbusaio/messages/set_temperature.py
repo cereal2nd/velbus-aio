@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.command_effects import SetCurrentTemperature
 from velbusaio.command_registry import register
 from velbusaio.message_fields import ComputedField, DeclarativeMessage, Field
 
@@ -40,3 +41,7 @@ class SetTemperatureMessage(DeclarativeMessage):
         parser=_parse_temp,
         serializer=_serialize_temp,
     )
+
+    def command_effect(self) -> SetCurrentTemperature | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        return SetCurrentTemperature(temperature=float(self.temp))

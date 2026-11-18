@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.command_effects import RestoreBrightness, first_channel
 from velbusaio.command_registry import register
 from velbusaio.message_fields import (
     ByteField,
@@ -31,6 +32,13 @@ class RestoreDimmerMessage(DeclarativeMessage):
     dimmer_channels = ChannelsField(0)
     _padding = ByteField(1, default=0)
     dimmer_transitiontime = Int16Field(2)
+
+    def command_effect(self) -> RestoreBrightness | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        channel = first_channel(self.dimmer_channels)
+        if channel is None:
+            return None
+        return RestoreBrightness(channel=channel)
 
 
 @register(COMMAND_CODE)

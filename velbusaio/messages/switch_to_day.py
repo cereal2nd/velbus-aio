@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from velbusaio.command_effects import ThermostatSetMode
 from velbusaio.command_registry import register
 from velbusaio.messages.switch_to_mode import SwitchToModeMessage
 
@@ -17,3 +18,7 @@ class SwitchToDayMessage(SwitchToModeMessage):
 
     _command_code = COMMAND_CODE
     __init__ = SwitchToModeMessage.__init__
+
+    def command_effect(self) -> ThermostatSetMode | None:
+        """Return a :class:`~velbusaio.command_effects.CommandEffect` for Signum translation."""
+        return ThermostatSetMode(mode="day")
