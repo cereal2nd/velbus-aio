@@ -4,7 +4,7 @@ requires = ["setuptools", "wheel"]
 [project]
 name = "velbus-aio"
 license = {text = "MIT"}
-version = "2026.11.4"
+version = "2026.11.3"
 description = "Asyncio Python library to control the Velbus home automation system."
 readme = "README.md"
 authors = [
