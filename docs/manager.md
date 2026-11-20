@@ -13,7 +13,7 @@ discovery path change.
 | DSN                   | Example                      | Notes                                                  |
 | --------------------- | ---------------------------- | ------------------------------------------------------ |
 | `manager://host:port` | `manager://192.168.1.9:4201` | Manager REST + WebSocket                               |
-| `gateway_id` kwarg    | Gateway ID from discovery    | Optional. Bind the controller to one bus              |
+| `gateway_id` kwarg    | Gateway ID from discovery    | Optional. Bind the controller to one bus               |
 | `access_token` kwarg  | Bearer token                 | Optional; required when the manager enforces auth      |
 | `session` kwarg       | `aiohttp.ClientSession`      | Optional; share a session with Home Assistant or tests |
 
