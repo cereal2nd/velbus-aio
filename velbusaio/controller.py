@@ -86,8 +86,10 @@ class Velbus:
         one_address: int | None = None,
         session: ClientSession | None = None,
         access_token: str | None = None,
+        *,
+        gateway_id: str | None = None,
     ) -> None:
-        """Init the Velbus controller."""
+        """Init the Velbus controller, optionally bound to a Manager gateway ID."""
         self._log = logging.getLogger("velbus")
         self._closing = False
         self._auto_reconnect = True
@@ -121,8 +123,11 @@ class Velbus:
                 parts.port,
                 session,
                 access_token,
+                gateway_id=gateway_id,
             )
         else:
+            if gateway_id is not None:
+                raise ValueError("gateway_id requires a manager:// DSN")
             self._backend = RawBusBackend(self, dsn)
 
     @property
@@ -214,9 +219,10 @@ class Velbus:
                 continue
             if sub_addr in self._submodules:
                 self._submodules.remove(sub_addr)
-        cache_file = pathlib.Path(self._cache_dir) / f"{address}.json"
-        if await anyio.Path(cache_file).is_file():
-            await anyio.Path(cache_file).unlink()
+        if self.manager_backend is None:
+            cache_file = pathlib.Path(self._cache_dir) / f"{address}.json"
+            if await anyio.Path(cache_file).is_file():
+                await anyio.Path(cache_file).unlink()
         self._log.info("Removed stale module at address %s (%#02x)", address, address)
 
     @property

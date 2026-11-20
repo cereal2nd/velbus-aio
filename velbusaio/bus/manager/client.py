@@ -12,12 +12,13 @@ import aiohttp
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
 
 from velbusaio.bus.manager.errors import VelbusManagerError
-from velbusaio.exceptions import VelbusAuthenticationFailed
+from velbusaio.exceptions import VelbusAuthenticationFailed, VelbusConnectionFailed
 
 _LOGGER = logging.getLogger(__name__)
 
 MessageCallback = Callable[[dict[str, Any]], Awaitable[None] | None]
-DisconnectCallback = Callable[[], Awaitable[None] | None]
+ConnectionCallback = Callable[[], Awaitable[None] | None]
+DisconnectCallback = ConnectionCallback
 
 _WS_BACKOFF_MIN = 1.0
 _WS_BACKOFF_MAX = 30.0
@@ -204,13 +205,16 @@ class ManagerClient:
         self,
         on_message: MessageCallback,
         on_disconnect: DisconnectCallback | None = None,
+        *,
+        gateway_id: str | None = None,
+        on_reconnect: ConnectionCallback | None = None,
     ) -> None:
         """Connect to the push WebSocket and reconnect with backoff until stopped."""
         if self._ws_task is not None:
             return
         self._stop_ws.clear()
         self._ws_task = asyncio.create_task(
-            self._websocket_loop(on_message, on_disconnect),
+            self._websocket_loop(on_message, on_disconnect, gateway_id, on_reconnect),
             name="manager-websocket",
         )
 
@@ -228,15 +232,25 @@ class ManagerClient:
         self,
         on_message: MessageCallback,
         on_disconnect: DisconnectCallback | None,
+        gateway_id: str | None,
+        on_reconnect: ConnectionCallback | None,
     ) -> None:
+        connected_once = False
         backoff = _WS_BACKOFF_MIN
         while not self._stop_ws.is_set():
             try:
                 async with self._session.ws_connect(
                     self._ws_url(),
+                    params={"gatewayId": gateway_id}
+                    if gateway_id is not None
+                    else None,
+                    headers=self._auth_headers(),
                     heartbeat=_WS_HEARTBEAT,
                 ) as ws:
                     self._ws = ws
+                    if connected_once and on_reconnect is not None:
+                        await self._call_callback(on_reconnect)
+                    connected_once = True
                     self._ws_connected.set()
                     backoff = _WS_BACKOFF_MIN
                     async for msg in ws:
@@ -253,7 +267,13 @@ class ManagerClient:
                             break
             except asyncio.CancelledError:
                 raise
-            except (aiohttp.ClientError, TimeoutError, json.JSONDecodeError, OSError):
+            except (
+                aiohttp.ClientError,
+                TimeoutError,
+                json.JSONDecodeError,
+                OSError,
+                VelbusConnectionFailed,
+            ):
                 _LOGGER.debug("Signum WebSocket disconnected", exc_info=True)
             finally:
                 self._ws = None

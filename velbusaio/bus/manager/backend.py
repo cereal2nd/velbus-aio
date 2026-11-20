@@ -69,6 +69,8 @@ class ManagerBackend:
         port: int,
         session: ClientSession | None,
         access_token: str | None,
+        *,
+        gateway_id: str | None = None,
     ) -> None:
         """Attach to Signum Manager at *host*:*port* for *controller*."""
         self.controller = controller
@@ -79,7 +81,10 @@ class ManagerBackend:
             host, port, session=session, access_token=access_token
         )
         self._translator = ManagerCommandTranslator(self)
+        self._requested_gateway_id = gateway_id
         self._gateway_id: str | None = None
+        self._legacy_single_gateway = False
+        self._started = False
         self._channel_things: dict[tuple[int, int], str] = {}
         self._thing_channels: dict[str, tuple[int, int]] = {}
         self._module_things: dict[int, str] = {}
@@ -134,14 +139,46 @@ class ManagerBackend:
 
     def thing_id_for(self, address: int, channel: int) -> str | None:
         """Return the Signum thing id for a module address and channel number."""
+        if self._requested_gateway_id is not None and not self._available:
+            return None
         return self._channel_things.get((address, channel))
 
     def module_thing_id(self, address: int) -> str | None:
         """Return the Signum thing id for a module."""
+        if self._requested_gateway_id is not None and not self._available:
+            return None
         return self._module_things.get(address)
 
-    async def connect(self) -> None:
-        """Open the WebSocket feed and verify the manager responds."""
+    @property
+    def gateway_id(self) -> str | None:
+        """Return the gateway ID selected during connection setup."""
+        return self._gateway_id
+
+    def _select_gateway(self, gateways: list[dict[str, Any]]) -> dict[str, Any]:
+        candidates = [
+            gateway
+            for gateway in gateways
+            if gateway.get("id")
+            and (
+                gateway.get("type") == "velbusgateway" or gateway.get("isLocalGateway")
+            )
+        ]
+        if self._requested_gateway_id is None:
+            for gateway in candidates:
+                if gateway.get("isLocalGateway"):
+                    return gateway
+            if candidates:
+                return candidates[0]
+        else:
+            for gateway in candidates:
+                if str(gateway["id"]) == self._requested_gateway_id:
+                    return gateway
+            _LOGGER.warning(
+                "Velbus gateway %r is unavailable", self._requested_gateway_id
+            )
+        raise VelbusConnectionFailed
+
+    async def _read_gateway(self) -> dict[str, Any]:
         try:
             gateways = await self._client.get_gateways()
         except VelbusAuthenticationFailed:
@@ -150,22 +187,31 @@ class ManagerBackend:
         except Exception as err:
             raise VelbusConnectionFailed from err
 
-        local = next((g for g in gateways if g.get("isLocalGateway")), None)
-        if local is None:
-            local = next(
-                (g for g in gateways if g.get("type") == "velbusgateway"), None
-            )
-        if local is None:
-            raise VelbusConnectionFailed
-        self._gateway_id = str(local["id"])
-        link = _gateway_link_up(local.get("state"))
+        gateway = self._select_gateway(gateways)
+        self._gateway_id = str(gateway["id"])
+        self._legacy_single_gateway = (
+            self._requested_gateway_id is None and len(gateways) == 1
+        )
+        link = _gateway_link_up(gateway.get("state"))
         if link is True:
             self._bus_connected = True
         elif link is False:
             self._bus_connected = False
         self._sync_bus_link_event()
 
-        await self._client.run_websocket(self._on_ws_message, self._on_ws_disconnect)
+        return gateway
+
+    async def connect(self) -> None:
+        """Open the WebSocket feed and verify the manager responds."""
+        gateway = await self._read_gateway()
+        await self._client.run_websocket(
+            self._on_ws_message,
+            self._on_ws_disconnect,
+            gateway_id=self._requested_gateway_id,
+            on_reconnect=self._on_ws_reconnect
+            if self._requested_gateway_id is not None
+            else None,
+        )
         await self._client.wait_websocket()
         await self._set_manager_available(True)
 
@@ -173,10 +219,10 @@ class ManagerBackend:
             _LOGGER.info(
                 "Signum gateway %s Velbus link state is %r; requesting Connect",
                 self._gateway_id,
-                local.get("state"),
+                gateway.get("state"),
             )
             try:
-                await self._client.gateway_action(self._gateway_id, "Connect")
+                await self._client.gateway_action(str(gateway["id"]), "Connect")
             except Exception:
                 _LOGGER.exception("Signum gateway Connect action failed")
             else:
@@ -195,6 +241,7 @@ class ManagerBackend:
 
     async def stop(self) -> None:
         """Shut down the WebSocket task and close an owned HTTP session."""
+        self._started = False
         await self._set_manager_available(False)
         await self._client.close()
 
@@ -232,6 +279,7 @@ class ManagerBackend:
         async with self._snapshot_lock:
             if self._gateway_id is None:
                 return
+            self._started = True
             try:
                 actors = await self._client.get_actors(
                     self._gateway_id, include_properties=True
@@ -244,6 +292,9 @@ class ManagerBackend:
                 _LOGGER.exception("Signum snapshot read failed")
                 raise
 
+            channel_things: dict[tuple[int, int], str] = {}
+            thing_channels: dict[str, tuple[int, int]] = {}
+            module_things: dict[int, str] = {}
             seen: set[int] = set()
             for actor in actors:
                 if actor.get("type") != "velbusmodule":
@@ -285,13 +336,13 @@ class ManagerBackend:
                 module.set_manager_display_name(
                     actor.get("name") or module.get_type_name()
                 )
-                self._module_things[addr] = str(actor["id"])
+                module_things[addr] = str(actor["id"])
                 await module.load_from_manager(actor.get("channels", []))
                 for ch in actor.get("channels", []):
                     channel_id = remap_channel_number(module_type, int(ch["channelId"]))
                     thing_id = str(ch["id"])
-                    self._channel_things[(addr, channel_id)] = thing_id
-                    self._thing_channels[thing_id] = (addr, channel_id)
+                    channel_things[(addr, channel_id)] = thing_id
+                    thing_channels[thing_id] = (addr, channel_id)
                     props = ch.get("properties") or {}
                     chan = module.get_channels().get(channel_id)
                     if chan is not None and props:
@@ -314,14 +365,35 @@ class ManagerBackend:
                     ).items():
                         await module.apply_manager_property_update(prop_key, values)
 
+            self._channel_things = channel_things
+            self._thing_channels = thing_channels
+            self._module_things = module_things
             stale = set(self.controller.get_modules()) - seen
             for address in stale:
                 await self.controller.remove_stale_module(address)
 
+    def _owns_message(self, data: dict[str, Any]) -> bool:
+        source = data.get("gatewayId")
+        if source is not None and source != self._gateway_id:
+            return False
+        thing_id = data.get("thingId")
+        if data.get("messageType") == "gatewayStatus" and thing_id is not None:
+            return isinstance(thing_id, str) and thing_id == self._gateway_id
+        if source is not None or self._legacy_single_gateway:
+            return True
+        # Older Managers can broadcast untagged messages from several buses.
+        return isinstance(thing_id, str) and (
+            thing_id == self._gateway_id
+            or thing_id in self._thing_channels
+            or thing_id in self._module_things.values()
+        )
+
     async def _on_ws_message(self, data: dict[str, Any]) -> None:
+        if not self._owns_message(data):
+            return
+        msg_type = data.get("messageType")
         if not self._available:
             await self._set_manager_available(True)
-        msg_type = data.get("messageType")
         if msg_type == "propertyStatus":
             await self._handle_property_status(data)
         elif msg_type == "gatewayStatus":
@@ -396,6 +468,13 @@ class ManagerBackend:
             self._logged_bus_unavailable = False
         await self._notify_connection_state()
 
+    async def _on_ws_reconnect(self) -> None:
+        # Check the pinned ID and refresh even an empty inventory before accepting events.
+        await self._read_gateway()
+        if self._started:
+            await self.start()
+        await self._set_manager_available(True)
+
     async def _on_ws_disconnect(self) -> None:
         await self._set_manager_available(False)
 
@@ -412,7 +491,11 @@ class ManagerBackend:
                 _LOGGER.info("Signum Manager available again")
             self._logged_manager_unavailable = False
         await self._notify_connection_state()
-        if available and self.controller.get_modules():
+        if (
+            available
+            and self._requested_gateway_id is None
+            and self.controller.get_modules()
+        ):
             try:
                 await self._apply_snapshot()
             except VelbusAuthenticationFailed:
