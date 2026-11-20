@@ -7,17 +7,19 @@ from collections.abc import Awaitable, Callable
 import json
 import logging
 from typing import Any, cast
+from urllib.parse import quote
 
 import aiohttp
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
 
 from velbusaio.bus.manager.errors import VelbusManagerError
-from velbusaio.exceptions import VelbusAuthenticationFailed
+from velbusaio.exceptions import VelbusAuthenticationFailed, VelbusConnectionFailed
 
 _LOGGER = logging.getLogger(__name__)
 
 MessageCallback = Callable[[dict[str, Any]], Awaitable[None] | None]
-DisconnectCallback = Callable[[], Awaitable[None] | None]
+ConnectionCallback = Callable[[], Awaitable[None] | None]
+DisconnectCallback = ConnectionCallback
 
 _WS_BACKOFF_MIN = 1.0
 _WS_BACKOFF_MAX = 30.0
@@ -39,7 +41,8 @@ class ManagerClient:
         access_token: str | None = None,
     ) -> None:
         """Initialize the client."""
-        self._host = host
+        # The DSN parser returns IPv6 literals without their URL brackets.
+        self._host = f"[{host}]" if ":" in host and not host.startswith("[") else host
         self._port = port
         self._access_token = access_token
         self._owns_session = session is None
@@ -122,7 +125,7 @@ class ManagerClient:
         """Return modules for a gateway, optionally with property values."""
         params = {"includeProperties": "true"} if include_properties else None
         result = await self._request(
-            "GET", f"/gateways/{gateway_id}/actors", params=params
+            "GET", f"/gateways/{quote(gateway_id, safe='')}/actors", params=params
         )
         return cast("list[dict[str, Any]]", result)
 
@@ -136,7 +139,7 @@ class ManagerClient:
         body = {action_name: {"input": inputs or {}}}
         await self._request(
             "POST",
-            f"/things/{thing_id}/actions/{action_name}",
+            f"/things/{quote(thing_id, safe='')}/actions/{action_name}",
             json_body=body,
         )
 
@@ -144,7 +147,7 @@ class ManagerClient:
         """PUT a property value on a thing."""
         await self._request(
             "PUT",
-            f"/things/{thing_id}/properties/{prop_name}",
+            f"/things/{quote(thing_id, safe='')}/properties/{prop_name}",
             json_body={prop_name: value},
         )
 
@@ -159,7 +162,9 @@ class ManagerClient:
 
     async def get_running_actions(self, thing_id: str) -> list[dict[str, Any]]:
         """Return queued or running actions for a thing (empty when idle)."""
-        result = await self._request("GET", f"/things/{thing_id}/actions")
+        result = await self._request(
+            "GET", f"/things/{quote(thing_id, safe='')}/actions"
+        )
         if not result:
             return []
         return cast("list[dict[str, Any]]", result)
@@ -204,13 +209,16 @@ class ManagerClient:
         self,
         on_message: MessageCallback,
         on_disconnect: DisconnectCallback | None = None,
+        *,
+        gateway_id: str | None = None,
+        on_reconnect: ConnectionCallback | None = None,
     ) -> None:
         """Connect to the push WebSocket and reconnect with backoff until stopped."""
         if self._ws_task is not None:
             return
         self._stop_ws.clear()
         self._ws_task = asyncio.create_task(
-            self._websocket_loop(on_message, on_disconnect),
+            self._websocket_loop(on_message, on_disconnect, gateway_id, on_reconnect),
             name="manager-websocket",
         )
 
@@ -228,15 +236,25 @@ class ManagerClient:
         self,
         on_message: MessageCallback,
         on_disconnect: DisconnectCallback | None,
+        gateway_id: str | None,
+        on_reconnect: ConnectionCallback | None,
     ) -> None:
+        connected_once = False
         backoff = _WS_BACKOFF_MIN
         while not self._stop_ws.is_set():
             try:
                 async with self._session.ws_connect(
                     self._ws_url(),
+                    params={"gatewayId": gateway_id}
+                    if gateway_id is not None
+                    else None,
+                    headers=self._auth_headers(),
                     heartbeat=_WS_HEARTBEAT,
                 ) as ws:
                     self._ws = ws
+                    if connected_once and on_reconnect is not None:
+                        await self._call_callback(on_reconnect)
+                    connected_once = True
                     self._ws_connected.set()
                     backoff = _WS_BACKOFF_MIN
                     async for msg in ws:
@@ -253,7 +271,13 @@ class ManagerClient:
                             break
             except asyncio.CancelledError:
                 raise
-            except (aiohttp.ClientError, TimeoutError, json.JSONDecodeError, OSError):
+            except (
+                aiohttp.ClientError,
+                TimeoutError,
+                json.JSONDecodeError,
+                OSError,
+                VelbusConnectionFailed,
+            ):
                 _LOGGER.debug("Signum WebSocket disconnected", exc_info=True)
             finally:
                 self._ws = None

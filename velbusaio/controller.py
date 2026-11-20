@@ -10,7 +10,7 @@ import itertools
 import logging
 import pathlib
 import typing as t
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from aiohttp import ClientSession
 import anyio
@@ -87,7 +87,7 @@ class Velbus:
         session: ClientSession | None = None,
         access_token: str | None = None,
     ) -> None:
-        """Init the Velbus controller."""
+        """Init the Velbus controller from its connection DSN."""
         self._log = logging.getLogger("velbus")
         self._closing = False
         self._auto_reconnect = True
@@ -115,12 +115,17 @@ class Velbus:
         if parts.scheme == "manager":
             if parts.hostname is None or parts.port is None:
                 raise VelbusConnectionFailed
+            segment = parts.path.removeprefix("/")
+            gateway_id = unquote(segment, errors="strict")
+            if "/" in segment or gateway_id in (".", ".."):
+                raise ValueError("Expected a single gateway ID in the Manager DSN path")
             self._backend: VelbusBusBackend = ManagerBackend(
                 self,
                 parts.hostname,
                 parts.port,
                 session,
                 access_token,
+                gateway_id=gateway_id or None,
             )
         else:
             self._backend = RawBusBackend(self, dsn)
@@ -214,9 +219,10 @@ class Velbus:
                 continue
             if sub_addr in self._submodules:
                 self._submodules.remove(sub_addr)
-        cache_file = pathlib.Path(self._cache_dir) / f"{address}.json"
-        if await anyio.Path(cache_file).is_file():
-            await anyio.Path(cache_file).unlink()
+        if self.manager_backend is None:
+            cache_file = pathlib.Path(self._cache_dir) / f"{address}.json"
+            if await anyio.Path(cache_file).is_file():
+                await anyio.Path(cache_file).unlink()
         self._log.info("Removed stale module at address %s (%#02x)", address, address)
 
     @property

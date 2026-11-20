@@ -10,11 +10,12 @@ discovery path change.
 
 ## Connecting
 
-| DSN                   | Example                      | Notes                                                  |
-| --------------------- | ---------------------------- | ------------------------------------------------------ |
-| `manager://host:port` | `manager://192.168.1.9:4201` | Manager REST + WebSocket                               |
-| `access_token` kwarg  | Bearer token                 | Optional; required when the manager enforces auth      |
-| `session` kwarg       | `aiohttp.ClientSession`      | Optional; share a session with Home Assistant or tests |
+| Connection setting               | Example                              | Notes                                                  |
+| -------------------------------- | ------------------------------------ | ------------------------------------------------------ |
+| `manager://host:port`            | `manager://192.168.1.9:4201`         | Manager REST + WebSocket                               |
+| `manager://host:port/gateway-id` | `manager://192.168.1.9:4201/GWLOCAL` | Bind this controller to the gateway with this ID       |
+| `access_token` kwarg             | Bearer token                         | Optional; required when the manager enforces auth      |
+| `session` kwarg                  | `aiohttp.ClientSession`              | Optional; share a session with Home Assistant or tests |
 
 When `Velbus` is constructed with a `manager://` DSN, `controller.py` sets
 `_backend` to a `ManagerBackend` instead of `RawBusBackend` (direct bus):
@@ -31,6 +32,58 @@ await controller.start()
 
 Public exports live in `velbusaio.bus.manager`: `ManagerBackend`, `ManagerClient`,
 `VelbusManagerError`.
+
+### Choosing a bus
+
+For a bus picker, call `ManagerClient.get_gateways()` before connecting a
+controller. Display each gateway's `name` and store its `id` as the selection.
+A gateway can be renamed.
+
+```python
+from velbusaio.bus.manager import ManagerClient
+from velbusaio.controller import Velbus
+
+client = ManagerClient(host, port, session=my_session, access_token=token)
+try:
+    gateways = await client.get_gateways()
+finally:
+    await client.close()
+
+choices = {
+    gateway["id"]: gateway.get("name") or gateway["id"]
+    for gateway in gateways
+    if gateway.get("id")
+    and (gateway.get("type") == "velbusgateway" or gateway.get("isLocalGateway"))
+}
+```
+
+Create one controller per selected gateway. Append the selected ID as one
+percent-encoded path segment to the Manager DSN. Each controller exposes its
+own modules, channels and connection state.
+
+```python
+from urllib.parse import quote
+
+manager_dsn = "manager://192.168.1.9:4201"
+gateway_dsn = f"{manager_dsn}/{quote(selected_id, safe='')}"
+controller = Velbus(
+    gateway_dsn,
+    session=my_session,
+    access_token=token,
+)
+try:
+    await controller.connect()
+    await controller.start()
+    # Use the controller for this bus.
+finally:
+    await controller.stop()
+```
+
+With no gateway path, both `manager://host:port` and `manager://host:port/`
+keep automatic selection. The controller prefers the local gateway, then the
+first Velbus gateway. If the ID in the path is missing from discovery,
+`connect()` raises `VelbusConnectionFailed`.
+After connection, `controller.manager_backend.gateway_id` gives the selected ID.
 
 ## Architecture
 
@@ -83,7 +136,7 @@ sequenceDiagram
     B->>C: get_gateways()
     C->>M: GET /velbus/api/v2/gateways
     M-->>C: gateways JSON
-    B->>B: pick local velbusgateway
+    B->>B: select requested or default gateway
     B->>C: run_websocket()
     C->>M: WS /velbus/api/v2/ws
     B->>B: _set_manager_available(True)
@@ -106,7 +159,8 @@ sequenceDiagram
 
 1. `GET /gateways` — failure becomes `VelbusConnectionFailed`; HTTP 401 fires
    auth-failed callbacks and raises `VelbusAuthenticationFailed`.
-2. Choose the gateway: prefer `isLocalGateway`, else first `type == "velbusgateway"`.
+2. Select the requested ID when supplied. Automatic selection prefers the local
+   gateway and falls back to the first Velbus gateway.
 3. Record `gateway_id` and initial Velbus link state from gateway `state`
    (`Connected` → bus up).
 4. Start the WebSocket task and wait up to 5s for the first successful connect.
@@ -132,8 +186,10 @@ again. Stale modules that disappear from the actor list are removed via
 - the manager is considered available (WebSocket up, or recovered after disconnect), and
 - the gateway reports Velbus bus state `Connected` (`gatewayStatus` WebSocket messages).
 
-Disconnecting the WebSocket marks the manager unavailable; a reconnect triggers
-another snapshot when modules are already loaded.
+Disconnecting the WebSocket marks the manager unavailable. A controller bound
+to a specific gateway rechecks its ID on reconnect and refreshes the inventory
+if discovery was started. If the ID is missing, the controller stays offline
+and retries with the same ID.
 
 ## ManagerClient (REST and WebSocket)
 
@@ -156,9 +212,11 @@ The WebSocket loop reconnects with exponential backoff (1s → 30s cap), 30s
 heartbeat, until `stop_websocket()` / `close()` sets the stop event. Each JSON
 text frame is passed to the backend’s `on_message` callback.
 
-Optional `Authorization: Bearer {token}` is sent on REST; WebSocket auth behaviour
-depends on manager configuration (tests use `FakeManager` with optional
-`require_auth`).
+With an explicit gateway, each WebSocket connection requests `?gatewayId=<id>`,
+including on reconnect. The backend also checks the gateway or thing ID in
+incoming messages so it can use an older Manager with an unfiltered feed.
+When configured, the client sends the bearer token on REST requests and on
+the WebSocket handshake.
 
 ## Installation snapshot (`_apply_snapshot`)
 

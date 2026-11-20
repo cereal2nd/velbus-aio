@@ -42,6 +42,8 @@ class FakeManager:
         self.access_token = access_token
         self.require_auth = require_auth
         self.requests: list[RecordedRequest] = []
+        self.modules_by_gateway: dict[str, list[dict[str, Any]]] = {}
+        self.websocket_gateway_ids: list[str | None] = []
         self._running_actions: dict[str, list[str]] = {}
         self._ws_clients: set[web.WebSocketResponse] = set()
         self._runner: web.AppRunner | None = None
@@ -81,7 +83,7 @@ class FakeManager:
         gateway_ids = {g["id"] for g in self.installation["gateways"]}
         if gateway_id not in gateway_ids:
             raise web.HTTPNotFound()
-        modules = self.installation["modules"]
+        modules = self.modules_by_gateway.get(gateway_id, self.installation["modules"])
         if request.query.get("includeProperties", "").lower() == "true":
             return web.json_response(modules)
         stripped: list[dict[str, Any]] = []
@@ -135,9 +137,11 @@ class FakeManager:
         return web.Response(status=200)
 
     async def _handle_ws(self, request: web.Request) -> web.WebSocketResponse:
+        self._check_auth(request)
         ws = web.WebSocketResponse(heartbeat=30)
         await ws.prepare(request)
         self._ws_clients.add(ws)
+        self.websocket_gateway_ids.append(request.query.get("gatewayId"))
         try:
             async for msg in ws:
                 if msg.type == aiohttp.WSMsgType.ERROR:
@@ -176,11 +180,15 @@ class FakeManager:
         self.port = sock.getsockname()[1]
         return self.host, self.port
 
-    async def stop(self) -> None:
-        """Shut down WebSocket clients and the HTTP server."""
+    async def disconnect_websockets(self) -> None:
+        """Close current connections while leaving the HTTP server running."""
         for ws in list(self._ws_clients):
             await ws.close()
         self._ws_clients.clear()
+
+    async def stop(self) -> None:
+        """Shut down WebSocket clients and the HTTP server."""
+        await self.disconnect_websockets()
         if self._runner is not None:
             await self._runner.cleanup()
             self._runner = None
