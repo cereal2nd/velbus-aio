@@ -7,6 +7,7 @@ from collections.abc import Awaitable, Callable
 import json
 import logging
 from typing import Any, cast
+from urllib.parse import quote
 
 import aiohttp
 from aiohttp import ClientSession, ClientWebSocketResponse, WSMsgType
@@ -40,7 +41,8 @@ class ManagerClient:
         access_token: str | None = None,
     ) -> None:
         """Initialize the client."""
-        self._host = host
+        # The DSN parser returns IPv6 literals without their URL brackets.
+        self._host = f"[{host}]" if ":" in host and not host.startswith("[") else host
         self._port = port
         self._access_token = access_token
         self._owns_session = session is None
@@ -123,7 +125,7 @@ class ManagerClient:
         """Return modules for a gateway, optionally with property values."""
         params = {"includeProperties": "true"} if include_properties else None
         result = await self._request(
-            "GET", f"/gateways/{gateway_id}/actors", params=params
+            "GET", f"/gateways/{quote(gateway_id, safe='')}/actors", params=params
         )
         return cast("list[dict[str, Any]]", result)
 
@@ -137,7 +139,7 @@ class ManagerClient:
         body = {action_name: {"input": inputs or {}}}
         await self._request(
             "POST",
-            f"/things/{thing_id}/actions/{action_name}",
+            f"/things/{quote(thing_id, safe='')}/actions/{action_name}",
             json_body=body,
         )
 
@@ -145,7 +147,7 @@ class ManagerClient:
         """PUT a property value on a thing."""
         await self._request(
             "PUT",
-            f"/things/{thing_id}/properties/{prop_name}",
+            f"/things/{quote(thing_id, safe='')}/properties/{prop_name}",
             json_body={prop_name: value},
         )
 
@@ -160,7 +162,9 @@ class ManagerClient:
 
     async def get_running_actions(self, thing_id: str) -> list[dict[str, Any]]:
         """Return queued or running actions for a thing (empty when idle)."""
-        result = await self._request("GET", f"/things/{thing_id}/actions")
+        result = await self._request(
+            "GET", f"/things/{quote(thing_id, safe='')}/actions"
+        )
         if not result:
             return []
         return cast("list[dict[str, Any]]", result)

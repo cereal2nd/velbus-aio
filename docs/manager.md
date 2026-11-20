@@ -10,12 +10,12 @@ discovery path change.
 
 ## Connecting
 
-| DSN                   | Example                      | Notes                                                  |
-| --------------------- | ---------------------------- | ------------------------------------------------------ |
-| `manager://host:port` | `manager://192.168.1.9:4201` | Manager REST + WebSocket                               |
-| `gateway_id` kwarg    | Gateway ID from discovery    | Optional. Bind the controller to one bus               |
-| `access_token` kwarg  | Bearer token                 | Optional; required when the manager enforces auth      |
-| `session` kwarg       | `aiohttp.ClientSession`      | Optional; share a session with Home Assistant or tests |
+| Connection setting               | Example                              | Notes                                                  |
+| -------------------------------- | ------------------------------------ | ------------------------------------------------------ |
+| `manager://host:port`            | `manager://192.168.1.9:4201`         | Manager REST + WebSocket                               |
+| `manager://host:port/gateway-id` | `manager://192.168.1.9:4201/GWLOCAL` | Bind this controller to the gateway with this ID       |
+| `access_token` kwarg             | Bearer token                         | Optional; required when the manager enforces auth      |
+| `session` kwarg                  | `aiohttp.ClientSession`              | Optional; share a session with Home Assistant or tests |
 
 When `Velbus` is constructed with a `manager://` DSN, `controller.py` sets
 `_backend` to a `ManagerBackend` instead of `RawBusBackend` (direct bus):
@@ -52,19 +52,24 @@ finally:
 choices = {
     gateway["id"]: gateway.get("name") or gateway["id"]
     for gateway in gateways
-    if gateway.get("type") == "velbusgateway" or gateway.get("isLocalGateway")
+    if gateway.get("id")
+    and (gateway.get("type") == "velbusgateway" or gateway.get("isLocalGateway"))
 }
 ```
 
-Create one controller per selected gateway, using the ID from the picker.
-Each controller exposes its own modules, channels and connection state.
+Create one controller per selected gateway. Append the selected ID as one
+percent-encoded path segment to the Manager DSN. Each controller exposes its
+own modules, channels and connection state.
 
 ```python
+from urllib.parse import quote
+
+manager_dsn = "manager://192.168.1.9:4201"
+gateway_dsn = f"{manager_dsn}/{quote(selected_id, safe='')}"
 controller = Velbus(
-    manager_dsn,
+    gateway_dsn,
     session=my_session,
     access_token=token,
-    gateway_id=selected_id,
 )
 try:
     await controller.connect()
@@ -74,8 +79,10 @@ finally:
     await controller.stop()
 ```
 
-An explicit ID that is missing from discovery raises `VelbusConnectionFailed`
-during `connect()`. Omitting `gateway_id` preserves automatic selection.
+With no gateway path, both `manager://host:port` and `manager://host:port/`
+keep automatic selection. The controller prefers the local gateway, then the
+first Velbus gateway. If the ID in the path is missing from discovery,
+`connect()` raises `VelbusConnectionFailed`.
 After connection, `controller.manager_backend.gateway_id` gives the selected ID.
 
 ## Architecture

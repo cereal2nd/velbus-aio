@@ -10,7 +10,7 @@ import itertools
 import logging
 import pathlib
 import typing as t
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from aiohttp import ClientSession
 import anyio
@@ -86,10 +86,8 @@ class Velbus:
         one_address: int | None = None,
         session: ClientSession | None = None,
         access_token: str | None = None,
-        *,
-        gateway_id: str | None = None,
     ) -> None:
-        """Init the Velbus controller, optionally bound to a Manager gateway ID."""
+        """Init the Velbus controller from its connection DSN."""
         self._log = logging.getLogger("velbus")
         self._closing = False
         self._auto_reconnect = True
@@ -117,17 +115,19 @@ class Velbus:
         if parts.scheme == "manager":
             if parts.hostname is None or parts.port is None:
                 raise VelbusConnectionFailed
+            segment = parts.path.removeprefix("/")
+            gateway_id = unquote(segment, errors="strict")
+            if "/" in segment or gateway_id in (".", ".."):
+                raise ValueError("Expected a single gateway ID in the Manager DSN path")
             self._backend: VelbusBusBackend = ManagerBackend(
                 self,
                 parts.hostname,
                 parts.port,
                 session,
                 access_token,
-                gateway_id=gateway_id,
+                gateway_id=gateway_id or None,
             )
         else:
-            if gateway_id is not None:
-                raise ValueError("gateway_id requires a manager:// DSN")
             self._backend = RawBusBackend(self, dsn)
 
     @property

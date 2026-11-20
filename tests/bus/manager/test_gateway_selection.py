@@ -6,6 +6,7 @@ import asyncio
 from collections.abc import AsyncIterator, Callable
 from copy import deepcopy
 from pathlib import Path
+from urllib.parse import quote
 
 import pytest
 import pytest_asyncio
@@ -39,9 +40,8 @@ async def two_buses() -> AsyncIterator[FakeManager]:
 async def remote_bus(two_buses: FakeManager, tmp_path: Path) -> AsyncIterator[Velbus]:
     """Build an independent controller for the non-local gateway."""
     controller = Velbus(
-        f"manager://{two_buses.base_url}",
+        f"manager://{two_buses.base_url}/GWREMOTE",
         cache_dir=str(tmp_path),
-        gateway_id="GWREMOTE",
         access_token=two_buses.access_token,
     )
     try:
@@ -63,7 +63,7 @@ async def test_two_controllers_route_commands(
     """The automatic and explicitly selected buses each control their own relay."""
     dsn = f"manager://{two_buses.base_url}"
     local = Velbus(dsn, cache_dir=str(tmp_path))
-    remote = Velbus(dsn, cache_dir=str(tmp_path), gateway_id="GWREMOTE")
+    remote = Velbus(f"{dsn}/GWREMOTE", cache_dir=str(tmp_path))
     try:
         for controller in (local, remote):
             await controller.connect()
@@ -87,13 +87,16 @@ async def test_two_controllers_route_commands(
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("suffix", ["", "/"])
 async def test_automatic_selection_without_local_gateway(
-    two_buses: FakeManager, tmp_path: Path
+    two_buses: FakeManager, tmp_path: Path, suffix: str
 ) -> None:
     """Existing installations fall back to the first Velbus gateway."""
     for gateway in two_buses.installation["gateways"]:
         gateway["isLocalGateway"] = False
-    controller = Velbus(f"manager://{two_buses.base_url}", cache_dir=str(tmp_path))
+    controller = Velbus(
+        f"manager://{two_buses.base_url}{suffix}", cache_dir=str(tmp_path)
+    )
     try:
         await controller.connect()
         assert controller.manager_backend.gateway_id == "GWREMOTE"
@@ -103,15 +106,13 @@ async def test_automatic_selection_without_local_gateway(
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("gateway_id", ["missing", ""])
 async def test_missing_gateway_never_connects_to_another_bus(
-    two_buses: FakeManager, tmp_path: Path, gateway_id: str
+    two_buses: FakeManager, tmp_path: Path
 ) -> None:
     """An explicit ID must exist before opening a socket or sending an action."""
     controller = Velbus(
-        f"manager://{two_buses.base_url}",
+        f"manager://{two_buses.base_url}/missing",
         cache_dir=str(tmp_path),
-        gateway_id=gateway_id,
     )
     try:
         with pytest.raises(VelbusConnectionFailed):
@@ -119,6 +120,61 @@ async def test_missing_gateway_never_connects_to_another_bus(
         assert controller.manager_backend.gateway_id is None
         assert two_buses.websocket_gateway_ids == []
         assert two_buses.requests == []
+    finally:
+        await controller.stop()
+
+
+@pytest.mark.asyncio
+async def test_gateway_id_is_one_encoded_segment(
+    two_buses: FakeManager, tmp_path: Path
+) -> None:
+    """A gateway ID survives DSN, REST path and WebSocket query encoding."""
+    gateway_id = "floor/A?west#1 +%2F"
+    two_buses.installation["gateways"][0]["id"] = gateway_id
+    two_buses.modules_by_gateway[gateway_id] = two_buses.modules_by_gateway.pop(
+        "GWREMOTE"
+    )
+    dsn = f"manager://{two_buses.base_url}/{quote(gateway_id, safe='')}"
+    controller = Velbus(dsn, cache_dir=str(tmp_path))
+    try:
+        await controller.connect()
+        await controller.start()
+        assert controller.manager_backend.gateway_id == gateway_id
+        assert controller.manager_backend.thing_id_for(5, 1) == "CHREMOTE"
+        assert two_buses.websocket_gateway_ids == [gateway_id]
+        await controller.scan()
+        assert [r.path for r in two_buses.requests] == [
+            f"/velbus/api/v2/things/{gateway_id}/actions/Quickupdate"
+        ]
+    finally:
+        await controller.stop()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("path", ["/GWREMOTE/extra", "//", "/.", "/..", "/%2E%2e"])
+async def test_rejects_invalid_gateway_path(
+    two_buses: FakeManager, tmp_path: Path, path: str
+) -> None:
+    """Ambiguous or relative paths fail before any bus is selected."""
+    with pytest.raises(ValueError):
+        Velbus(f"manager://{two_buses.base_url}{path}", cache_dir=str(tmp_path))
+
+
+@pytest.mark.asyncio
+async def test_select_gateway_with_ipv6_literal(
+    two_buses: FakeManager, tmp_path: Path
+) -> None:
+    """Use an IPv4-mapped IPv6 authority to reach the test server over REST and WS."""
+    controller = Velbus(
+        f"manager://[::ffff:127.0.0.1]:{two_buses.port}/GWREMOTE",
+        cache_dir=str(tmp_path),
+    )
+    try:
+        await controller.connect()
+        await controller.start()
+        assert controller.manager_backend.gateway_id == "GWREMOTE"
+        assert two_buses.websocket_gateway_ids == ["GWREMOTE"]
+        assert controller.manager_backend.thing_id_for(5, 1) == "CHREMOTE"
     finally:
         await controller.stop()
 
